@@ -5,9 +5,7 @@
 #include "GameFramework/GameMode.h"
 #include "SurvivalGameMode.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class SURVIVAL_API ASurvivalGameMode : public AGameMode
 {
