@@ -4,5 +4,36 @@
 #include "SurvivalGameState.h"
 
 
+ASurvivalGameState::ASurvivalGameState()
+{
+	MatchTimeStartOffset = 0.0f;
+}
 
+void ASurvivalGameState::SetMatchProperties(float LengthOfDay)
+{
+	GameMode_LengthOfDay = LengthOfDay;
+}
 
+float ASurvivalGameState::GetMatchTime()
+{
+	return GetServerWorldTimeSeconds() - MatchTimeStartOffset;
+}
+
+float ASurvivalGameState::GetTimeOfDay()
+{
+	return FMath::Fmod(GetMatchTime() * (24.0f / GameMode_LengthOfDay), 24.0f);
+}
+
+float ASurvivalGameState::GetLengthOfDay()
+{
+	return GameMode_LengthOfDay;
+}
+
+void ASurvivalGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASurvivalGameState, MatchTimeStartOffset);
+
+	DOREPLIFETIME(ASurvivalGameState, GameMode_LengthOfDay);
+}

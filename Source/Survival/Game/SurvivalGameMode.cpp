@@ -2,7 +2,21 @@
 
 #include "Survival.h"
 #include "SurvivalGameMode.h"
+#include "SurvivalGameState.h"
 
 
+ASurvivalGameMode::ASurvivalGameMode()
+{
+	LengthOfDay = 60.0f;
+}
 
+void ASurvivalGameMode::InitGameState()
+{
+	Super::InitGameState();
 
+	ASurvivalGameState* SurvivalGameState = GetGameState<ASurvivalGameState>();
+	if (SurvivalGameState)
+	{
+		SurvivalGameState->SetMatchProperties(LengthOfDay);
+	}
+}
