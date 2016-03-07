@@ -15,7 +15,7 @@ public:
 	ASurvivalGameState();
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = "GameState")
-	void SetMatchProperties(float LengthOfDay);
+	void SetMatchProperties(float LengthOfDay, float StartTimeOfDay);
 	
 	// Get the time since match has started in seconds
 	UFUNCTION(BlueprintPure, Category = "GameState")
@@ -35,4 +35,7 @@ private:
 
 	UPROPERTY(Replicated)
 	float GameMode_LengthOfDay;
+
+	UPROPERTY(Replicated)
+	float GameMode_StartTimeOfDay;
 };

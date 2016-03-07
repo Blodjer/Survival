@@ -9,9 +9,10 @@ ASurvivalGameState::ASurvivalGameState()
 	MatchTimeStartOffset = 0.0f;
 }
 
-void ASurvivalGameState::SetMatchProperties(float LengthOfDay)
+void ASurvivalGameState::SetMatchProperties(float LengthOfDay, float StartTimeOfDay)
 {
 	GameMode_LengthOfDay = LengthOfDay;
+	GameMode_StartTimeOfDay = StartTimeOfDay;
 }
 
 float ASurvivalGameState::GetMatchTime()
@@ -21,7 +22,7 @@ float ASurvivalGameState::GetMatchTime()
 
 float ASurvivalGameState::GetTimeOfDay()
 {
-	return FMath::Fmod(GetMatchTime() * (24.0f / GameMode_LengthOfDay), 24.0f);
+	return FMath::Fmod((GetMatchTime() + GameMode_StartTimeOfDay / (24.0f / GameMode_LengthOfDay)) * (24.0f / GameMode_LengthOfDay), 24.0f);
 }
 
 float ASurvivalGameState::GetLengthOfDay()
@@ -36,4 +37,5 @@ void ASurvivalGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &O
 	DOREPLIFETIME(ASurvivalGameState, MatchTimeStartOffset);
 
 	DOREPLIFETIME(ASurvivalGameState, GameMode_LengthOfDay);
+	DOREPLIFETIME(ASurvivalGameState, GameMode_StartTimeOfDay);
 }

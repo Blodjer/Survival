@@ -8,6 +8,7 @@
 ASurvivalGameMode::ASurvivalGameMode()
 {
 	LengthOfDay = 60.0f;
+	StartTimeOfDay = 6.0f;
 }
 
 void ASurvivalGameMode::InitGameState()
@@ -17,6 +18,6 @@ void ASurvivalGameMode::InitGameState()
 	ASurvivalGameState* SurvivalGameState = GetGameState<ASurvivalGameState>();
 	if (SurvivalGameState)
 	{
-		SurvivalGameState->SetMatchProperties(LengthOfDay);
+		SurvivalGameState->SetMatchProperties(LengthOfDay, StartTimeOfDay);
 	}
 }

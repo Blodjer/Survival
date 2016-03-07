@@ -18,7 +18,11 @@ public:
 
 protected:
 	// The length of one day in seconds
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "TimeOfDay")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0.0", UIMin = "0.0"), Category = "TimeOfDay")
 	float LengthOfDay;
+
+	// At what time the match should start (0-24)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0.0", ClampMax = "24.0", UIMin = "0.0", UIMax = "24.0"), Category = "TimeOfDay")
+	float StartTimeOfDay;
 	
 };
