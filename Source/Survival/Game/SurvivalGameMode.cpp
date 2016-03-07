@@ -8,7 +8,7 @@
 ASurvivalGameMode::ASurvivalGameMode()
 {
 	LengthOfDay = 60.0f;
-	StartTimeOfDay = 6.0f;
+	StartTimeOfDay = 8.5f;
 }
 
 void ASurvivalGameMode::InitGameState()
