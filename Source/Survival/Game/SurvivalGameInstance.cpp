@@ -23,7 +23,7 @@ bool USurvivalGameInstance::IsOnlineSubystemReady()
 	return OnlineSub != nullptr ? true : false;
 }
 
-bool USurvivalGameInstance::CreateSession(bool bIsLAN, FString MapName, bool bIsPresence, int32 MaxNumPlayers)
+bool USurvivalGameInstance::CreateSession(bool bIsLAN, bool bIsPresence, FString MapName, int32 MaxNumPlayers)
 {
 	const ULocalPlayer* LocalPlayer = GetFirstGamePlayer();
 	TSharedPtr<const FUniqueNetId> UserId = LocalPlayer->GetPreferredUniqueNetId();
@@ -120,7 +120,7 @@ void USurvivalGameInstance::OnStartSessionComplete(FName SessionName, bool bWasS
 	StartSessionComplete(bWasSuccessful);
 }
 
-bool USurvivalGameInstance::FindSessions(bool bIsLAN, FString MapName, bool bIsPresence)
+bool USurvivalGameInstance::FindSessions(bool bIsLAN, bool bIsPresence, FString MapName)
 {
 	const ULocalPlayer* LocalPlayer = GetFirstGamePlayer();
 	TSharedPtr<const FUniqueNetId> UserId = LocalPlayer->GetPreferredUniqueNetId();
@@ -138,6 +138,7 @@ bool USurvivalGameInstance::FindSessions(bool bIsLAN, FString MapName, bool bIsP
 			SessionSearch->PingBucketSize = 100;
 
 			SessionSearch->QuerySettings.Set(SETTING_MAPNAME, MapName, EOnlineComparisonOp::Equals);
+			SessionSearch->QuerySettings.Set(SEARCH_MINSLOTSAVAILABLE, 1, EOnlineComparisonOp::GreaterThanEquals);
 			if (bIsPresence)
 			{
 				SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, bIsPresence, EOnlineComparisonOp::Equals);
@@ -181,12 +182,12 @@ void USurvivalGameInstance::OnFindSessionsComplete(bool bWasSuccessful)
 			{
 				if (SearchResult.IsValid())
 				{
-					FString MapName = "Unkown";
+					FString MapName = "%&$";
 					SearchResult.Session.SessionSettings.Get(SETTING_MAPNAME, MapName);
-					FString ExpectedMapName = "Unkown";
+					FString ExpectedMapName = "$&%";
 					SessionSearch->QuerySettings.Get(SETTING_MAPNAME, ExpectedMapName);
 
-					if (SearchResult.Session.OwningUserId != UserId && ExpectedMapName == MapName)
+					if (SearchResult.Session.OwningUserId != UserId && MapName == ExpectedMapName && SearchResult.Session.NumOpenPublicConnections >= 1)
 					{
 						FBlueprintSessionResult SearchResultBP = FBlueprintSessionResult();
 						SearchResultBP.OnlineResult = SearchResult;
@@ -261,10 +262,7 @@ bool USurvivalGameInstance::EndSession()
 			// Notify players to start the online session
 			for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 			{
-				for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
-				{
-					Iterator->Get()->ClientEndOnlineSession();
-				}
+				Iterator->Get()->ClientEndOnlineSession();
 			}
 
 			OnEndSessionCompleteDelegateHandle = Sessions->AddOnEndSessionCompleteDelegate_Handle(OnEndSessionCompleteDelegate);

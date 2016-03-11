@@ -42,13 +42,13 @@ public:
 	bool IsOnlineSubystemReady();
 
 	UFUNCTION(BlueprintCallable, Category = SurvivalNetwork)
-	bool CreateSession(bool bIsLAN = false, FString MapName = "", bool bIsPresence = true, int32 MaxNumPlayers = 6);
+	bool CreateSession(bool bIsLAN = false, bool bIsPresence = true, FString MapName = "", int32 MaxNumPlayers = 6);
 
 	UFUNCTION(BlueprintCallable, Category = SurvivalNetwork)
 	bool StartSession();
 
 	UFUNCTION(BlueprintCallable, Category = SurvivalNetwork)
-	bool FindSessions(bool bIsLAN, FString MapName = "", bool bIsPresence = true);
+	bool FindSessions(bool bIsLAN = false, bool bIsPresence = true, FString MapName = "");
 
 	UFUNCTION(BlueprintCallable, Category = SurvivalNetwork)
 	bool EnterSession(const int32 SearchResultsIndex);

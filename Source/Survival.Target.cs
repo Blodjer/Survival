@@ -23,5 +23,7 @@ public class SurvivalTarget : TargetRules
 		)
 	{
 		OutExtraModuleNames.AddRange( new string[] { "Survival" } );
-	}
+
+		UEBuildConfiguration.bCompileSteamOSS = false;
+    }
 }
