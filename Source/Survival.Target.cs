@@ -8,6 +8,8 @@ public class SurvivalTarget : TargetRules
 	public SurvivalTarget(TargetInfo Target)
 	{
 		Type = TargetType.Game;
+
+		bUsesSteam = false;
 	}
 
 	//
