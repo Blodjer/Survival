@@ -25,6 +25,21 @@ ASurvivalPlayerCharacter::ASurvivalPlayerCharacter()
 	// Set 3rd person mesh invisible for owner
 	GetMesh()->SetOwnerNoSee(true);
 
+	//Create SpotLightComponent for the flashlight
+	Flashlight = CreateDefaultSubobject<USpotLightComponent>("Flashlight");
+	Flashlight->AttachTo(Camera);
+	Flashlight->OuterConeAngle = 28.0f;
+	Flashlight->InnerConeAngle = 20.0f;
+	Flashlight->Intensity = 1.5f;
+	Flashlight->bUseInverseSquaredFalloff = false;
+	Flashlight->AttenuationRadius = 2500.0f;
+	Flashlight->bAffectDynamicIndirectLighting = true;
+	Flashlight->bAffectTranslucentLighting = true;
+	Flashlight->bUseRayTracedDistanceFieldShadows = true;
+	Flashlight->SetVisibility(false);
+
+	bIsFlashlightOn = false;
+
 	PrimaryActorTick.bCanEverTick = true;
 }
 
@@ -38,6 +53,10 @@ void ASurvivalPlayerCharacter::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
+	if (!IsLocallyControlled())
+	{
+		Flashlight->SetWorldRotation(GetBaseAimRotation());
+	}
 }
 
 void ASurvivalPlayerCharacter::SetupPlayerInputComponent(class UInputComponent* InputComponent)
@@ -60,6 +79,8 @@ void ASurvivalPlayerCharacter::SetupPlayerInputComponent(class UInputComponent* 
 	// Controller
 	InputComponent->BindAxis("TurnAtRate", this, &ASurvivalPlayerCharacter::TurnAtRate);
 	InputComponent->BindAxis("LookUpAtRate", this, &ASurvivalPlayerCharacter::LookUpAtRate);
+
+	InputComponent->BindAction("Flashlight", IE_Pressed, this, &ASurvivalPlayerCharacter::ToggleFlashlight);
 }
 
 void ASurvivalPlayerCharacter::MoveForward(float Value)
@@ -108,4 +129,44 @@ void ASurvivalPlayerCharacter::LookUpAtRate(float Value)
 	{
 		AddControllerPitchInput(Value * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 	}
+}
+
+void ASurvivalPlayerCharacter::ToggleFlashlight()
+{
+	if (bIsFlashlightOn)
+	{
+		SetFlashlightOn(false);
+	}
+	else
+	{
+		SetFlashlightOn(true);
+	}
+}
+
+void ASurvivalPlayerCharacter::SetFlashlightOn(bool bOn)
+{
+	Flashlight->SetVisibility(bOn);
+	bIsFlashlightOn = bOn;
+
+	if (!HasAuthority())
+	{
+		ServerSetFlashlightOn(bOn);
+	}
+}
+
+void ASurvivalPlayerCharacter::ServerSetFlashlightOn_Implementation(bool bOn)
+{
+	SetFlashlightOn(bOn);
+}
+
+void ASurvivalPlayerCharacter::OnRep_IsFlashlightOn()
+{
+	SetFlashlightOn(bIsFlashlightOn);
+}
+
+void ASurvivalPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(ASurvivalPlayerCharacter, bIsFlashlightOn, COND_SkipOwner);
 }
