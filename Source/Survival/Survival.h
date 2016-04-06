@@ -6,3 +6,6 @@
 
 #include "UnrealNetwork.h"
 #include "Online.h"
+
+#include "Survival/Player/SurvivalPlayerCharacter.h"
+#include "Survival/Equipment/Handheld.h"

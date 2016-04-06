@@ -13,9 +13,13 @@ class SURVIVAL_API ASurvivalPlayerCharacter : public ACharacter
 public:
 	ASurvivalPlayerCharacter();
 
+	virtual void OnConstruction(const FTransform& Transform) override;
+
+	virtual void PostInitializeComponents() override;
+
 	virtual void BeginPlay() override;
-	
-	virtual void Tick( float DeltaSeconds ) override;
+
+	virtual void Tick(float DeltaSeconds) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 	
@@ -39,9 +43,11 @@ private:
 	void LookUpAtRate(float Value);
 	
 	// Toggle the light visibility on/off
+	UFUNCTION(BlueprintCallable, Category = Flashlight)
 	void ToggleFlashlight();
 
 	// Set the light on or off. Replicates to server
+	UFUNCTION(BlueprintCallable, Category = Flashlight)
 	void SetFlashlightOn(bool bOn);
 
 	// Set the light on or off on the server. Replicate to all clients except the owner
@@ -49,6 +55,16 @@ private:
 	void ServerSetFlashlightOn(bool bOn);
 	void ServerSetFlashlightOn_Implementation(bool bOn);
 	bool ServerSetFlashlightOn_Validate(bool bOn) { return true; };
+
+	// Spawn a specific hendheld. Handled by server
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = Equipment)
+	void SpawnHandheld(TSubclassOf<class AHandheld> HandheldClass);
+	void SpawnHandheld_Implementation(TSubclassOf<class AHandheld> HandheldClass);
+	bool SpawnHandheld_Validate(TSubclassOf<class AHandheld> HandheldClass) { return true; };
+
+	// Equip a hendheld actor
+	UFUNCTION(BlueprintCallable, Category = Equipment)
+	void Equip(AHandheld* Handheld);
 
 private:
 	// First person mesh. Seen only by owner.
@@ -67,6 +83,10 @@ private:
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_IsFlashlightOn)
 	bool bIsFlashlightOn;
 
+	// The currently equipped handheld
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_EquippedHandheld)
+	AHandheld* EquippedHandheld;
+
 protected:
 	// Base controller turn rate, in deg/sec
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera)
@@ -76,15 +96,29 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera)
 	float BaseLookUpRate;
 
+	// Socket name for attaching handheld meshes
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Equipment)
+	FName HandheldAttachPoint;
+
+	// Default equipment spawned on player spawn
+	UPROPERTY(EditDefaultsOnly, Category = Loadout)
+	TArray<TSubclassOf<class AHandheld>> StartEquipment;
+
 public:
 	// Return the first person mesh
 	FORCEINLINE USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 
 	// Return the camera component
 	FORCEINLINE UCameraComponent* GetCamera() const { return Camera; }
+
+	// Return the socket name for attaching handheld meshes
+	FORCEINLINE FName GetHandheldAttachPoint() const { return HandheldAttachPoint; }
 	
 private:
 	UFUNCTION()
 	void OnRep_IsFlashlightOn();
+	
+	UFUNCTION()
+	void OnRep_EquippedHandheld();
 
 };

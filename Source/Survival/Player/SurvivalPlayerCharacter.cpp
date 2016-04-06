@@ -10,6 +10,9 @@ ASurvivalPlayerCharacter::ASurvivalPlayerCharacter()
 	BaseTurnRate = 45.0f;
 	BaseLookUpRate = 45.0f;
 
+	// Set base eye height for camera
+	BaseEyeHeight = 80.0f;
+
 	// Create CameraComponent for the first person camera
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
 	Camera->AttachTo(GetCapsuleComponent());
@@ -36,20 +39,39 @@ ASurvivalPlayerCharacter::ASurvivalPlayerCharacter()
 	Flashlight->bAffectDynamicIndirectLighting = true;
 	Flashlight->bAffectTranslucentLighting = true;
 	Flashlight->bUseRayTracedDistanceFieldShadows = true;
-	Flashlight->SetVisibility(false);
 
 	bIsFlashlightOn = false;
+	Flashlight->SetVisibility(bIsFlashlightOn);
 
 	PrimaryActorTick.bCanEverTick = true;
+}
+
+void ASurvivalPlayerCharacter::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	// Set the camera height to eye height
+	Camera->RelativeLocation = FVector(0, 0, BaseEyeHeight);
+}
+
+void ASurvivalPlayerCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	// Spawn the first handheld from the loadout list
+	if (HasAuthority() && StartEquipment.Num() > 0)
+	{
+		SpawnHandheld(StartEquipment[0]);
+	}
 }
 
 void ASurvivalPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
-void ASurvivalPlayerCharacter::Tick( float DeltaTime )
+void ASurvivalPlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick( DeltaTime );
 
@@ -159,9 +181,37 @@ void ASurvivalPlayerCharacter::ServerSetFlashlightOn_Implementation(bool bOn)
 	SetFlashlightOn(bOn);
 }
 
+void ASurvivalPlayerCharacter::SpawnHandheld_Implementation(TSubclassOf<AHandheld> HandheldClass)
+{
+	if (HandheldClass == nullptr)
+		return;
+
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	AHandheld* NewHandheld = GetWorld()->SpawnActor<AHandheld>(HandheldClass, SpawnInfo);
+	NewHandheld->SetOwnerCharacter(this);
+	Equip(NewHandheld); // Prototyping
+}
+
+void ASurvivalPlayerCharacter::Equip(AHandheld* Handheld)
+{
+	if (Handheld == nullptr)
+		return;
+
+	Handheld->Equip();
+
+	EquippedHandheld = Handheld;
+}
+
 void ASurvivalPlayerCharacter::OnRep_IsFlashlightOn()
 {
 	SetFlashlightOn(bIsFlashlightOn);
+}
+
+void ASurvivalPlayerCharacter::OnRep_EquippedHandheld()
+{
+	Equip(EquippedHandheld);
 }
 
 void ASurvivalPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -169,4 +219,5 @@ void ASurvivalPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(ASurvivalPlayerCharacter, bIsFlashlightOn, COND_SkipOwner);
+	DOREPLIFETIME(ASurvivalPlayerCharacter, EquippedHandheld);
 }
