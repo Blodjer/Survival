@@ -4,7 +4,8 @@
 #include "SurvivalPlayerCharacter.h"
 
 
-ASurvivalPlayerCharacter::ASurvivalPlayerCharacter()
+ASurvivalPlayerCharacter::ASurvivalPlayerCharacter(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<USurvivalCharacterMovement>(ACharacter::CharacterMovementComponentName))
 {
 	// Set base input rates for controllers
 	BaseTurnRate = 45.0f;
@@ -43,6 +44,10 @@ ASurvivalPlayerCharacter::ASurvivalPlayerCharacter()
 	bIsFlashlightOn = false;
 	Flashlight->SetVisibility(bIsFlashlightOn);
 
+	SurvivalCharacterMovement = Cast<USurvivalCharacterMovement>(Super::GetCharacterMovement());
+
+	bIsSprinting = false;
+	
 	PrimaryActorTick.bCanEverTick = true;
 }
 
@@ -90,9 +95,12 @@ void ASurvivalPlayerCharacter::SetupPlayerInputComponent(class UInputComponent* 
 	
 	InputComponent->BindAction("Jump", IE_Pressed, this, &ASurvivalPlayerCharacter::Jump);
 	InputComponent->BindAction("Jump", IE_Released, this, &ASurvivalPlayerCharacter::StopJumping);
-
+	
 	InputComponent->BindAxis("MoveForward", this, &ASurvivalPlayerCharacter::MoveForward);
 	InputComponent->BindAxis("MoveRight", this, &ASurvivalPlayerCharacter::MoveRight);
+
+	InputComponent->BindAction("Sprint", IE_Pressed, this, &ASurvivalPlayerCharacter::StartSprint);
+	InputComponent->BindAction("Sprint", IE_Released, this, &ASurvivalPlayerCharacter::StopSprint);
 
 	// Mouse
 	InputComponent->BindAxis("Turn", this, &ASurvivalPlayerCharacter::Turn);
@@ -145,6 +153,42 @@ void ASurvivalPlayerCharacter::TurnAtRate(float Value)
 	}
 }
 
+void ASurvivalPlayerCharacter::StartSprint()
+{
+	SetSprint(true);
+}
+
+void ASurvivalPlayerCharacter::StopSprint()
+{
+	SetSprint(false);
+}
+
+void ASurvivalPlayerCharacter::SetSprint(bool bShouldSprint)
+{
+	if (SurvivalCharacterMovement)
+	{
+		SurvivalCharacterMovement->bWantsToSprint = bShouldSprint;
+		bIsSprinting = bShouldSprint;
+	}
+
+	if (!HasAuthority())
+	{
+		ServerSetSprint(bShouldSprint);
+	}
+}
+
+void ASurvivalPlayerCharacter::ServerSetSprint_Implementation(bool bShouldSprint)
+{
+	if(bShouldSprint)
+	{
+		StartSprint();
+	}
+	else
+	{
+		StopSprint();
+	}
+}
+
 void ASurvivalPlayerCharacter::LookUpAtRate(float Value)
 {
 	if (Value != 0.0f)
@@ -191,7 +235,7 @@ void ASurvivalPlayerCharacter::SpawnHandheld_Implementation(TSubclassOf<AHandhel
 
 	AHandheld* NewHandheld = GetWorld()->SpawnActor<AHandheld>(HandheldClass, SpawnInfo);
 	NewHandheld->SetOwnerCharacter(this);
-	Equip(NewHandheld); // Prototyping
+	Equip(NewHandheld); // TODO: Replace
 }
 
 void ASurvivalPlayerCharacter::Equip(AHandheld* Handheld)
@@ -202,6 +246,18 @@ void ASurvivalPlayerCharacter::Equip(AHandheld* Handheld)
 	Handheld->Equip();
 
 	EquippedHandheld = Handheld;
+}
+
+void ASurvivalPlayerCharacter::OnRep_IsSprinting()
+{
+	if (bIsSprinting)
+	{
+		StartSprint();
+	}
+	else
+	{
+		StopSprint();
+	}
 }
 
 void ASurvivalPlayerCharacter::OnRep_IsFlashlightOn()
@@ -218,6 +274,7 @@ void ASurvivalPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME_CONDITION(ASurvivalPlayerCharacter, bIsSprinting, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(ASurvivalPlayerCharacter, bIsFlashlightOn, COND_SkipOwner);
 	DOREPLIFETIME(ASurvivalPlayerCharacter, EquippedHandheld);
 }

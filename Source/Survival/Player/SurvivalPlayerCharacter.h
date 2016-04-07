@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/Character.h"
+#include "SurvivalCharacterMovement.h"
 #include "SurvivalPlayerCharacter.generated.h"
 
 UCLASS()
@@ -11,7 +12,7 @@ class SURVIVAL_API ASurvivalPlayerCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-	ASurvivalPlayerCharacter();
+	ASurvivalPlayerCharacter(const FObjectInitializer& ObjectInitializer);
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
@@ -41,7 +42,23 @@ private:
 
 	// Rotates the camera up at BaseLookUpRate
 	void LookUpAtRate(float Value);
+
+	// Start sprinting
+	UFUNCTION(BlueprintCallable, Category = Sprint)
+	void StartSprint();
+
+	// Stop sprinting
+	UFUNCTION(BlueprintCallable, Category = Sprint)
+	void StopSprint();
 	
+	// Start or Stop sprinting
+	void SetSprint(bool bShouldSprint);
+
+	UFUNCTION(Server, Reliable, WithValidation, Category = Sprint)
+	void ServerSetSprint(bool bShouldSprint);
+	void ServerSetSprint_Implementation(bool bShouldSprint);
+	bool ServerSetSprint_Validate(bool bShouldSprint) { return true; };
+
 	// Toggle the light visibility on/off
 	UFUNCTION(BlueprintCallable, Category = Flashlight)
 	void ToggleFlashlight();
@@ -78,6 +95,10 @@ private:
 	// Spotlight used as flashlight. Attached to view.
 	UPROPERTY(VisibleAnywhere, Category = Flashlight)
 	class USpotLightComponent* Flashlight;
+
+	// SurvivalCharacterMovementComponent (extends CharacterMovementComponent)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character, meta = (AllowPrivateAccess = "true"))
+	class USurvivalCharacterMovement* SurvivalCharacterMovement;
 	
 	// Is the flashlight turned on or off
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_IsFlashlightOn)
@@ -96,6 +117,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera)
 	float BaseLookUpRate;
 
+	// Set by character movement to specify that this Character is currently sprinting
+	UPROPERTY(Transient, BlueprintReadOnly, ReplicatedUsing = OnRep_IsSprinting, Category = Character)
+	bool bIsSprinting;
+
 	// Socket name for attaching handheld meshes
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Equipment)
 	FName HandheldAttachPoint;
@@ -111,10 +136,15 @@ public:
 	// Return the camera component
 	FORCEINLINE UCameraComponent* GetCamera() const { return Camera; }
 
+	FORCEINLINE USurvivalCharacterMovement* GetCharacterMovement() const { return SurvivalCharacterMovement; }
+
 	// Return the socket name for attaching handheld meshes
 	FORCEINLINE FName GetHandheldAttachPoint() const { return HandheldAttachPoint; }
 	
 private:
+	UFUNCTION()
+	void OnRep_IsSprinting();
+
 	UFUNCTION()
 	void OnRep_IsFlashlightOn();
 	
