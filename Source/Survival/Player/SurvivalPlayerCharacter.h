@@ -54,6 +54,17 @@ private:
 	// Start or Stop sprinting
 	void SetSprint(bool bShouldSprint);
 
+	// Toggle crouching
+	UFUNCTION(BlueprintCallable, Category = Crouch)
+	void ToggleCrouch();
+
+	// Starts crouchin (forwarding to character movement component)
+	void StartCrouch();
+
+	// Stops crouchin (forwarding to character movement component)
+	void StopCrouch();
+
+	// Starts or stops sprinting on server. Replicates to all clients except owner
 	UFUNCTION(Server, Reliable, WithValidation, Category = Sprint)
 	void ServerSetSprint(bool bShouldSprint);
 	void ServerSetSprint_Implementation(bool bShouldSprint);

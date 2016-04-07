@@ -102,6 +102,11 @@ void ASurvivalPlayerCharacter::SetupPlayerInputComponent(class UInputComponent* 
 	InputComponent->BindAction("Sprint", IE_Pressed, this, &ASurvivalPlayerCharacter::StartSprint);
 	InputComponent->BindAction("Sprint", IE_Released, this, &ASurvivalPlayerCharacter::StopSprint);
 
+	InputComponent->BindAction("Crouch", IE_Pressed, this, &ASurvivalPlayerCharacter::StartCrouch);
+	InputComponent->BindAction("Crouch", IE_Released, this, &ASurvivalPlayerCharacter::StopCrouch);
+
+	InputComponent->BindAction("CrouchToggle", IE_Pressed, this, &ASurvivalPlayerCharacter::ToggleCrouch);
+
 	// Mouse
 	InputComponent->BindAxis("Turn", this, &ASurvivalPlayerCharacter::Turn);
 	InputComponent->BindAxis("LookUp", this, &ASurvivalPlayerCharacter::LookUp);
@@ -175,6 +180,28 @@ void ASurvivalPlayerCharacter::SetSprint(bool bShouldSprint)
 	{
 		ServerSetSprint(bShouldSprint);
 	}
+}
+
+void ASurvivalPlayerCharacter::ToggleCrouch()
+{
+	if (bIsCrouched)
+	{
+		StopCrouch();
+	}
+	else
+	{
+		StartCrouch();
+	}
+}
+
+void ASurvivalPlayerCharacter::StartCrouch()
+{
+	Crouch();
+}
+
+void ASurvivalPlayerCharacter::StopCrouch()
+{
+	UnCrouch();
 }
 
 void ASurvivalPlayerCharacter::ServerSetSprint_Implementation(bool bShouldSprint)
