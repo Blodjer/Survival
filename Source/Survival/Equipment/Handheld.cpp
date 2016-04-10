@@ -25,11 +25,39 @@ AHandheld::AHandheld()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
+void AHandheld::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	// Try to get the input from the owner character. Setup input actions when ready
+	if (OwnerInputComponent == nullptr)
+	{
+		if (OwnerCharacter->InputComponent != nullptr)
+		{
+			OwnerInputComponent = OwnerCharacter->InputComponent;
+
+			if (bIsEquipped)
+			{
+				SetupInputActions();
+			}
+		}
+	}
+}
+
+void AHandheld::Destroyed()
+{
+	ClearActionBindings();
+
+	Super::Destroyed();
+}
+
 void AHandheld::SetOwnerCharacter(ASurvivalPlayerCharacter* Character)
 {
 	OwnerCharacter = Character;
-	Instigator = Character;
+	OwnerInputComponent = Character->InputComponent;
 
+	Instigator = Character;
+	
 	SetOwner(Character);
 }
 
@@ -43,16 +71,18 @@ void AHandheld::Equip()
 	Mesh1P->AttachTo(OwnerCharacter->GetMesh1P(), AttachPoint);
 	Mesh3P->AttachTo(OwnerCharacter->GetMesh(), AttachPoint);
 
-	// Play Sound
-
-	// Play Animation
+	// TODO: Animation
+	
+	SetupInputActions();
 
 	bIsEquipped = true;
 }
 
 void AHandheld::UnEquip()
 {
-	// Detach
+	ClearActionBindings();
+
+	// TODO: Detach
 
 	bIsEquipped = false;
 }
@@ -60,6 +90,27 @@ void AHandheld::UnEquip()
 bool AHandheld::IsEquipped() const
 {
 	return bIsEquipped;
+}
+
+void AHandheld::ClearActionBindings()
+{
+	if (InputActionBindings.Num() == 0 || OwnerInputComponent == nullptr)
+		return;
+
+	// Iterate through each input action binded from this handheld and remove it from the owner input component
+	for (FInputActionBinding InputActionBinding : InputActionBindings)
+	{
+		for (int32 i = 0; i < OwnerInputComponent->GetNumActionBindings(); i++)
+		{
+			if (OwnerInputComponent->GetActionBinding(i).ActionName == InputActionBinding.ActionName)
+			{
+				OwnerInputComponent->RemoveActionBinding(i);
+				break;
+			}
+		}
+	}
+
+	InputActionBindings.Empty();
 }
 
 void AHandheld::OnRep_OwnerCharacter()

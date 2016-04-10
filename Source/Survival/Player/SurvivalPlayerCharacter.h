@@ -54,6 +54,12 @@ private:
 	// Start or Stop sprinting
 	void SetSprint(bool bShouldSprint);
 
+	// Starts or stops sprinting on server. Replicates to all clients except owner
+	UFUNCTION(Server, Reliable, WithValidation, Category = Sprint)
+	void ServerSetSprint(bool bShouldSprint);
+	void ServerSetSprint_Implementation(bool bShouldSprint);
+	bool ServerSetSprint_Validate(bool bShouldSprint) { return true; };
+
 	// Toggle crouching
 	UFUNCTION(BlueprintCallable, Category = Crouch)
 	void ToggleCrouch();
@@ -63,12 +69,6 @@ private:
 
 	// Stops crouchin (forwarding to character movement component)
 	void StopCrouch();
-
-	// Starts or stops sprinting on server. Replicates to all clients except owner
-	UFUNCTION(Server, Reliable, WithValidation, Category = Sprint)
-	void ServerSetSprint(bool bShouldSprint);
-	void ServerSetSprint_Implementation(bool bShouldSprint);
-	bool ServerSetSprint_Validate(bool bShouldSprint) { return true; };
 
 	// Toggle the light visibility on/off
 	UFUNCTION(BlueprintCallable, Category = Flashlight)
@@ -84,7 +84,7 @@ private:
 	void ServerSetFlashlightOn_Implementation(bool bOn);
 	bool ServerSetFlashlightOn_Validate(bool bOn) { return true; };
 
-	// Spawn a specific hendheld. Handled by server
+	// Spawn a specific hendheld. Handled by server. TODO: Replace with Spawn Loadout/Equipment
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = Equipment)
 	void SpawnHandheld(TSubclassOf<class AHandheld> HandheldClass);
 	void SpawnHandheld_Implementation(TSubclassOf<class AHandheld> HandheldClass);
@@ -93,6 +93,15 @@ private:
 	// Equip a hendheld actor
 	UFUNCTION(BlueprintCallable, Category = Equipment)
 	void Equip(AHandheld* Handheld);
+
+private:
+	UFUNCTION(Server, Reliable, WithValidation, Category = Handheld)
+	void ServerEquip(AHandheld* Handheld);
+	void ServerEquip_Implementation(AHandheld* Handheld);
+	bool ServerEquip_Validate(AHandheld* Handheld) { return true; };
+
+	UFUNCTION()
+	void SimulateEquip(AHandheld* Handheld);
 
 private:
 	// First person mesh. Seen only by owner.
@@ -117,7 +126,7 @@ private:
 
 	// The currently equipped handheld
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_EquippedHandheld)
-	AHandheld* EquippedHandheld;
+	class AHandheld* EquippedHandheld;
 
 protected:
 	// Base controller turn rate, in deg/sec

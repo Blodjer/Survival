@@ -158,6 +158,14 @@ void ASurvivalPlayerCharacter::TurnAtRate(float Value)
 	}
 }
 
+void ASurvivalPlayerCharacter::LookUpAtRate(float Value)
+{
+	if (Value != 0.0f)
+	{
+		AddControllerPitchInput(Value * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+	}
+}
+
 void ASurvivalPlayerCharacter::StartSprint()
 {
 	SetSprint(true);
@@ -182,6 +190,18 @@ void ASurvivalPlayerCharacter::SetSprint(bool bShouldSprint)
 	}
 }
 
+void ASurvivalPlayerCharacter::ServerSetSprint_Implementation(bool bShouldSprint)
+{
+	if (bShouldSprint)
+	{
+		StartSprint();
+	}
+	else
+	{
+		StopSprint();
+	}
+}
+
 void ASurvivalPlayerCharacter::ToggleCrouch()
 {
 	if (bIsCrouched)
@@ -202,26 +222,6 @@ void ASurvivalPlayerCharacter::StartCrouch()
 void ASurvivalPlayerCharacter::StopCrouch()
 {
 	UnCrouch();
-}
-
-void ASurvivalPlayerCharacter::ServerSetSprint_Implementation(bool bShouldSprint)
-{
-	if(bShouldSprint)
-	{
-		StartSprint();
-	}
-	else
-	{
-		StopSprint();
-	}
-}
-
-void ASurvivalPlayerCharacter::LookUpAtRate(float Value)
-{
-	if (Value != 0.0f)
-	{
-		AddControllerPitchInput(Value * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
-	}
 }
 
 void ASurvivalPlayerCharacter::ToggleFlashlight()
@@ -262,15 +262,39 @@ void ASurvivalPlayerCharacter::SpawnHandheld_Implementation(TSubclassOf<AHandhel
 
 	AHandheld* NewHandheld = GetWorld()->SpawnActor<AHandheld>(HandheldClass, SpawnInfo);
 	NewHandheld->SetOwnerCharacter(this);
-	Equip(NewHandheld); // TODO: Replace
+
+	Equip(NewHandheld);
 }
 
 void ASurvivalPlayerCharacter::Equip(AHandheld* Handheld)
 {
-	if (Handheld == nullptr)
-		return;
+	if (HasAuthority())
+	{
+		SimulateEquip(Handheld);
+	}
+	else
+	{
+		ServerEquip(Handheld);
+	}
+}
 
-	Handheld->Equip();
+void ASurvivalPlayerCharacter::ServerEquip_Implementation(AHandheld* Handheld)
+{
+	Equip(Handheld);
+}
+
+void ASurvivalPlayerCharacter::SimulateEquip(AHandheld* Handheld)
+{
+	if (EquippedHandheld != nullptr)
+	{
+		EquippedHandheld->UnEquip();
+	}
+
+	if (Handheld != nullptr)
+	{
+		Handheld->SetOwnerCharacter(this);
+		Handheld->Equip();
+	}
 
 	EquippedHandheld = Handheld;
 }
@@ -294,7 +318,7 @@ void ASurvivalPlayerCharacter::OnRep_IsFlashlightOn()
 
 void ASurvivalPlayerCharacter::OnRep_EquippedHandheld()
 {
-	Equip(EquippedHandheld);
+	SimulateEquip(EquippedHandheld);
 }
 
 void ASurvivalPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
