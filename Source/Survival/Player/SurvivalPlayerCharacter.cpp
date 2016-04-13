@@ -2,6 +2,7 @@
 
 #include "Survival.h"
 #include "SurvivalPlayerCharacter.h"
+#include "Survival/Game/SurvivalGameMode.h"
 
 
 ASurvivalPlayerCharacter::ASurvivalPlayerCharacter(const FObjectInitializer& ObjectInitializer)
@@ -135,10 +136,24 @@ float ASurvivalPlayerCharacter::TakeDamage(float Damage, FDamageEvent const& Dam
 
 	if (Health <= 0.0f)
 	{
-		// TODO: Die()
+		Die(EventInstigator, DamageEvent);
 	}
 
 	return TakenDamage;
+}
+
+void ASurvivalPlayerCharacter::Die(AController* Killer, FDamageEvent const& DamageEvent)
+{
+	Health = 0.0f;
+
+	if (GetWorld() && GetWorld()->GetAuthGameMode())
+	{
+		ASurvivalGameMode* SurvialGameMode = Cast<ASurvivalGameMode>(GetWorld()->GetAuthGameMode());
+		const UDamageType* DamageType = DamageEvent.DamageTypeClass ? DamageEvent.DamageTypeClass->GetDefaultObject<UDamageType>() : GetDefault<UDamageType>();
+		SurvialGameMode->Killed(Killer, this->GetController(), DamageType);
+	}
+
+	UnPossessed();
 }
 
 float ASurvivalPlayerCharacter::GetMaxHealth() const
@@ -285,10 +300,12 @@ void ASurvivalPlayerCharacter::SpawnHandheld_Implementation(TSubclassOf<AHandhel
 	if (HandheldClass == nullptr)
 		return;
 
-	FActorSpawnParameters SpawnInfo;
-	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParameters.Instigator = GetInstigator();
+	SpawnParameters.Owner = this;
 
-	AHandheld* NewHandheld = GetWorld()->SpawnActor<AHandheld>(HandheldClass, SpawnInfo);
+	AHandheld* NewHandheld = GetWorld()->SpawnActor<AHandheld>(HandheldClass, SpawnParameters);
 	NewHandheld->SetOwnerCharacter(this);
 
 	Equip(NewHandheld);

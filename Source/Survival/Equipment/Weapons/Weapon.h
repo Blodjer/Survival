@@ -69,6 +69,7 @@ protected:
 	float RateOfFire;
 
 private:
+	// The current weapon state
 	EWeaponState CurrentState;
 
 	// Time loop between shots. Different uses by owner and others

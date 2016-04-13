@@ -55,10 +55,6 @@ void AHandheld::SetOwnerCharacter(ASurvivalPlayerCharacter* Character)
 {
 	OwnerCharacter = Character;
 	OwnerInputComponent = Character->InputComponent;
-
-	Instigator = Character;
-	
-	SetOwner(Character);
 }
 
 void AHandheld::Equip()

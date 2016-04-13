@@ -52,7 +52,6 @@ void AWeaponProjectile::PostInitializeComponents()
 	CollisionComponent->MoveIgnoreActors.Add(GetOwner());
 
 	ProjectileMovement->OnProjectileStop.AddDynamic(this, &AWeaponProjectile::OnImpact);
-
 }
 
 void AWeaponProjectile::InitProjectile(FVector& Direction)

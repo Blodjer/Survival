@@ -21,3 +21,14 @@ void ASurvivalGameMode::InitGameState()
 		SurvivalGameState->SetMatchProperties(LengthOfDay, StartTimeOfDay);
 	}
 }
+
+void ASurvivalGameMode::Killed(AController* Killer, AController* KilledPlayer, const UDamageType* DamageType)
+{
+	if (Killer->PlayerState != nullptr && KilledPlayer->PlayerState != nullptr)
+	{
+		FString KillerName = Killer->PlayerState->GetHumanReadableName();
+		FString KilledPlayerName = KilledPlayer->PlayerState->GetHumanReadableName();
+
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString(KillerName + " killed " + KilledPlayerName));
+	}
+}

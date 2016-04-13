@@ -27,6 +27,10 @@ public:
 public:
 	virtual float TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Character)
+	void Die(AController* Killer, FDamageEvent const& DamageEvent);
+
+	// The health value the player starts with
 	UFUNCTION(BlueprintPure, Category = Character)
 	float GetMaxHealth() const;
 
@@ -143,6 +147,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera)
 	float BaseLookUpRate;
 
+	// Current health
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = Character, meta = (ClampMin = "0.0", UIMin = "0.0"))
 	float Health;
 
@@ -165,6 +170,7 @@ public:
 	// Return the camera component
 	FORCEINLINE UCameraComponent* GetCamera() const { return Camera; }
 
+	// Return the custom character movement
 	FORCEINLINE USurvivalCharacterMovement* GetCharacterMovement() const { return SurvivalCharacterMovement; }
 
 	// Return the socket name for attaching handheld meshes

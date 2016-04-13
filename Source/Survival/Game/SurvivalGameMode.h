@@ -16,6 +16,9 @@ public:
 
 	virtual void InitGameState() override;
 
+public:
+	void Killed(AController* Killer, AController* KilledPlayer, const UDamageType* DamageType);
+
 protected:
 	// The length of one day in seconds
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0.0", UIMin = "0.0"), Category = "TimeOfDay")
