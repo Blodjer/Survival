@@ -112,6 +112,9 @@ void AWeapon::StopSimulateFire()
 
 void AWeapon::SimulateFire()
 {
+	if (ProjectileClass == nullptr)
+		return;
+
 	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, GetOwnerCharacter()->IsLocallyControlled() ? FColor::Green : FColor::Orange, "Pew");
 
 	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetOwnerCharacter()->GetBaseAimRotation().Vector() * 100000.0f, FColor::White, false, 0.15f);

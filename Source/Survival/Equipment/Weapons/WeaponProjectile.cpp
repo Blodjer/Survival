@@ -22,6 +22,11 @@ AWeaponProjectile::AWeaponProjectile()
 	Speed = 900.0f;
 	LifeSpan = 4.0f;
 
+	// Update dependent variables
+	ProjectileMovement->InitialSpeed = Speed * 100.0f;
+	ProjectileMovement->MaxSpeed = Speed * 100.0f;
+	InitialLifeSpan = LifeSpan;
+
 	bReplicates = true;
 	bReplicateMovement = true;
 
@@ -35,7 +40,6 @@ void AWeaponProjectile::PostEditChangeProperty(FPropertyChangedEvent& PropertyCh
 	// Update dependent variables
 	ProjectileMovement->InitialSpeed = Speed * 100.0f;
 	ProjectileMovement->MaxSpeed = Speed * 100.0f;
-
 	InitialLifeSpan = LifeSpan;
 }
 
@@ -46,10 +50,26 @@ void AWeaponProjectile::PostInitializeComponents()
 	// Ignore owner character and weapon collision
 	CollisionComponent->MoveIgnoreActors.Add(GetInstigator());
 	CollisionComponent->MoveIgnoreActors.Add(GetOwner());
+
+	ProjectileMovement->OnProjectileStop.AddDynamic(this, &AWeaponProjectile::OnImpact);
+
 }
 
 void AWeaponProjectile::InitProjectile(FVector& Direction)
 {
 	// Set the initial velocity
 	ProjectileMovement->Velocity = Direction * ProjectileMovement->InitialSpeed;
+}
+
+void AWeaponProjectile::OnImpact(const FHitResult& HitResult)
+{
+	if (HitResult.GetActor() != nullptr)
+	{
+			FPointDamageEvent PointDamage = FPointDamageEvent();
+			PointDamage.Damage = 25.0f;
+			PointDamage.HitInfo = HitResult;
+			PointDamage.ShotDirection = HitResult.ImpactNormal;
+
+			HitResult.GetActor()->TakeDamage(25.0f, PointDamage, GetInstigatorController(), this);
+	}
 }

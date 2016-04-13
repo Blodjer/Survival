@@ -20,6 +20,11 @@ public:
 	// Initialize the projectile
 	virtual void InitProjectile(FVector& Direction);
 
+private:
+	// Handle hit
+	UFUNCTION()
+	void OnImpact(const FHitResult& HitResult);
+
 protected:
 	// Projectile speed in m/s
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Projectile)
