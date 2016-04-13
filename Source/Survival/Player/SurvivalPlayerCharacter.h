@@ -23,7 +23,13 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
-	
+
+public:
+	virtual float TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	UFUNCTION(BlueprintPure, Category = Character)
+	float GetMaxHealth() const;
+
 private:
 	// Moves the character alongs his x-axis
 	void MoveForward(float Value);
@@ -119,7 +125,7 @@ private:
 	// SurvivalCharacterMovementComponent (extends CharacterMovementComponent)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character, meta = (AllowPrivateAccess = "true"))
 	class USurvivalCharacterMovement* SurvivalCharacterMovement;
-	
+
 	// Is the flashlight turned on or off
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_IsFlashlightOn)
 	bool bIsFlashlightOn;
@@ -136,6 +142,9 @@ protected:
 	// Base controller look up/down rate, in deg/sec
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera)
 	float BaseLookUpRate;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = Character, meta = (ClampMin = "0.0", UIMin = "0.0"))
+	float Health;
 
 	// Set by character movement to specify that this Character is currently sprinting
 	UPROPERTY(Transient, BlueprintReadOnly, ReplicatedUsing = OnRep_IsSprinting, Category = Character)

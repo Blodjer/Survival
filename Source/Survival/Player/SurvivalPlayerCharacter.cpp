@@ -46,6 +46,8 @@ ASurvivalPlayerCharacter::ASurvivalPlayerCharacter(const FObjectInitializer& Obj
 
 	SurvivalCharacterMovement = Cast<USurvivalCharacterMovement>(Super::GetCharacterMovement());
 
+	Health = 100.0f;
+
 	bIsSprinting = false;
 	
 	PrimaryActorTick.bCanEverTick = true;
@@ -116,6 +118,32 @@ void ASurvivalPlayerCharacter::SetupPlayerInputComponent(class UInputComponent* 
 	InputComponent->BindAxis("LookUpAtRate", this, &ASurvivalPlayerCharacter::LookUpAtRate);
 
 	InputComponent->BindAction("Flashlight", IE_Pressed, this, &ASurvivalPlayerCharacter::ToggleFlashlight);
+}
+
+float ASurvivalPlayerCharacter::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	if (Health <= 0.0f)
+	{
+		return 0.0f;
+	}
+
+	Damage = FMath::Max(0.0f, Damage);
+
+	const float TakenDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+
+	Health = FMath::Max(0.0f, Health - TakenDamage);
+
+	if (Health <= 0.0f)
+	{
+		// TODO: Die()
+	}
+
+	return TakenDamage;
+}
+
+float ASurvivalPlayerCharacter::GetMaxHealth() const
+{
+	return GetClass()->GetDefaultObject<ASurvivalPlayerCharacter>()->Health;
 }
 
 void ASurvivalPlayerCharacter::MoveForward(float Value)
@@ -328,4 +356,5 @@ void ASurvivalPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 	DOREPLIFETIME_CONDITION(ASurvivalPlayerCharacter, bIsSprinting, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(ASurvivalPlayerCharacter, bIsFlashlightOn, COND_SkipOwner);
 	DOREPLIFETIME(ASurvivalPlayerCharacter, EquippedHandheld);
+	DOREPLIFETIME(ASurvivalPlayerCharacter, Health);
 }
