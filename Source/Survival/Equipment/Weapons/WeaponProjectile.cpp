@@ -33,6 +33,7 @@ AWeaponProjectile::AWeaponProjectile()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
+#if WITH_EDITOR
 void AWeaponProjectile::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -42,6 +43,7 @@ void AWeaponProjectile::PostEditChangeProperty(FPropertyChangedEvent& PropertyCh
 	ProjectileMovement->MaxSpeed = Speed * 100.0f;
 	InitialLifeSpan = LifeSpan;
 }
+#endif
 
 void AWeaponProjectile::PostInitializeComponents()
 {

@@ -13,8 +13,10 @@ class SURVIVAL_API AWeaponProjectile : public AActor
 public:
 	AWeaponProjectile();
 
+#if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-	
+#endif
+
 	virtual void PostInitializeComponents() override;
 
 	// Initialize the projectile
