@@ -121,6 +121,13 @@ void ASurvivalPlayerCharacter::SetupPlayerInputComponent(class UInputComponent* 
 	InputComponent->BindAction("Flashlight", IE_Pressed, this, &ASurvivalPlayerCharacter::ToggleFlashlight);
 }
 
+void ASurvivalPlayerCharacter::FellOutOfWorld(const UDamageType& dmgType)
+{
+	Super::FellOutOfWorld(dmgType);
+
+	Die(FDamageEvent(dmgType.GetClass()), nullptr);
+}
+
 float ASurvivalPlayerCharacter::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	if (Health <= 0.0f)
@@ -136,13 +143,13 @@ float ASurvivalPlayerCharacter::TakeDamage(float Damage, FDamageEvent const& Dam
 
 	if (Health <= 0.0f)
 	{
-		Die(EventInstigator, DamageEvent);
+		Die(DamageEvent, EventInstigator);
 	}
 
 	return TakenDamage;
 }
 
-void ASurvivalPlayerCharacter::Die(AController* Killer, FDamageEvent const& DamageEvent)
+void ASurvivalPlayerCharacter::Die(const FDamageEvent& DamageEvent, AController* Killer)
 {
 	Health = 0.0f;
 
@@ -150,7 +157,7 @@ void ASurvivalPlayerCharacter::Die(AController* Killer, FDamageEvent const& Dama
 	{
 		ASurvivalGameMode* SurvialGameMode = Cast<ASurvivalGameMode>(GetWorld()->GetAuthGameMode());
 		const UDamageType* DamageType = DamageEvent.DamageTypeClass ? DamageEvent.DamageTypeClass->GetDefaultObject<UDamageType>() : GetDefault<UDamageType>();
-		SurvialGameMode->Killed(Killer, this->GetController(), DamageType);
+		SurvialGameMode->Killed(DamageType, Killer, this->GetController());
 	}
 
 	UnPossessed();

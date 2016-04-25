@@ -17,7 +17,7 @@ public:
 	virtual void InitGameState() override;
 
 public:
-	void Killed(AController* Killer, AController* KilledPlayer, const UDamageType* DamageType);
+	void Killed(const UDamageType* DamageType, AController* Killer, AController* KilledPlayer);
 
 protected:
 	// The length of one day in seconds

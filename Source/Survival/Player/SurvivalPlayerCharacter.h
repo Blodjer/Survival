@@ -25,10 +25,12 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
 public:
+	virtual void FellOutOfWorld(const class UDamageType& dmgType) override;
+
 	virtual float TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Character)
-	void Die(AController* Killer, FDamageEvent const& DamageEvent);
+	void Die(const FDamageEvent& DamageEvent, AController* Killer);
 
 	// The health value the player starts with
 	UFUNCTION(BlueprintPure, Category = Character)
