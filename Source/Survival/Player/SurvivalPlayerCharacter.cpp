@@ -160,7 +160,9 @@ void ASurvivalPlayerCharacter::Die(const FDamageEvent& DamageEvent, AController*
 		SurvialGameMode->Killed(DamageType, Killer, this->GetController());
 	}
 
-	UnPossessed();
+	DetachFromControllerPendingDestroy();
+
+	SetLifeSpan(1.0f);
 }
 
 float ASurvivalPlayerCharacter::GetMaxHealth() const

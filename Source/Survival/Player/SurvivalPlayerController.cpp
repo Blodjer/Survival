@@ -7,3 +7,8 @@ ASurvivalPlayerController::ASurvivalPlayerController()
 {
 
 }
+
+void ASurvivalPlayerController::UnFreeze()
+{
+	ServerRestartPlayer();
+}

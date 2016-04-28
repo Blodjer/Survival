@@ -13,4 +13,6 @@ class SURVIVAL_API ASurvivalPlayerController : public APlayerController
 public:
 	ASurvivalPlayerController();
 
+	virtual void UnFreeze() override;
+
 };
