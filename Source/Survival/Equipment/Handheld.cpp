@@ -32,7 +32,7 @@ void AHandheld::Tick(float DeltaSeconds)
 	// Try to get the input from the owner character. Setup input actions when ready
 	if (OwnerInputComponent == nullptr)
 	{
-		if (OwnerCharacter->InputComponent != nullptr)
+		if (OwnerCharacter && OwnerCharacter->InputComponent != nullptr)
 		{
 			OwnerInputComponent = OwnerCharacter->InputComponent;
 

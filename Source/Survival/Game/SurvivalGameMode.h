@@ -16,6 +16,12 @@ public:
 
 	virtual void InitGameState() override;
 
+	virtual void PostLogin(APlayerController* NewPlayer) override;
+
+	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
+
+	virtual bool ShouldSpawnAtStartSpot(AController* Player) override;
+
 public:
 	void Killed(const UDamageType* DamageType, AController* Killer, AController* KilledPlayer);
 
