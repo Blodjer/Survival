@@ -44,6 +44,7 @@ AActor* ASurvivalGameMode::ChoosePlayerStart_Implementation(AController* Player)
 
 	TArray<APlayerStart*> UnOccupiedTeamStartPoints;
 	TArray<APlayerStart*> OccupiedTeamStartPoints;
+	TArray<APlayerStart*> NeutralStartPoints;
 
 	UClass* PawnClass = GetDefaultPawnClassForController(Player);
 	APawn* PawnToFit = PawnClass ? PawnClass->GetDefaultObject<APawn>() : nullptr;
@@ -75,6 +76,10 @@ AActor* ASurvivalGameMode::ChoosePlayerStart_Implementation(AController* Player)
 				}
 			}
 		}
+		else
+		{
+			NeutralStartPoints.Add(PlayerStart);
+		}
 	}
 
 	if (FoundPlayerStart == nullptr)
@@ -86,6 +91,10 @@ AActor* ASurvivalGameMode::ChoosePlayerStart_Implementation(AController* Player)
 		else if (OccupiedTeamStartPoints.Num() > 0)
 		{
 			FoundPlayerStart = OccupiedTeamStartPoints[FMath::RandRange(0, OccupiedTeamStartPoints.Num() - 1)];
+		}
+		else if (NeutralStartPoints.Num() > 0)
+		{
+			FoundPlayerStart = NeutralStartPoints[FMath::RandRange(0, NeutralStartPoints.Num() - 1)];
 		}
 	}
 
