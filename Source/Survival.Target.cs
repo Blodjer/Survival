@@ -9,7 +9,7 @@ public class SurvivalTarget : TargetRules
 	{
 		Type = TargetType.Game;
 
-		bUsesSteam = false;
+		bUsesSteam = true;
 	}
 
 	//
@@ -24,6 +24,6 @@ public class SurvivalTarget : TargetRules
 	{
 		OutExtraModuleNames.AddRange( new string[] { "Survival" } );
 
-		UEBuildConfiguration.bCompileSteamOSS = false;
+		UEBuildConfiguration.bCompileSteamOSS = true;
     }
 }
