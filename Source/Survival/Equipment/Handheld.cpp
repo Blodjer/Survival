@@ -54,7 +54,7 @@ void AHandheld::Destroyed()
 void AHandheld::SetOwnerCharacter(ASurvivalPlayerCharacter* Character)
 {
 	OwnerCharacter = Character;
-	OwnerInputComponent = Character->InputComponent;
+	OwnerInputComponent = Character ? Character->InputComponent : nullptr;
 }
 
 void AHandheld::Equip()

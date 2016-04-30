@@ -112,7 +112,7 @@ void AWeapon::StopSimulateFire()
 
 void AWeapon::SimulateFire()
 {
-	if (ProjectileClass == nullptr)
+	if (GetOwnerCharacter() == nullptr)
 		return;
 
 	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetOwnerCharacter()->GetBaseAimRotation().Vector() * 100000.0f, FColor::White, false, 0.15f);
