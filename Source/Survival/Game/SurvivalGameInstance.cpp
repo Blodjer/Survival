@@ -41,7 +41,7 @@ bool USurvivalGameInstance::CreateSession(bool bIsLAN, bool bIsPresence, FString
 			SessionSettings->NumPublicConnections = MaxNumPlayers;
 			SessionSettings->NumPrivateConnections = 0;
 			SessionSettings->bAllowInvites = true;
-			SessionSettings->bAllowJoinInProgress = false;
+			SessionSettings->bAllowJoinInProgress = true;
 			SessionSettings->bShouldAdvertise = true;
 			SessionSettings->bAllowJoinViaPresence = true;
 			SessionSettings->bAllowJoinViaPresenceFriendsOnly = false;
@@ -134,15 +134,15 @@ bool USurvivalGameInstance::FindSessions(bool bIsLAN, bool bIsPresence, FString 
 			// Fill in all the SearchSettings
 			SessionSearch = MakeShareable(new FOnlineSessionSearch());
 			SessionSearch->bIsLanQuery = bIsLAN;
-			SessionSearch->MaxSearchResults = 20;
+			SessionSearch->MaxSearchResults = 100;
 			SessionSearch->PingBucketSize = 100;
 
-			SessionSearch->QuerySettings.Set(SETTING_MAPNAME, MapName, EOnlineComparisonOp::Equals);
-			SessionSearch->QuerySettings.Set(SEARCH_MINSLOTSAVAILABLE, 1, EOnlineComparisonOp::GreaterThanEquals);
 			if (bIsPresence)
 			{
 				SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, bIsPresence, EOnlineComparisonOp::Equals);
 			}
+
+			SessionSearch->QuerySettings.Set(SETTING_MAPNAME, MapName, EOnlineComparisonOp::Equals);
 
 			// Set the FindSessions delegate handle
 			OnFindSessionsCompleteDelegateHandle = Sessions->AddOnFindSessionsCompleteDelegate_Handle(OnFindSessionsCompleteDelegate);
@@ -187,7 +187,9 @@ void USurvivalGameInstance::OnFindSessionsComplete(bool bWasSuccessful)
 					FString ExpectedMapName = "$&%";
 					SessionSearch->QuerySettings.Get(SETTING_MAPNAME, ExpectedMapName);
 
-					if (SearchResult.Session.OwningUserId != UserId && MapName == ExpectedMapName && SearchResult.Session.NumOpenPublicConnections >= 1)
+					if (SearchResult.Session.OwningUserId != UserId
+						&& MapName == ExpectedMapName
+						&& SearchResult.Session.NumOpenPublicConnections >= 1)
 					{
 						FBlueprintSessionResult SearchResultBP = FBlueprintSessionResult();
 						SearchResultBP.OnlineResult = SearchResult;
