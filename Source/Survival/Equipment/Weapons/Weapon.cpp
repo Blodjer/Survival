@@ -115,6 +115,15 @@ void AWeapon::SimulateFire()
 	if (GetOwnerCharacter() == nullptr)
 		return;
 
+	if (GetOwnerCharacter()->IsLocallyControlled())
+	{
+		APlayerController* PlayerController = Cast<APlayerController>(GetOwnerCharacter()->GetController());
+		if (PlayerController)
+		{
+			PlayerController->ClientPlayCameraShake(CameraShake);
+		}
+	}
+
 	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetOwnerCharacter()->GetBaseAimRotation().Vector() * 100000.0f, FColor::White, false, 0.15f);
 }
 

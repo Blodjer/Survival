@@ -68,6 +68,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapon)
 	float RateOfFire;
 
+	UPROPERTY(EditDefaultsOnly, Category = Weapon)
+	TSubclassOf<UCameraShake> CameraShake;
+
 private:
 	// The current weapon state
 	EWeaponState CurrentState;
