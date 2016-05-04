@@ -35,6 +35,8 @@ public:
 	UFUNCTION(BlueprintPure, Category = Teams)
 	int32 GetNumberOfTeams();
 
+	void SetTimeOfDay(float TimeOfDay);
+
 private:
 	UPROPERTY(Replicated)
 	float MatchTimeStartOffset;

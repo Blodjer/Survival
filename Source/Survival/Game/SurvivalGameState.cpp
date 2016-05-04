@@ -41,6 +41,14 @@ int32 ASurvivalGameState::GetNumberOfTeams()
 	return GameMode_Teams.Num();
 }
 
+void ASurvivalGameState::SetTimeOfDay(float TimeOfDay)
+{
+	if (TimeOfDay >= 0.0f)
+	{
+		GameMode_StartTimeOfDay = (FMath::Fmod(TimeOfDay, 24.0f) - GetTimeOfDay()) + GameMode_StartTimeOfDay;
+	}
+}
+
 void ASurvivalGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

@@ -2,10 +2,11 @@
 
 #include "Survival.h"
 #include "SurvivalPlayerController.h"
+#include "Helper/SurvivalCheatManager.h"
 
 ASurvivalPlayerController::ASurvivalPlayerController()
 {
-
+	CheatClass = USurvivalCheatManager::StaticClass();
 }
 
 void ASurvivalPlayerController::UnFreeze()
