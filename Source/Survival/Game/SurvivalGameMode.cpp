@@ -11,6 +11,19 @@ ASurvivalGameMode::ASurvivalGameMode()
 {
 	LengthOfDay = 60.0f;
 	StartTimeOfDay = 8.5f;
+
+	Teams.Add(FTeamInfo("Alpha", FColor::Blue));
+	Teams.Add(FTeamInfo("Beta", FColor::Red));
+}
+
+void ASurvivalGameMode::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	if (Teams.Num() < 1)
+	{
+		Teams.Add(FTeamInfo());
+	}
 }
 
 void ASurvivalGameMode::InitGameState()
@@ -20,7 +33,7 @@ void ASurvivalGameMode::InitGameState()
 	ASurvivalGameState* SurvivalGameState = GetGameState<ASurvivalGameState>();
 	if (SurvivalGameState)
 	{
-		SurvivalGameState->SetMatchProperties(LengthOfDay, StartTimeOfDay);
+		SurvivalGameState->SetMatchProperties(LengthOfDay, StartTimeOfDay, Teams);
 	}
 }
 
@@ -31,7 +44,7 @@ void ASurvivalGameMode::PostLogin(APlayerController* NewPlayer)
 		ASurvivalPlayerState* SurvivalPlayerState = Cast<ASurvivalPlayerState>(NewPlayer->PlayerState);
 		if (SurvivalPlayerState)
 		{
-			SurvivalPlayerState->AssignToTeam(GetNumPlayers() % 2);
+			SurvivalPlayerState->AssignToTeam(GetNumPlayers() % Teams.Num());
 		}
 	}
 

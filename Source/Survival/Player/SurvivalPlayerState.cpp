@@ -2,6 +2,7 @@
 
 #include "Survival.h"
 #include "SurvivalPlayerState.h"
+#include "Survival/Game/SurvivalGameState.h"
 
 ASurvivalPlayerState::ASurvivalPlayerState()
 {
@@ -11,6 +12,23 @@ ASurvivalPlayerState::ASurvivalPlayerState()
 void ASurvivalPlayerState::AssignToTeam(int32 Number)
 {
 	TeamNumber = Number;
+}
+
+FTeamInfo ASurvivalPlayerState::GetTeamInfo()
+{
+	if (GetWorld() && GetWorld()->GetGameState())
+	{
+		ASurvivalGameState* SurvivalGameState = Cast<ASurvivalGameState>(GetWorld()->GetGameState());
+		if (SurvivalGameState)
+		{
+			if (TeamNumber >= 0 && SurvivalGameState->GetNumberOfTeams() >= TeamNumber + 1)
+			{
+				return SurvivalGameState->GetTeamInfos()[TeamNumber];
+			}
+		}
+	}
+
+	return FTeamInfo();
 }
 
 void ASurvivalPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

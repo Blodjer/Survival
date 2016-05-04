@@ -3,8 +3,8 @@
 #pragma once
 
 #include "GameFramework/GameMode.h"
+#include "../SurvivalStructs.h"
 #include "SurvivalGameMode.generated.h"
-
 
 UCLASS()
 class SURVIVAL_API ASurvivalGameMode : public AGameMode
@@ -13,6 +13,8 @@ class SURVIVAL_API ASurvivalGameMode : public AGameMode
 	
 public:
 	ASurvivalGameMode();
+
+	virtual void PostInitializeComponents() override;
 
 	virtual void InitGameState() override;
 
@@ -33,5 +35,8 @@ protected:
 	// At what time the match should start (0-24)
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0.0", ClampMax = "24.0", UIMin = "0.0", UIMax = "24.0"), Category = "TimeOfDay")
 	float StartTimeOfDay;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Teams")
+	TArray<FTeamInfo> Teams;
 	
 };
