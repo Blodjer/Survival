@@ -12,6 +12,16 @@ ASurvivalPlayerState::ASurvivalPlayerState()
 void ASurvivalPlayerState::AssignToTeam(int32 Number)
 {
 	TeamNumber = Number;
+
+	AController* Controller = Cast<AController>(GetOwner());
+	if (Controller)
+	{
+		ASurvivalPlayerCharacter* SurvivalPlayerCharacter = Cast<ASurvivalPlayerCharacter>(Controller->GetCharacter());
+		if (SurvivalPlayerCharacter)
+		{
+			SurvivalPlayerCharacter->OnUpdateTeamInfo();
+		}
+	}
 }
 
 FTeamInfo ASurvivalPlayerState::GetTeamInfo()
@@ -29,6 +39,11 @@ FTeamInfo ASurvivalPlayerState::GetTeamInfo()
 	}
 
 	return FTeamInfo();
+}
+
+void ASurvivalPlayerState::OnRep_TeamNumber()
+{
+	AssignToTeam(TeamNumber);
 }
 
 void ASurvivalPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

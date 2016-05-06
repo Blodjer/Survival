@@ -18,11 +18,17 @@ public:
 
 	virtual void PostInitializeComponents() override;
 
+	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
+
+	virtual void PossessedBy(AController* NewController) override;
+
+	virtual void OnRep_PlayerState() override;
+
+	virtual void OnUpdateTeamInfo();
+
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaSeconds) override;
-
-	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
 public:
 	virtual void FellOutOfWorld(const class UDamageType& dmgType) override;
@@ -115,6 +121,8 @@ private:
 	UFUNCTION()
 	void SimulateEquip(AHandheld* Handheld);
 
+	void UpdateTeamColors();
+
 private:
 	// First person mesh. Seen only by owner.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character, meta = (AllowPrivateAccess = "true"))
@@ -164,6 +172,9 @@ protected:
 	// Default equipment spawned on player spawn
 	UPROPERTY(EditDefaultsOnly, Category = Loadout)
 	TArray<TSubclassOf<class AHandheld>> StartEquipment;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = Material)
+	TArray<UMaterialInstanceDynamic*> MeshMIDs;
 
 public:
 	// Return the first person mesh

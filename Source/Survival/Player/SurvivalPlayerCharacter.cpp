@@ -3,7 +3,7 @@
 #include "Survival.h"
 #include "SurvivalPlayerCharacter.h"
 #include "Survival/Game/SurvivalGameMode.h"
-
+#include "SurvivalPlayerState.h"
 
 ASurvivalPlayerCharacter::ASurvivalPlayerCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<USurvivalCharacterMovement>(ACharacter::CharacterMovementComponentName))
@@ -71,21 +71,14 @@ void ASurvivalPlayerCharacter::PostInitializeComponents()
 	{
 		SpawnHandheld(StartEquipment[0]);
 	}
-}
 
-void ASurvivalPlayerCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-
-}
-
-void ASurvivalPlayerCharacter::Tick(float DeltaTime)
-{
-	Super::Tick( DeltaTime );
-
-	if (!IsLocallyControlled())
+	for (int32 i = 0; i < GetMesh()->GetNumMaterials(); i++)
 	{
-		Flashlight->SetWorldRotation(GetBaseAimRotation());
+		MeshMIDs.Add(GetMesh()->CreateAndSetMaterialInstanceDynamic(i));
+	}
+	for (int32 i = 0; i < GetMesh1P()->GetNumMaterials(); i++)
+	{
+		MeshMIDs.Add(GetMesh1P()->CreateAndSetMaterialInstanceDynamic(i));
 	}
 }
 
@@ -119,6 +112,41 @@ void ASurvivalPlayerCharacter::SetupPlayerInputComponent(class UInputComponent* 
 	InputComponent->BindAxis("LookUpAtRate", this, &ASurvivalPlayerCharacter::LookUpAtRate);
 
 	InputComponent->BindAction("Flashlight", IE_Pressed, this, &ASurvivalPlayerCharacter::ToggleFlashlight);
+}
+
+void ASurvivalPlayerCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	UpdateTeamColors();
+}
+
+void ASurvivalPlayerCharacter::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	UpdateTeamColors();
+}
+
+void ASurvivalPlayerCharacter::OnUpdateTeamInfo()
+{
+	UpdateTeamColors();
+}
+
+void ASurvivalPlayerCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+}
+
+void ASurvivalPlayerCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (!IsLocallyControlled())
+	{
+		Flashlight->SetWorldRotation(GetBaseAimRotation());
+	}
 }
 
 void ASurvivalPlayerCharacter::FellOutOfWorld(const UDamageType& dmgType)
@@ -351,6 +379,21 @@ void ASurvivalPlayerCharacter::SimulateEquip(AHandheld* Handheld)
 	}
 
 	EquippedHandheld = Handheld;
+}
+
+void ASurvivalPlayerCharacter::UpdateTeamColors()
+{
+	if (PlayerState)
+	{
+		ASurvivalPlayerState* SurvivalPlayerState = Cast<ASurvivalPlayerState>(PlayerState);
+		if (SurvivalPlayerState)
+		{
+			for (UMaterialInstanceDynamic* MID : MeshMIDs)
+			{
+				MID->SetVectorParameterValue("TeamColor", SurvivalPlayerState->GetTeamInfo().Color);
+			}
+		}
+	}
 }
 
 void ASurvivalPlayerCharacter::OnRep_IsSprinting()
