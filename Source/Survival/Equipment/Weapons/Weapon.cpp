@@ -15,7 +15,14 @@ AWeapon::AWeapon()
 	RecoilLeft = 0.35f;
 	RecoilRight = 0.35f;
 
+	MaxRoundsPerMagazine = 20;
+	CurrentRoundsInMagazine = MaxRoundsPerMagazine;
+
+	NoAnimReloadDuration = 1.5f;
+
 	BurstCount = 0;
+
+	bIsReloading = false;
 }
 
 void AWeapon::SetupInputActions()
@@ -25,15 +32,18 @@ void AWeapon::SetupInputActions()
 	BindInputAction("Fire", IE_Pressed, this, &AWeapon::StartFire);
 	BindInputAction("Fire", IE_Released, this, &AWeapon::StopFire);
 
-	// TODO: Zoom
+	BindInputAction("Reload", IE_Pressed, this, &AWeapon::StartReload);
 
-	// TODO: Reload
+	// TODO: Zoom
 
 	// TODO: Firemode
 }
 
 void AWeapon::StartFire()
 {
+	if (bIsReloading)
+		return;
+
 	if (!HasAuthority())
 	{
 		ServerStartFire();
@@ -71,11 +81,20 @@ void AWeapon::HandleFiring()
 {
 	if (GetOwnerCharacter() != nullptr && GetOwnerCharacter()->IsLocallyControlled())
 	{
-		ServerShootProjectile(GetActorLocation(), GetOwnerCharacter()->GetBaseAimRotation().Vector());
-
-		if (!GetWorld()->IsServer())
+		if (CurrentRoundsInMagazine > 0)
 		{
-			SimulateFire();
+			ServerShootProjectile(GetActorLocation(), GetOwnerCharacter()->GetBaseAimRotation().Vector());
+
+			if (!GetWorld()->IsServer())
+			{
+				SimulateFire();
+			}
+
+			CurrentRoundsInMagazine--;
+		}
+		else
+		{
+			StopFire();
 		}
 	}
 	
@@ -135,6 +154,40 @@ void AWeapon::SimulateFire()
 	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetOwnerCharacter()->GetBaseAimRotation().Vector() * 100000.0f, FColor::White, false, 0.15f);
 }
 
+void AWeapon::StartReload()
+{
+	if (GetOwnerCharacter() == nullptr)
+		return;
+
+	if (bIsReloading && (GetOwnerCharacter()->IsLocallyControlled() && !HasAuthority()))
+		return;
+
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Magenta, "Reload");
+
+	if (!HasAuthority() && GetOwnerCharacter()->IsLocallyControlled())
+	{
+		ServerStartReload();
+	}
+
+	StopFire();
+
+	GetWorldTimerManager().SetTimer(TimerHandle_Reload, this, &AWeapon::Reload, NoAnimReloadDuration, false);
+
+	bIsReloading = true;
+}
+
+void AWeapon::ServerStartReload_Implementation()
+{
+	StartReload();
+}
+
+void AWeapon::Reload()
+{
+	CurrentRoundsInMagazine = 20;
+
+	bIsReloading = false;
+}
+
 void AWeapon::OnRep_BurstCount()
 {
 	if (BurstCount > 0 && !GetWorldTimerManager().IsTimerActive(TimerHandle_HandleFiring))
@@ -147,9 +200,18 @@ void AWeapon::OnRep_BurstCount()
 	}
 }
 
+void AWeapon::OnRep_Reload()
+{
+	if (bIsReloading)
+	{
+		StartReload();
+	}
+}
+
 void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(AWeapon, BurstCount, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(AWeapon, bIsReloading, COND_SkipOwner);
 }

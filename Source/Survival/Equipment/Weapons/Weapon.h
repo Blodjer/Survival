@@ -9,7 +9,8 @@ UENUM()
 enum EWeaponState
 {
 	Idle,
-	Firing
+	Firing,
+	Reloading
 };
 
 UCLASS(Abstract, Blueprintable)
@@ -43,7 +44,7 @@ protected:
 	void ServerStopFire_Implementation();
 	bool ServerStopFire_Validate() { return true; };
 
-	// [client] Handle fire loop
+	// [owner] Handle fire loop
 	void HandleFiring();
 
 	// [server] Finally shoot a projectil
@@ -58,6 +59,19 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	void SimulateFire();
+
+	// [client + server]
+	UFUNCTION(BlueprintCallable, Category = Weapon)
+	void StartReload();
+
+	// [server]
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartReload();
+	void ServerStartReload_Implementation();
+	bool ServerStartReload_Validate() { return true; };
+
+	// [client + server]
+	void Reload();
 
 protected:
 	// The projectile the weapon uses
@@ -83,6 +97,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Weapon)
 	TSubclassOf<UCameraShake> CameraShake;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapon, meta = (ClampMin = "0", UIMin = "0"))
+	int32 MaxRoundsPerMagazine;
+
+	UPROPERTY(EditDefaultsOnly, Category = Weapon)
+	float NoAnimReloadDuration;
+
 private:
 	// The current weapon state
 	EWeaponState CurrentState;
@@ -90,12 +110,22 @@ private:
 	// Time loop between shots. Different uses by owner and others
 	FTimerHandle TimerHandle_HandleFiring;
 
+	FTimerHandle TimerHandle_Reload;
+
 	// Number of shots fired in one burst
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_BurstCount)
 	int32 BurstCount;
 
+	int32 CurrentRoundsInMagazine;
+
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_Reload)
+	bool bIsReloading;
+
 private:
 	UFUNCTION()
 	void OnRep_BurstCount();
+
+	UFUNCTION()
+	void OnRep_Reload();
 
 };
