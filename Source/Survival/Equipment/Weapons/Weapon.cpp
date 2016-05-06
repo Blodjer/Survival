@@ -10,6 +10,11 @@ AWeapon::AWeapon()
 
 	RateOfFire = 750;
 
+	RecoilUpMin = 0.45f;
+	RecoilUpMax = 0.65f;
+	RecoilLeft = 0.35f;
+	RecoilRight = 0.35f;
+
 	BurstCount = 0;
 }
 
@@ -114,13 +119,16 @@ void AWeapon::SimulateFire()
 {
 	if (GetOwnerCharacter() == nullptr)
 		return;
-
+	
 	if (GetOwnerCharacter()->IsLocallyControlled())
 	{
 		APlayerController* PlayerController = Cast<APlayerController>(GetOwnerCharacter()->GetController());
 		if (PlayerController)
 		{
 			PlayerController->ClientPlayCameraShake(CameraShake);
+			
+			FRotator NewControlRotation = PlayerController->GetControlRotation().Add(FMath::FRandRange(RecoilUpMin, RecoilUpMax), FMath::FRandRange(-RecoilLeft, RecoilRight), 0.0f);
+			PlayerController->SetControlRotation(NewControlRotation);
 		}
 	}
 
