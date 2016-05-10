@@ -47,7 +47,11 @@ protected:
 	// [owner] Handle fire loop
 	void HandleFiring();
 
-	// [server] Finally shoot a projectil
+	// [owner] Handle weapon shot
+	UFUNCTION(BlueprintCallable, Category = Weapon)
+	void ShootProjectile();
+
+	// [server] Finally shoot a projectile
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerShootProjectile(FVector Origin, FVector_NetQuantizeNormal Direction);
 	void ServerShootProjectile_Implementation(FVector Origin, FVector_NetQuantizeNormal Direction);
@@ -93,6 +97,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = Weapon, meta = (ClampMin = "0.0", UIMin = "0.0"))
 	float RecoilRight;
+
+	UPROPERTY(EditDefaultsOnly, Category = Weapon, meta = (ClampMin = "0.0", UIMin = "0.0"))
+	float Spread;
 
 	UPROPERTY(EditDefaultsOnly, Category = Weapon)
 	TSubclassOf<UCameraShake> CameraShake;

@@ -15,6 +15,8 @@ AWeapon::AWeapon()
 	RecoilLeft = 0.35f;
 	RecoilRight = 0.35f;
 
+	Spread = 0.5f;
+
 	MaxRoundsPerMagazine = 20;
 	CurrentRoundsInMagazine = MaxRoundsPerMagazine;
 
@@ -83,12 +85,7 @@ void AWeapon::HandleFiring()
 	{
 		if (CurrentRoundsInMagazine > 0)
 		{
-			ServerShootProjectile(GetActorLocation(), GetOwnerCharacter()->GetBaseAimRotation().Vector());
-
-			if (!GetWorld()->IsServer())
-			{
-				SimulateFire();
-			}
+			ShootProjectile();
 
 			CurrentRoundsInMagazine--;
 		}
@@ -99,6 +96,24 @@ void AWeapon::HandleFiring()
 	}
 	
 	GetWorldTimerManager().SetTimer(TimerHandle_HandleFiring, this, &AWeapon::HandleFiring, 60.0f / RateOfFire, false);
+}
+
+void AWeapon::ShootProjectile()
+{
+	FVector Direction = FMath::VRandCone(GetOwnerCharacter()->GetBaseAimRotation().Vector(), FMath::DegreesToRadians(Spread));
+	ServerShootProjectile(GetActorLocation(), Direction);
+
+	if (!GetWorld()->IsServer())
+	{
+		SimulateFire();
+	}
+
+	APlayerController* PlayerController = Cast<APlayerController>(GetOwnerCharacter()->GetController());
+	if (PlayerController)
+	{
+		FRotator NewControlRotation = PlayerController->GetControlRotation().Add(FMath::FRandRange(RecoilUpMin, RecoilUpMax), FMath::FRandRange(-RecoilLeft, RecoilRight), 0.0f);
+		PlayerController->SetControlRotation(NewControlRotation);
+	}
 }
 
 void AWeapon::ServerShootProjectile_Implementation(FVector Origin, FVector_NetQuantizeNormal Direction)
@@ -145,12 +160,10 @@ void AWeapon::SimulateFire()
 		if (PlayerController)
 		{
 			PlayerController->ClientPlayCameraShake(CameraShake);
-			
-			FRotator NewControlRotation = PlayerController->GetControlRotation().Add(FMath::FRandRange(RecoilUpMin, RecoilUpMax), FMath::FRandRange(-RecoilLeft, RecoilRight), 0.0f);
-			PlayerController->SetControlRotation(NewControlRotation);
 		}
 	}
 
+	// TODO: Remove. Trail isn't showing in the real direction.
 	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetOwnerCharacter()->GetBaseAimRotation().Vector() * 100000.0f, FColor::White, false, 0.15f);
 }
 
