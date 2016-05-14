@@ -24,7 +24,7 @@ void ASurvivalPlayerState::AssignToTeam(int32 Number)
 	}
 }
 
-FTeamInfo ASurvivalPlayerState::GetTeamInfo()
+bool ASurvivalPlayerState::GetTeamInfo(FTeamInfo& TeamInfo)
 {
 	if (GetWorld() && GetWorld()->GetGameState())
 	{
@@ -33,12 +33,13 @@ FTeamInfo ASurvivalPlayerState::GetTeamInfo()
 		{
 			if (TeamIdx >= 0 && SurvivalGameState->GetNumberOfTeams() >= TeamIdx + 1)
 			{
-				return SurvivalGameState->GetTeamInfos()[TeamIdx];
+				TeamInfo = SurvivalGameState->GetTeamInfos()[TeamIdx];
+				return true;
 			}
 		}
 	}
-
-	return FTeamInfo();
+	
+	return false;
 }
 
 void ASurvivalPlayerState::OnRep_TeamIdx()

@@ -43,7 +43,7 @@ public:
 	float GetMaxHealth() const;
 
 	UFUNCTION(BlueprintCallable, Category = Team)
-	FTeamInfo GetTeamInfo();
+	bool GetTeamInfo(FTeamInfo& TeamInfo);
 
 	UFUNCTION(BlueprintCallable, Category = Team)
 	int32 GetTeamIdx();

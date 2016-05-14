@@ -36,7 +36,7 @@ TArray<FTeamInfo>& ASurvivalGameState::GetTeamInfos()
 	return GameMode_Teams;
 }
 
-FTeamInfo ASurvivalGameState::GetTeamInfo(int32 TeamIdx)
+FTeamInfo& ASurvivalGameState::GetTeamInfo(int32 TeamIdx)
 {
 	return GameMode_Teams[TeamIdx];
 }

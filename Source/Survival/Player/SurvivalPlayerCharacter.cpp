@@ -198,18 +198,18 @@ float ASurvivalPlayerCharacter::GetMaxHealth() const
 	return GetClass()->GetDefaultObject<ASurvivalPlayerCharacter>()->Health;
 }
 
-FTeamInfo ASurvivalPlayerCharacter::GetTeamInfo()
+bool ASurvivalPlayerCharacter::GetTeamInfo(FTeamInfo& TeamInfo)
 {
 	if (PlayerState)
 	{
 		ASurvivalPlayerState* SurvivalPlayerState = Cast<ASurvivalPlayerState>(PlayerState);
 		if (SurvivalPlayerState)
 		{
-			return SurvivalPlayerState->GetTeamInfo();
+			return SurvivalPlayerState->GetTeamInfo(TeamInfo);
 		}
 	}
 	
-	return FTeamInfo();
+	return false;
 }
 
 int32 ASurvivalPlayerCharacter::GetTeamIdx()
@@ -418,7 +418,9 @@ void ASurvivalPlayerCharacter::UpdateTeamColors()
 		{
 			for (UMaterialInstanceDynamic* MID : MeshMIDs)
 			{
-				MID->SetVectorParameterValue("TeamColor", SurvivalPlayerState->GetTeamInfo().Color);
+				FTeamInfo TeamInfo;
+				SurvivalPlayerState->GetTeamInfo(TeamInfo);
+				MID->SetVectorParameterValue("TeamColor", TeamInfo.Color);
 			}
 		}
 	}

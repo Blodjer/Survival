@@ -17,7 +17,7 @@ public:
 	void AssignToTeam(int32 Number);
 
 	UFUNCTION(BlueprintCallable, Category = Team)
-	FTeamInfo GetTeamInfo();
+	bool GetTeamInfo(FTeamInfo& TeamInfo);
 
 private:
 	UPROPERTY(Transient, BlueprintReadOnly, ReplicatedUsing = OnRep_TeamIdx, Category = Team, meta = (AllowPrivateAccess = "true"))

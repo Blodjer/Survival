@@ -19,7 +19,7 @@ struct SURVIVAL_API FTeamInfo
 	FTeamInfo()
 	{
 		Name = "Unknown";
-		Color = FColor::Magenta;
+		Color = FColor(15, 15, 15);
 	}
 
 	FTeamInfo(FName Name, FLinearColor Color)
