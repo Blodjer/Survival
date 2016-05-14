@@ -198,6 +198,34 @@ float ASurvivalPlayerCharacter::GetMaxHealth() const
 	return GetClass()->GetDefaultObject<ASurvivalPlayerCharacter>()->Health;
 }
 
+FTeamInfo ASurvivalPlayerCharacter::GetTeamInfo()
+{
+	if (PlayerState)
+	{
+		ASurvivalPlayerState* SurvivalPlayerState = Cast<ASurvivalPlayerState>(PlayerState);
+		if (SurvivalPlayerState)
+		{
+			return SurvivalPlayerState->GetTeamInfo();
+		}
+	}
+	
+	return FTeamInfo();
+}
+
+int32 ASurvivalPlayerCharacter::GetTeamNumber()
+{
+	if (PlayerState)
+	{
+		ASurvivalPlayerState* SurvivalPlayerState = Cast<ASurvivalPlayerState>(PlayerState);
+		if (SurvivalPlayerState)
+		{
+			return SurvivalPlayerState->GetTeamNumber();
+		}
+	}
+
+	return -1;
+}
+
 void ASurvivalPlayerCharacter::MoveForward(float Value)
 {
 	if (Value != 0.0f)

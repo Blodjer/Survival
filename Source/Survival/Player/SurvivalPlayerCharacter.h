@@ -42,6 +42,12 @@ public:
 	UFUNCTION(BlueprintPure, Category = Character)
 	float GetMaxHealth() const;
 
+	UFUNCTION(BlueprintCallable, Category = Team)
+	FTeamInfo GetTeamInfo();
+
+	UFUNCTION(BlueprintCallable, Category = Team)
+	int32 GetTeamNumber();
+
 private:
 	// Moves the character alongs his x-axis
 	void MoveForward(float Value);

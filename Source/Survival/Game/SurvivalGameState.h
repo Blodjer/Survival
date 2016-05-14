@@ -32,6 +32,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Team)
 	TArray<FTeamInfo>& GetTeamInfos();
 
+	UFUNCTION(BlueprintCallable, Category = Team)
+	FTeamInfo GetTeamInfo(int32 TeamNumber);
+
 	UFUNCTION(BlueprintPure, Category = Teams)
 	int32 GetNumberOfTeams();
 
