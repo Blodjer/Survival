@@ -57,14 +57,14 @@ void ACampfire::OnCapturingPlayersChanged()
 	TMap<int32, uint32> CapturingTeams;
 	for (ASurvivalPlayerCharacter* SurvialPlayerCharacter : CapturingPlayers)
 	{
-		int32 TeamNumber = SurvialPlayerCharacter->GetTeamNumber();
-		if (CapturingTeams.Contains(TeamNumber))
+		int32 TeamIdx = SurvialPlayerCharacter->GetTeamIdx();
+		if (CapturingTeams.Contains(TeamIdx))
 		{
-			CapturingTeams[TeamNumber]++;
+			CapturingTeams[TeamIdx]++;
 		}
 		else
 		{
-			CapturingTeams.Add(TeamNumber, 1);
+			CapturingTeams.Add(TeamIdx, 1);
 		}
 	}
 
@@ -73,17 +73,17 @@ void ACampfire::OnCapturingPlayersChanged()
 		TArray<int32, FDefaultAllocator> CapturingTeamsKeys;
 		CapturingTeams.GenerateKeyArray(CapturingTeamsKeys);
 
-		int32 DominantTeamNumber = CapturingTeamsKeys[0];
+		int32 DominantTeamIdx = CapturingTeamsKeys[0];
 		bool bDraw = false;
 
 		for (auto& Element : CapturingTeams)
 		{
-			if (Element.Value > CapturingTeams[DominantTeamNumber])
+			if (Element.Value > CapturingTeams[DominantTeamIdx])
 			{
-				DominantTeamNumber = Element.Key;
+				DominantTeamIdx = Element.Key;
 				bDraw = false;
 			}
-			else if (Element.Key != DominantTeamNumber && Element.Value == CapturingTeams[DominantTeamNumber])
+			else if (Element.Key != DominantTeamIdx && Element.Value == CapturingTeams[DominantTeamIdx])
 			{
 				bDraw = true;
 			}
@@ -94,7 +94,7 @@ void ACampfire::OnCapturingPlayersChanged()
 			ASurvivalGameState* SurvialGameState = Cast<ASurvivalGameState>(GetWorld()->GetGameState());
 			if (SurvialGameState)
 			{
-				OwningTeam = SurvialGameState->GetTeamInfo(DominantTeamNumber);
+				OwningTeam = SurvialGameState->GetTeamInfo(DominantTeamIdx);
 				SmokeParticleSystem->SetColorParameter("SmokeColor", OwningTeam.Color);
 			}
 		}

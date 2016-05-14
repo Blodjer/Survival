@@ -212,14 +212,14 @@ FTeamInfo ASurvivalPlayerCharacter::GetTeamInfo()
 	return FTeamInfo();
 }
 
-int32 ASurvivalPlayerCharacter::GetTeamNumber()
+int32 ASurvivalPlayerCharacter::GetTeamIdx()
 {
 	if (PlayerState)
 	{
 		ASurvivalPlayerState* SurvivalPlayerState = Cast<ASurvivalPlayerState>(PlayerState);
 		if (SurvivalPlayerState)
 		{
-			return SurvivalPlayerState->GetTeamNumber();
+			return SurvivalPlayerState->GetTeamIdx();
 		}
 	}
 

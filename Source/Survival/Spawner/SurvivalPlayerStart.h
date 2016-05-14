@@ -16,9 +16,9 @@ public:
 private:
 	// Which team can start at this point
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = Team, meta = (AllowPrivateAccess = "true"))
-	int32 TeamNumber;
+	int32 TeamIdx;
 
 public:
-	FORCEINLINE int32 GetTeamNumber() const { return TeamNumber; }
+	FORCEINLINE int32 GetTeamIdx() const { return TeamIdx; }
 
 };

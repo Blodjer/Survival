@@ -20,14 +20,14 @@ public:
 	FTeamInfo GetTeamInfo();
 
 private:
-	UPROPERTY(Transient, BlueprintReadOnly, ReplicatedUsing = OnRep_TeamNumber, Category = Team, meta = (AllowPrivateAccess = "true"))
-	int32 TeamNumber;
+	UPROPERTY(Transient, BlueprintReadOnly, ReplicatedUsing = OnRep_TeamIdx, Category = Team, meta = (AllowPrivateAccess = "true"))
+	int32 TeamIdx;
 
 public:
-	FORCEINLINE int32 GetTeamNumber() const { return TeamNumber; }
+	FORCEINLINE int32 GetTeamIdx() const { return TeamIdx; }
 
 private:
 	UFUNCTION()
-	void OnRep_TeamNumber();
+	void OnRep_TeamIdx();
 
 };

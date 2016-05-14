@@ -75,7 +75,7 @@ AActor* ASurvivalGameMode::ChoosePlayerStart_Implementation(AController* Player)
 		{
 			ASurvivalPlayerStart* SurvivalPlayerStart = Cast<ASurvivalPlayerStart>(PlayerStart);
 			ASurvivalPlayerState* SurvivalPlayerState = Cast<ASurvivalPlayerState>(Player->PlayerState);
-			if (SurvivalPlayerStart->GetTeamNumber() == SurvivalPlayerState->GetTeamNumber())
+			if (SurvivalPlayerStart->GetTeamIdx() == SurvivalPlayerState->GetTeamIdx())
 			{
 				FVector ActorLocation = PlayerStart->GetActorLocation();
 				FRotator ActorRotation = PlayerStart->GetActorRotation();

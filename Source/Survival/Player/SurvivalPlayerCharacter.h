@@ -46,7 +46,7 @@ public:
 	FTeamInfo GetTeamInfo();
 
 	UFUNCTION(BlueprintCallable, Category = Team)
-	int32 GetTeamNumber();
+	int32 GetTeamIdx();
 
 private:
 	// Moves the character alongs his x-axis

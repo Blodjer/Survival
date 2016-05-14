@@ -7,5 +7,5 @@ ASurvivalPlayerStart::ASurvivalPlayerStart()
 {
 	GetCapsuleComponent()->InitCapsuleSize(45.0f, 100.0f);
 
-	TeamNumber = 0;
+	TeamIdx = 0;
 }
