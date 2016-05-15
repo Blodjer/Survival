@@ -23,6 +23,8 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 
 	virtual void OnRep_PlayerState() override;
+	
+	virtual void OnRep_Controller() override;
 
 	virtual void OnUpdateTeamInfo();
 
@@ -47,6 +49,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Team)
 	int32 GetTeamIdx();
+
+protected:
+	UFUNCTION(BlueprintImplementableEvent, Category = Character, meta = (AllowPrivateAccess = "true"))
+	void OnPossessedLocal();
 
 private:
 	// Moves the character alongs his x-axis
@@ -118,7 +124,6 @@ private:
 	UFUNCTION(BlueprintCallable, Category = Equipment)
 	void Equip(AHandheld* Handheld);
 
-private:
 	UFUNCTION(Server, Reliable, WithValidation, Category = Handheld)
 	void ServerEquip(AHandheld* Handheld);
 	void ServerEquip_Implementation(AHandheld* Handheld);

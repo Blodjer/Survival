@@ -117,8 +117,23 @@ void ASurvivalPlayerCharacter::SetupPlayerInputComponent(class UInputComponent* 
 void ASurvivalPlayerCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
+	
+	if (IsLocallyControlled() && IsPlayerControlled())
+	{
+		OnPossessedLocal();
+	}
 
 	UpdateTeamColors();
+}
+
+void ASurvivalPlayerCharacter::OnRep_Controller()
+{
+	Super::OnRep_Controller();
+
+	if (IsLocallyControlled())
+	{
+		OnPossessedLocal();
+	}
 }
 
 void ASurvivalPlayerCharacter::OnRep_PlayerState()
