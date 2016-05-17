@@ -35,8 +35,8 @@ private:
 	UPROPERTY(Transient, Replicated)
 	int32 DominantTeamIdx;
 
-	UPROPERTY(Transient)
-	FLinearColor CurrentOwnerBaseColor;
+	UPROPERTY(BlueprintReadOnly, Transient, Category = Campfire, meta = (AllowPrivateAccess = "true"))
+	FLinearColor OwnerBaseColor;
 
 	// The time it takes to capture and neutralize the campfire
 	UPROPERTY(EditDefaultsOnly, Category = Campfire, meta = (AllowPrivateAccess = "true"))
@@ -67,5 +67,7 @@ public:
 	FORCEINLINE UParticleSystemComponent* GetSmokeParticleSystem() const { return SmokeParticleSystem; }
 
 	FORCEINLINE float GetCaptureValue() const { return CaptureValue; }
+
+	FORCEINLINE FLinearColor GetOwnerBaseColor() const { return OwnerBaseColor; }
 
 };

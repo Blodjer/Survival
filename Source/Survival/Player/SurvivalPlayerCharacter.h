@@ -50,6 +50,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Team)
 	int32 GetTeamIdx();
 
+public:
+	UPROPERTY(BlueprintReadOnly, Transient, Category = Campfire)
+	class ACampfire* CapturingCampfire;
+
 protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = Character, meta = (AllowPrivateAccess = "true"))
 	void OnPossessedLocal();

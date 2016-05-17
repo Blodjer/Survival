@@ -58,7 +58,7 @@ void ACampfire::Tick(float DeltaTime)
 				ASurvivalGameState* SurvialGameState = Cast<ASurvivalGameState>(GetWorld()->GetGameState());
 				if (SurvialGameState)
 				{
-					CurrentOwnerBaseColor = SurvialGameState->GetTeamInfo(OwningTeamIdx).Color;
+					OwnerBaseColor = SurvialGameState->GetTeamInfo(OwningTeamIdx).Color;
 				}
 			}
 		}
@@ -69,18 +69,20 @@ void ACampfire::Tick(float DeltaTime)
 	}
 
 
-	FLinearColor SmokeColor = FMath::Lerp(SmokeBaseColor, CurrentOwnerBaseColor, FMath::Pow(CaptureValue, 4));
+	FLinearColor SmokeColor = FMath::Lerp(SmokeBaseColor, OwnerBaseColor, FMath::Pow(CaptureValue, 4));
 	SmokeParticleSystem->SetColorParameter("SmokeColor", SmokeColor);
 }
 
 void ACampfire::OnBeginOverlap(AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (!HasAuthority())
-		return;
-
 	ASurvivalPlayerCharacter* SurvivalPlayerCharacter = Cast<ASurvivalPlayerCharacter>(OtherActor);
 	if (SurvivalPlayerCharacter)
 	{
+		SurvivalPlayerCharacter->CapturingCampfire = this;
+
+		if (!HasAuthority())
+			return;
+
 		if (SurvivalPlayerCharacter->PlayerState)
 		{
 			CapturingPlayers.Add(SurvivalPlayerCharacter);
@@ -91,12 +93,14 @@ void ACampfire::OnBeginOverlap(AActor* OtherActor, UPrimitiveComponent* OtherCom
 
 void ACampfire::OnEndOverlap(AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (!HasAuthority())
-		return;
-
 	ASurvivalPlayerCharacter* SurvivalPlayerCharacter = Cast<ASurvivalPlayerCharacter>(OtherActor);
 	if (SurvivalPlayerCharacter)
 	{
+		SurvivalPlayerCharacter->CapturingCampfire = nullptr;
+
+		if (!HasAuthority())
+			return;
+
 		CapturingPlayers.Remove(SurvivalPlayerCharacter);
 		OnCapturingPlayersChanged();
 	}
@@ -161,7 +165,7 @@ void ACampfire::OnRep_OwningTeam()
 		ASurvivalGameState* SurvialGameState = Cast<ASurvivalGameState>(GetWorld()->GetGameState());
 		if (SurvialGameState)
 		{
-			CurrentOwnerBaseColor = SurvialGameState->GetTeamInfo(OwningTeamIdx).Color;
+			OwnerBaseColor = SurvialGameState->GetTeamInfo(OwningTeamIdx).Color;
 		}
 	}
 }
