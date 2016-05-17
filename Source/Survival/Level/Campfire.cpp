@@ -14,7 +14,26 @@ ACampfire::ACampfire()
 	SmokeParticleSystem = CreateDefaultSubobject<UParticleSystemComponent>("Smoke");
 	SmokeParticleSystem->AttachTo(RootComponent);
 
+	OwningTeamIdx = -1;
+	DominantTeamIdx = -1;
+
+	CaptureDuration = 10.0f;
+
+	CaptureValue = 0.0f;
+
+	SmokeBaseColor = FLinearColor(0.15f, 0.15f, 0.15f);
+
+	bReplicates = true;
+
 	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.TickGroup = ETickingGroup::TG_PostPhysics;
+}
+
+void ACampfire::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	SmokeParticleSystem->SetColorParameter("SmokeColor", SmokeBaseColor);
 }
 
 void ACampfire::BeginPlay()
@@ -23,14 +42,42 @@ void ACampfire::BeginPlay()
 	
 }
 
-void ACampfire::Tick( float DeltaTime )
+void ACampfire::Tick(float DeltaTime)
 {
 	Super::Tick( DeltaTime );
 
+	if (DominantTeamIdx != -1)
+	{
+		if (DominantTeamIdx != OwningTeamIdx)
+		{
+			CaptureValue = FMath::Clamp(CaptureValue - DeltaTime / CaptureDuration, 0.0f, 1.0f);
+
+			if (CaptureValue <= 0.0f)
+			{
+				OwningTeamIdx = DominantTeamIdx;
+				ASurvivalGameState* SurvialGameState = Cast<ASurvivalGameState>(GetWorld()->GetGameState());
+				if (SurvialGameState)
+				{
+					CurrentOwnerBaseColor = SurvialGameState->GetTeamInfo(OwningTeamIdx).Color;
+				}
+			}
+		}
+		else if (CaptureValue < 1.0f)
+		{
+			CaptureValue = FMath::Clamp(CaptureValue + DeltaTime / CaptureDuration, 0.0f, 1.0f);
+		}
+	}
+
+
+	FLinearColor SmokeColor = FMath::Lerp(SmokeBaseColor, CurrentOwnerBaseColor, FMath::Pow(CaptureValue, 4));
+	SmokeParticleSystem->SetColorParameter("SmokeColor", SmokeColor);
 }
 
 void ACampfire::OnBeginOverlap(AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (!HasAuthority())
+		return;
+
 	ASurvivalPlayerCharacter* SurvivalPlayerCharacter = Cast<ASurvivalPlayerCharacter>(OtherActor);
 	if (SurvivalPlayerCharacter)
 	{
@@ -44,6 +91,9 @@ void ACampfire::OnBeginOverlap(AActor* OtherActor, UPrimitiveComponent* OtherCom
 
 void ACampfire::OnEndOverlap(AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	if (!HasAuthority())
+		return;
+
 	ASurvivalPlayerCharacter* SurvivalPlayerCharacter = Cast<ASurvivalPlayerCharacter>(OtherActor);
 	if (SurvivalPlayerCharacter)
 	{
@@ -91,12 +141,36 @@ void ACampfire::OnCapturingPlayersChanged()
 
 		if (!bDraw)
 		{
-			ASurvivalGameState* SurvialGameState = Cast<ASurvivalGameState>(GetWorld()->GetGameState());
-			if (SurvialGameState)
-			{
-				OwningTeam = SurvialGameState->GetTeamInfo(DominantTeamIdx);
-				SmokeParticleSystem->SetColorParameter("SmokeColor", OwningTeam.Color);
-			}
+			this->DominantTeamIdx = DominantTeamIdx;
+		}
+		else
+		{
+			this->DominantTeamIdx = -1;
 		}
 	}
+	else
+	{
+		this->DominantTeamIdx = -1;
+	}
+}
+
+void ACampfire::OnRep_OwningTeam()
+{
+	if (OwningTeamIdx >= 0)
+	{
+		ASurvivalGameState* SurvialGameState = Cast<ASurvivalGameState>(GetWorld()->GetGameState());
+		if (SurvialGameState)
+		{
+			CurrentOwnerBaseColor = SurvialGameState->GetTeamInfo(OwningTeamIdx).Color;
+		}
+	}
+}
+
+void ACampfire::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ACampfire, CaptureValue);
+	DOREPLIFETIME(ACampfire, OwningTeamIdx);
+	DOREPLIFETIME(ACampfire, DominantTeamIdx);
 }

@@ -13,6 +13,8 @@ class SURVIVAL_API ACampfire : public AActor
 public:	
 	ACampfire();
 
+	virtual void OnConstruction(const FTransform& Transform) override;
+
 	virtual void BeginPlay() override;
 	
 	virtual void Tick( float DeltaSeconds ) override;
@@ -27,7 +29,24 @@ private:
 	UPROPERTY(BlueprintReadOnly, Category = Campfire, meta = (AllowPrivateAccess = "true"))
 	TArray<ASurvivalPlayerCharacter*> CapturingPlayers;
 
-	FTeamInfo OwningTeam;
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_OwningTeam)
+	int32 OwningTeamIdx;
+
+	UPROPERTY(Transient, Replicated)
+	int32 DominantTeamIdx;
+
+	UPROPERTY(Transient)
+	FLinearColor CurrentOwnerBaseColor;
+
+	// The time it takes to capture and neutralize the campfire
+	UPROPERTY(EditDefaultsOnly, Category = Campfire, meta = (AllowPrivateAccess = "true"))
+	float CaptureDuration;
+
+	UPROPERTY(BlueprintReadOnly, Transient, Replicated, Category = Campfire, meta = (AllowPrivateAccess = "true"))
+	float CaptureValue;
+
+	UPROPERTY(EditDefaultsOnly, Category = Campfire)
+	FLinearColor SmokeBaseColor;
 
 private:
 	UFUNCTION()
@@ -38,9 +57,15 @@ private:
 
 	void OnCapturingPlayersChanged();
 
+private:
+	UFUNCTION()
+	void OnRep_OwningTeam();
+
 public:
 	FORCEINLINE USphereComponent* GetCaptureSphere() const { return CaptureSphere; }
 
 	FORCEINLINE UParticleSystemComponent* GetSmokeParticleSystem() const { return SmokeParticleSystem; }
+
+	FORCEINLINE float GetCaptureValue() const { return CaptureValue; }
 
 };
