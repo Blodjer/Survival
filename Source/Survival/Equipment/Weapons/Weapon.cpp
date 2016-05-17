@@ -101,7 +101,7 @@ void AWeapon::HandleFiring()
 void AWeapon::ShootProjectile()
 {
 	FVector Direction = FMath::VRandCone(GetOwnerCharacter()->GetBaseAimRotation().Vector(), FMath::DegreesToRadians(Spread));
-	ServerShootProjectile(GetActorLocation(), Direction);
+	ServerShootProjectile(GetOwnerCharacter()->GetCamera()->GetComponentLocation(), Direction);
 
 	if (!GetWorld()->IsServer())
 	{
