@@ -64,6 +64,9 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	void SimulateFire();
 
+	UFUNCTION(BlueprintImplementableEvent, Category = Weapon)
+	void OnSimulateFire();
+
 	// [client + server]
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	void StartReload();
