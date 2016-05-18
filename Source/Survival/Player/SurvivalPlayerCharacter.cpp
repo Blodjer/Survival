@@ -47,6 +47,8 @@ ASurvivalPlayerCharacter::ASurvivalPlayerCharacter(const FObjectInitializer& Obj
 
 	SurvivalCharacterMovement = Cast<USurvivalCharacterMovement>(Super::GetCharacterMovement());
 
+	bIsDying = false;
+	bIsDead = false;
 	Health = 100.0f;
 
 	bIsSprinting = false;
@@ -168,7 +170,7 @@ void ASurvivalPlayerCharacter::FellOutOfWorld(const UDamageType& dmgType)
 {
 	Super::FellOutOfWorld(dmgType);
 
-	Die(FDamageEvent(dmgType.GetClass()), nullptr);
+	Die(FDamageEvent(dmgType.GetClass()), nullptr, true);
 }
 
 float ASurvivalPlayerCharacter::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -177,7 +179,7 @@ float ASurvivalPlayerCharacter::TakeDamage(float Damage, FDamageEvent const& Dam
 	{
 		return 0.0f;
 	}
-
+	
 	Damage = FMath::Max(0.0f, Damage);
 
 	const float TakenDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
@@ -186,13 +188,13 @@ float ASurvivalPlayerCharacter::TakeDamage(float Damage, FDamageEvent const& Dam
 
 	if (Health <= 0.0f)
 	{
-		Die(DamageEvent, EventInstigator);
+		Die(DamageEvent, EventInstigator, false);
 	}
 
 	return TakenDamage;
 }
 
-void ASurvivalPlayerCharacter::Die(const FDamageEvent& DamageEvent, AController* Killer)
+void ASurvivalPlayerCharacter::Die(const FDamageEvent& DamageEvent, AController* Killer, bool bImmediately)
 {
 	Health = 0.0f;
 
@@ -203,9 +205,63 @@ void ASurvivalPlayerCharacter::Die(const FDamageEvent& DamageEvent, AController*
 		SurvialGameMode->Killed(DamageType, Killer, this->GetController());
 	}
 
+	if (bImmediately)
+	{
+		Die();
+	}
+	else
+	{
+		bIsDying = true;
+		
+		ASurvivalPlayerController* SurvivalPlayerController = GetPlayerController();
+		float DieDelay = SurvivalPlayerController ? SurvivalPlayerController->GetMinDieDelay() : 0.0f;
+		if (DieDelay >= 0.1f)
+		{
+			GetWorldTimerManager().SetTimer(TimerHandle_Die, this, &ASurvivalPlayerCharacter::Die, DieDelay);
+
+			GetCharacterMovement()->StopMovementImmediately();
+			GetCharacterMovement()->DisableMovement();
+
+			GetMesh1P()->SetVisibility(false, true);
+		}
+		else
+		{
+			Die();
+		}
+	}
+}
+
+void ASurvivalPlayerCharacter::Die()
+{
+	bIsDead = true;
+
+	if (GetController())
+	{
+		APlayerController* PlayerController = Cast<APlayerController>(GetController());
+		float RespawnDelay = PlayerController ? PlayerController->GetMinRespawnDelay() : 0.0f;
+		RespawnDelay > 0.0f ? SetLifeSpan(RespawnDelay) : Destroy();
+	}
+	else
+	{
+		Destroy();
+	}
+
 	DetachFromControllerPendingDestroy();
 
-	SetLifeSpan(1.0f);
+	// TODO: Enable Ragdoll
+}
+
+void ASurvivalPlayerCharacter::Revive()
+{
+	if (bIsDying && !bIsDead)
+	{
+		GetWorldTimerManager().ClearTimer(TimerHandle_Die);
+		SetLifeSpan(0.0f);
+
+		bIsDying = false;
+
+		GetMesh1P()->SetVisibility(true, true);
+	}
 }
 
 float ASurvivalPlayerCharacter::GetMaxHealth() const

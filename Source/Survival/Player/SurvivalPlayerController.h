@@ -15,4 +15,20 @@ public:
 
 	virtual void UnFreeze() override;
 
+	UFUNCTION(BlueprintPure, Category = Spawn)
+	float GetRemainingRespawnTime();
+
+	float GetMinDieDelay();
+
+protected:
+	virtual void BeginInactiveState() override;
+
+	virtual void EndInactiveState() override;
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Character)
+	void OnDeath();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Character)
+	void OnRespawn();
+
 };

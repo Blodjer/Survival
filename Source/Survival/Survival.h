@@ -9,6 +9,7 @@
 
 #include "SurvivalStructs.h"
 
+#include "Survival/Game/SurvivalGameMode.h"
 #include "Survival/Game/SurvivalGameState.h"
 
 #include "Survival/Player/SurvivalPlayerCharacter.h"

@@ -11,5 +11,32 @@ ASurvivalPlayerController::ASurvivalPlayerController()
 
 void ASurvivalPlayerController::UnFreeze()
 {
+	Super::UnFreeze();
+
 	ServerRestartPlayer();
+}
+
+float ASurvivalPlayerController::GetRemainingRespawnTime()
+{
+	return GetWorldTimerManager().GetTimerRemaining(TimerHandle_UnFreeze);
+}
+
+float ASurvivalPlayerController::GetMinDieDelay()
+{
+	AGameState const* const GameState = GetWorld()->GameState;
+	return ((GameState != NULL) && (GameState->GameModeClass != NULL)) ? GetDefault<ASurvivalGameMode>(GameState->GameModeClass)->MinDieDelay : 0.0f;
+}
+
+void ASurvivalPlayerController::BeginInactiveState()
+{
+	Super::BeginInactiveState();
+
+	OnDeath();
+}
+
+void ASurvivalPlayerController::EndInactiveState()
+{
+	Super::EndInactiveState();
+
+	OnRespawn();
 }

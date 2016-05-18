@@ -27,6 +27,10 @@ public:
 public:
 	void Killed(const UDamageType* DamageType, AController* Killer, AController* KilledPlayer);
 
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = GameMode, meta = (DisplayName = "Minimum Die Delay"))
+	float MinDieDelay;
+
 protected:
 	// The length of one day in seconds
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0.0", UIMin = "0.0"), Category = "TimeOfDay")

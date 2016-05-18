@@ -12,6 +12,9 @@ ASurvivalGameMode::ASurvivalGameMode()
 	LengthOfDay = 60.0f;
 	StartTimeOfDay = 8.5f;
 
+	MinRespawnDelay = 10.0f;
+	MinDieDelay = 10.0f;
+
 	Teams.Add(FTeamInfo("Alpha", FColor::Blue));
 	Teams.Add(FTeamInfo("Beta", FColor::Red));
 }

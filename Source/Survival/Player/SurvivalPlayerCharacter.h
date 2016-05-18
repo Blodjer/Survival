@@ -4,6 +4,7 @@
 
 #include "GameFramework/Character.h"
 #include "SurvivalCharacterMovement.h"
+#include "SurvivalPlayerController.h"
 #include "SurvivalPlayerCharacter.generated.h"
 
 UCLASS()
@@ -38,7 +39,13 @@ public:
 	virtual float TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Character)
-	void Die(const FDamageEvent& DamageEvent, AController* Killer);
+	void Die(const FDamageEvent& DamageEvent, AController* Killer, bool bImmediately = true);
+
+private:
+	void Die();
+
+public:
+	void Revive();
 
 	// The health value the player starts with
 	UFUNCTION(BlueprintPure, Category = Character)
@@ -163,6 +170,14 @@ private:
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_EquippedHandheld)
 	class AHandheld* EquippedHandheld;
 
+	UPROPERTY(Replicated)
+	bool bIsDying;
+
+	UPROPERTY(Replicated)
+	bool bIsDead;
+
+	FTimerHandle TimerHandle_Die;
+
 protected:
 	// Base controller turn rate, in deg/sec
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera)
@@ -200,6 +215,8 @@ public:
 
 	// Return the custom character movement
 	FORCEINLINE USurvivalCharacterMovement* GetCharacterMovement() const { return SurvivalCharacterMovement; }
+
+	FORCEINLINE ASurvivalPlayerController* GetPlayerController() const { return GetController() ? Cast<ASurvivalPlayerController>(GetController()) : nullptr; }
 
 	// Return the socket name for attaching handheld meshes
 	FORCEINLINE FName GetHandheldAttachPoint() const { return HandheldAttachPoint; }
