@@ -235,20 +235,33 @@ void ASurvivalPlayerCharacter::Die()
 {
 	bIsDead = true;
 
+	SetReplicateMovement(false);
+
 	if (GetController())
 	{
 		APlayerController* PlayerController = Cast<APlayerController>(GetController());
 		float RespawnDelay = PlayerController ? PlayerController->GetMinRespawnDelay() : 0.0f;
-		RespawnDelay > 0.0f ? SetLifeSpan(RespawnDelay) : Destroy();
+		if (RespawnDelay > 0.0f)
+		{
+			SetLifeSpan(RespawnDelay);
+			SetRagdollPhysics();
+		}
+		else
+		{
+			Destroy();
+		}
 	}
 	else
 	{
 		Destroy();
 	}
 
-	DetachFromControllerPendingDestroy();
+	if (EquippedHandheld)
+	{
+		EquippedHandheld->Destroy();
+	}
 
-	// TODO: Enable Ragdoll
+	DetachFromControllerPendingDestroy();
 }
 
 void ASurvivalPlayerCharacter::Revive()
@@ -295,6 +308,24 @@ int32 ASurvivalPlayerCharacter::GetTeamIdx()
 	}
 
 	return -1;
+}
+
+void ASurvivalPlayerCharacter::SetRagdollPhysics()
+{
+	if (!GetMesh() || !GetMesh()->GetPhysicsAsset())
+		return;
+
+	GetCharacterMovement()->StopMovementImmediately();
+	GetCharacterMovement()->DisableMovement();
+	GetCharacterMovement()->SetComponentTickEnabled(false);
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetMesh()->SetAllBodiesSimulatePhysics(true);
+	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->WakeAllRigidBodies();
+	GetMesh()->bBlendPhysics = true;
 }
 
 void ASurvivalPlayerCharacter::MoveForward(float Value)
@@ -519,6 +550,14 @@ void ASurvivalPlayerCharacter::OnRep_EquippedHandheld()
 	SimulateEquip(EquippedHandheld);
 }
 
+void ASurvivalPlayerCharacter::OnRep_IsDead()
+{
+	if (bIsDead)
+	{
+		SetRagdollPhysics();
+	}
+}
+
 void ASurvivalPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -527,4 +566,5 @@ void ASurvivalPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 	DOREPLIFETIME_CONDITION(ASurvivalPlayerCharacter, bIsFlashlightOn, COND_SkipOwner);
 	DOREPLIFETIME(ASurvivalPlayerCharacter, EquippedHandheld);
 	DOREPLIFETIME(ASurvivalPlayerCharacter, Health);
+	DOREPLIFETIME(ASurvivalPlayerCharacter, bIsDead);
 }

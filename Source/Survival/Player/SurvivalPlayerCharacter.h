@@ -65,6 +65,9 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = Character, meta = (AllowPrivateAccess = "true"))
 	void OnPossessedLocal();
 
+	UFUNCTION(BlueprintCallable, Category = Character)
+	void SetRagdollPhysics();
+
 private:
 	// Moves the character alongs his x-axis
 	void MoveForward(float Value);
@@ -170,10 +173,10 @@ private:
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_EquippedHandheld)
 	class AHandheld* EquippedHandheld;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(Transient, Replicated)
 	bool bIsDying;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_IsDead)
 	bool bIsDead;
 
 	FTimerHandle TimerHandle_Die;
@@ -230,5 +233,8 @@ private:
 	
 	UFUNCTION()
 	void OnRep_EquippedHandheld();
+
+	UFUNCTION()
+	void OnRep_IsDead();
 
 };
