@@ -19,6 +19,10 @@ public:
 	
 	virtual void Tick( float DeltaSeconds ) override;
 
+public:
+	UFUNCTION(BlueprintPure, Category = Campfire)
+	bool IsCaptured();
+
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Campfire, meta = (AllowPrivateAccess = "true"))
 	USphereComponent* CaptureSphere;
@@ -70,4 +74,5 @@ public:
 
 	FORCEINLINE FLinearColor GetOwnerBaseColor() const { return OwnerBaseColor; }
 
+	FORCEINLINE int32 GetOwningTeamIdx() const { return OwningTeamIdx; }
 };

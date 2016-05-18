@@ -20,6 +20,13 @@ public:
 
 	float GetMinDieDelay();
 
+	UFUNCTION(Client, Reliable)
+	void MatchHasEnded(int32 WinnerTeamIdx);
+	void MatchHasEnded_Implementation(int32 WinnerTeamIdx);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Match)
+	void OnMatchHasEnded(int32 WinnerTeamIdx);
+
 protected:
 	virtual void BeginInactiveState() override;
 

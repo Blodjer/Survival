@@ -24,23 +24,33 @@ public:
 
 	virtual bool ShouldSpawnAtStartSpot(AController* Player) override;
 
+	virtual void Tick(float DeltaTime) override;
+
 public:
 	void Killed(const UDamageType* DamageType, AController* Killer, AController* KilledPlayer);
+
+	void RegisterCampfire(class ACampfire* Campfire);
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = GameMode, meta = (DisplayName = "Minimum Die Delay"))
 	float MinDieDelay;
 
 protected:
+	virtual bool DetermineMatchWinner(int32& WinnerTeamIdx);
+
+protected:
 	// The length of one day in seconds
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0.0", UIMin = "0.0"), Category = "TimeOfDay")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0.0", UIMin = "0.0"), Category = TimeOfDay)
 	float LengthOfDay;
 
 	// At what time the match should start (0-24)
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0.0", ClampMax = "24.0", UIMin = "0.0", UIMax = "24.0"), Category = "TimeOfDay")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0.0", ClampMax = "24.0", UIMin = "0.0", UIMax = "24.0"), Category = TimeOfDay)
 	float StartTimeOfDay;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Teams")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Teams)
 	TArray<FTeamInfo> Teams;
+
+	UPROPERTY(BlueprintReadOnly, Category = GameMode)
+	TArray<class ACampfire*> Campfires;
 	
 };

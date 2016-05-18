@@ -5,6 +5,7 @@
 #include "SurvivalGameState.h"
 #include "Survival/Spawner/SurvivalPlayerStart.h"
 #include "Survival/Player/SurvivalPlayerState.h"
+#include "Survival/Level/Campfire.h"
 
 
 ASurvivalGameMode::ASurvivalGameMode()
@@ -122,6 +123,26 @@ bool ASurvivalGameMode::ShouldSpawnAtStartSpot(AController* Player)
 	return false;
 }
 
+void ASurvivalGameMode::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	int32 WinnerTeamIdx;
+	if (IsMatchInProgress() && DetermineMatchWinner(WinnerTeamIdx))
+	{
+		EndMatch();
+
+		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+		{
+			ASurvivalPlayerController* SurvivalPlayerController = Cast<ASurvivalPlayerController>(Iterator->Get());
+			if (SurvivalPlayerController)
+			{
+				SurvivalPlayerController->MatchHasEnded(WinnerTeamIdx);
+			}
+		}
+	}
+}
+
 void ASurvivalGameMode::Killed(const UDamageType* DamageType, AController* Killer, AController* KilledPlayer)
 {
 	if (Killer != nullptr && Killer->PlayerState != nullptr && KilledPlayer != nullptr && KilledPlayer->PlayerState != nullptr)
@@ -135,4 +156,77 @@ void ASurvivalGameMode::Killed(const UDamageType* DamageType, AController* Kille
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, DamageType->bCausedByWorld ? "World killed you" : "unknown killer");
 	}
+}
+
+void ASurvivalGameMode::RegisterCampfire(ACampfire* Campfire)
+{
+	Campfires.Add(Campfire);
+}
+
+bool ASurvivalGameMode::DetermineMatchWinner(int32& WinnerTeamIdx)
+{
+	// Captured all Campfires
+	for (int32 TeamIdx = 0; TeamIdx < Teams.Num(); TeamIdx++)
+	{
+		int32 OwnedCampfires = 0;
+		for (ACampfire* Campfire : Campfires)
+		{
+			if (Campfire->IsCaptured() && Campfire->GetOwningTeamIdx() == TeamIdx)
+			{
+				OwnedCampfires++;
+
+				if (OwnedCampfires == Campfires.Num())
+				{
+					WinnerTeamIdx = TeamIdx;
+					return true;
+				}
+			}
+		}
+	}
+
+	// Killed all other teams
+	if (Teams.Num() >= 2)
+	{
+		TMap<int32, uint32> AlivePlayersInTeam;
+		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+		{
+			ASurvivalPlayerController* SurvivalPlayerController = Cast<ASurvivalPlayerController>(Iterator->Get());
+			if (SurvivalPlayerController)
+			{
+				ASurvivalPlayerState* SurvivalPlayerState = Cast<ASurvivalPlayerState>(SurvivalPlayerController->PlayerState);
+				if (SurvivalPlayerState)
+				{
+					uint32& PlayersAlive = AlivePlayersInTeam.FindOrAdd(SurvivalPlayerState->GetTeamIdx());
+
+					if (!(SurvivalPlayerController->IsFrozen() || SurvivalPlayerController->GetPawn() && SurvivalPlayerController->GetPawn()->IsPendingKill()))
+					{
+						PlayersAlive++;
+					}				
+				}
+			}
+		}
+		if (AlivePlayersInTeam.Num() >= 2)
+		{
+			for (int32 TeamIdx = 0; TeamIdx < Teams.Num(); TeamIdx++)
+			{
+				uint32* PlayersAlive = AlivePlayersInTeam.Find(TeamIdx);
+				if (PlayersAlive != nullptr)
+				{
+					if (*PlayersAlive == 0)
+					{
+						AlivePlayersInTeam.Remove(TeamIdx);
+					}
+				}
+			}
+			if (AlivePlayersInTeam.Num() == 1)
+			{
+				TArray<int32> WinnerTeams;
+				AlivePlayersInTeam.GetKeys(WinnerTeams);
+				WinnerTeamIdx = WinnerTeams[0];
+				return true;
+			}
+		}
+	}
+
+	return false;
 }

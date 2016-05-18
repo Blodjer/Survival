@@ -40,6 +40,18 @@ void ACampfire::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if (HasAuthority() && GetWorld())
+	{
+		AGameMode* GameMode = GetWorld()->GetAuthGameMode();
+		if (GameMode)
+		{
+			ASurvivalGameMode* SurvivalGameMode = Cast<ASurvivalGameMode>(GameMode);
+			if (SurvivalGameMode)
+			{
+				SurvivalGameMode->RegisterCampfire(this);
+			}
+		}
+	}
 }
 
 void ACampfire::Tick(float DeltaTime)
@@ -68,9 +80,13 @@ void ACampfire::Tick(float DeltaTime)
 		}
 	}
 
-
 	FLinearColor SmokeColor = FMath::Lerp(SmokeBaseColor, OwnerBaseColor, FMath::Pow(CaptureValue, 4));
 	SmokeParticleSystem->SetColorParameter("SmokeColor", SmokeColor);
+}
+
+bool ACampfire::IsCaptured()
+{
+	return CaptureValue >= 1.0f;
 }
 
 void ACampfire::OnBeginOverlap(AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
