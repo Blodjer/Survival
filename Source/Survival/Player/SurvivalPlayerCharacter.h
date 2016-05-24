@@ -51,6 +51,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = Character)
 	float GetMaxHealth() const;
 
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Character)
+	void Heal(float Value);
+
 	UFUNCTION(BlueprintCallable, Category = Team)
 	bool GetTeamInfo(FTeamInfo& TeamInfo);
 
