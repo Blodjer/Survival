@@ -26,6 +26,7 @@ ASurvivalPlayerCharacter::ASurvivalPlayerCharacter(const FObjectInitializer& Obj
 	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>("Mesh1P");
 	Mesh1P->AttachTo(Camera);
 	Mesh1P->SetOnlyOwnerSee(true);
+	Mesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Mesh1P->CastShadow = false;
 
 	// Set 3rd person mesh invisible for owner

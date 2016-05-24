@@ -8,8 +8,8 @@ AWeaponProjectile::AWeaponProjectile()
 {
 	// Create the sphere collision
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>("CollisionComponent");
-	CollisionComponent->InitSphereRadius(3.0f);
-	CollisionComponent->SetCollisionProfileName("BlockAllDynamic");
+	CollisionComponent->InitSphereRadius(2.0f);
+	CollisionComponent->SetCollisionProfileName("Projectile");
 	CollisionComponent->bTraceComplexOnMove = true;
 	RootComponent = CollisionComponent;
 
