@@ -17,7 +17,7 @@ ASurvivalGameMode::ASurvivalGameMode()
 	MinDieDelay = 10.0f;
 
 	Teams.Add(FTeamInfo("Alpha", FColor::Blue));
-	Teams.Add(FTeamInfo("Beta", FColor::Red));
+	Teams.Add(FTeamInfo("Bravo", FColor::Red));
 }
 
 void ASurvivalGameMode::PostInitializeComponents()
