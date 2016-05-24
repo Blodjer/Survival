@@ -24,6 +24,7 @@ ACampfire::ACampfire()
 	SmokeBaseColor = FLinearColor(0.15f, 0.15f, 0.15f);
 
 	bReplicates = true;
+	bAlwaysRelevant = true;
 
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.TickGroup = ETickingGroup::TG_PostPhysics;
