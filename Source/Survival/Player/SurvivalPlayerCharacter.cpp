@@ -4,6 +4,7 @@
 #include "SurvivalPlayerCharacter.h"
 #include "Survival/Game/SurvivalGameMode.h"
 #include "SurvivalPlayerState.h"
+#include "Survival/Pickups/Pickup.h"
 
 ASurvivalPlayerCharacter::ASurvivalPlayerCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<USurvivalCharacterMovement>(ACharacter::CharacterMovementComponentName))
@@ -52,6 +53,8 @@ ASurvivalPlayerCharacter::ASurvivalPlayerCharacter(const FObjectInitializer& Obj
 	Health = 100.0f;
 
 	bIsSprinting = false;
+
+	PickupRange = 250.0f;
 	
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -114,6 +117,8 @@ void ASurvivalPlayerCharacter::SetupPlayerInputComponent(class UInputComponent* 
 	InputComponent->BindAxis("LookUpAtRate", this, &ASurvivalPlayerCharacter::LookUpAtRate);
 
 	InputComponent->BindAction("Flashlight", IE_Pressed, this, &ASurvivalPlayerCharacter::ToggleFlashlight);
+
+	InputComponent->BindAction("Pickup", IE_Pressed, this, &ASurvivalPlayerCharacter::Pickup);
 }
 
 void ASurvivalPlayerCharacter::PossessedBy(AController* NewController)
@@ -163,6 +168,11 @@ void ASurvivalPlayerCharacter::Tick(float DeltaTime)
 	if (!IsLocallyControlled())
 	{
 		Flashlight->SetWorldRotation(GetBaseAimRotation());
+	}
+
+	if (IsLocallyControlled())
+	{
+		UpdateTargetPickup();
 	}
 }
 
@@ -526,6 +536,60 @@ void ASurvivalPlayerCharacter::UpdateTeamColors()
 			}
 		}
 	}
+}
+
+void ASurvivalPlayerCharacter::UpdateTargetPickup()
+{
+	APickup* NewTargetPickup;
+
+	FHitResult HitResult;
+
+	FVector TraceStart = GetCamera()->GetComponentLocation();
+	FVector TraceEnd = TraceStart + GetBaseAimRotation().Vector() * PickupRange;
+
+	FCollisionQueryParams CollisionQueryParams;
+	CollisionQueryParams.AddIgnoredActor(this);
+	CollisionQueryParams.AddIgnoredActor(EquippedHandheld);
+
+	if (GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECollisionChannel::ECC_Camera, CollisionQueryParams))
+	{
+		NewTargetPickup = Cast<APickup>(HitResult.GetActor());
+	}
+	else
+	{
+		NewTargetPickup = nullptr;
+	}
+
+	if (TargetingPickup != NewTargetPickup)
+	{
+		if (TargetingPickup && TargetingPickup->GetPickupMesh())
+		{
+			TargetingPickup->GetPickupMesh()->SetRenderCustomDepth(false);
+		}
+
+		if (NewTargetPickup && NewTargetPickup->GetPickupMesh())
+		{
+			NewTargetPickup->GetPickupMesh()->SetRenderCustomDepth(true);
+		}
+	}
+
+	TargetingPickup = NewTargetPickup;
+}
+
+void ASurvivalPlayerCharacter::Pickup()
+{
+	if (TargetingPickup == nullptr)
+		return;
+
+	ServerPickup(TargetingPickup);
+}
+
+void ASurvivalPlayerCharacter::ServerPickup_Implementation(APickup* Pickup)
+{
+	if (Pickup == nullptr || Pickup->IsPendingKill())
+		return;
+
+	Pickup->Pickup(this);
 }
 
 void ASurvivalPlayerCharacter::OnRep_IsSprinting()

@@ -148,6 +148,16 @@ private:
 
 	void UpdateTeamColors();
 
+	UFUNCTION(BlueprintCallable, Category = Pickup)
+	void UpdateTargetPickup();
+
+	void Pickup();
+
+	UFUNCTION(Server, Reliable, WithValidation, Category = Pickup)
+	void ServerPickup(class APickup* Pickup);
+	void ServerPickup_Implementation(class APickup* Pickup);
+	bool ServerPickup_Validate(class APickup* Pickup) { return true; };
+
 private:
 	// First person mesh. Seen only by owner.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character, meta = (AllowPrivateAccess = "true"))
@@ -181,6 +191,9 @@ private:
 
 	FTimerHandle TimerHandle_Die;
 
+	UPROPERTY(Transient, BlueprintReadOnly, Category = Pickup, meta = (AllowPrivateAccess = "true"))
+	class APickup* TargetingPickup;
+
 protected:
 	// Base controller turn rate, in deg/sec
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera)
@@ -205,6 +218,9 @@ protected:
 	// Default equipment spawned on player spawn
 	UPROPERTY(EditDefaultsOnly, Category = Loadout)
 	TArray<TSubclassOf<class AHandheld>> StartEquipment;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Pickup)
+	float PickupRange;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = Material)
 	TArray<UMaterialInstanceDynamic*> MeshMIDs;
