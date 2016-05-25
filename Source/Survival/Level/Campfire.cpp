@@ -17,9 +17,11 @@ ACampfire::ACampfire()
 	OwningTeamIdx = -1;
 	DominantTeamIdx = -1;
 
-	CaptureDuration = 10.0f;
+	CaptureDuration = 18.0f;
+	CaptureDurationMuliplier = 0.5f;
 
 	CaptureValue = 0.0f;
+	CurrentCaptureDurationMultiplier = 1.0f;
 
 	SmokeBaseColor = FLinearColor(0.15f, 0.15f, 0.15f);
 
@@ -63,7 +65,7 @@ void ACampfire::Tick(float DeltaTime)
 	{
 		if (DominantTeamIdx != OwningTeamIdx)
 		{
-			CaptureValue = FMath::Clamp(CaptureValue - DeltaTime / CaptureDuration, 0.0f, 1.0f);
+			CaptureValue = FMath::Clamp(CaptureValue - DeltaTime / (CaptureDuration * CurrentCaptureDurationMultiplier), 0.0f, 1.0f);
 
 			if (CaptureValue <= 0.0f)
 			{
@@ -77,7 +79,7 @@ void ACampfire::Tick(float DeltaTime)
 		}
 		else if (CaptureValue < 1.0f)
 		{
-			CaptureValue = FMath::Clamp(CaptureValue + DeltaTime / CaptureDuration, 0.0f, 1.0f);
+			CaptureValue = FMath::Clamp(CaptureValue + DeltaTime / (CaptureDuration * CurrentCaptureDurationMultiplier), 0.0f, 1.0f);
 		}
 	}
 
@@ -163,15 +165,20 @@ void ACampfire::OnCapturingPlayersChanged()
 		if (!bDraw)
 		{
 			this->DominantTeamIdx = DominantTeamIdx;
+			
+			int32 TeamPower = CapturingTeams[this->DominantTeamIdx] - (CapturingPlayers.Num() - CapturingTeams[this->DominantTeamIdx]);
+			this->CurrentCaptureDurationMultiplier = FMath::Pow(CaptureDurationMuliplier, TeamPower - 1);
 		}
 		else
 		{
 			this->DominantTeamIdx = -1;
+			this->CurrentCaptureDurationMultiplier = 1.0f;
 		}
 	}
 	else
 	{
 		this->DominantTeamIdx = -1;
+		this->CurrentCaptureDurationMultiplier = 1.0f;
 	}
 }
 

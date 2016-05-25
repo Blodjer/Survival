@@ -43,11 +43,17 @@ private:
 	FLinearColor OwnerBaseColor;
 
 	// The time it takes to capture and neutralize the campfire
-	UPROPERTY(EditDefaultsOnly, Category = Campfire, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, Category = Campfire, meta = (ClampMin = "0", UIMin = "0", AllowPrivateAccess = "true"))
 	float CaptureDuration;
+
+	UPROPERTY(EditDefaultsOnly, Category = Campfire, meta = (ClampMin = "0", UIMin = "0", ClampMax = "1", UIMax = "1", AllowPrivateAccess = "true"))
+	float CaptureDurationMuliplier;
 
 	UPROPERTY(BlueprintReadOnly, Transient, Replicated, Category = Campfire, meta = (AllowPrivateAccess = "true"))
 	float CaptureValue;
+
+	UPROPERTY(BlueprintReadOnly, Transient, Category = Campfire, meta = (AllowPrivateAccess = "true"))
+	float CurrentCaptureDurationMultiplier;
 
 	UPROPERTY(EditDefaultsOnly, Category = Campfire)
 	FLinearColor SmokeBaseColor;
