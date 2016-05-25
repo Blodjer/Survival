@@ -295,7 +295,7 @@ float ASurvivalPlayerCharacter::GetMaxHealth() const
 
 void ASurvivalPlayerCharacter::Heal(float Value)
 {
-	Health += FMath::Max(0.0f, Value);
+	Health = FMath::Min(Health + FMath::Max(0.0f, Value), GetMaxHealth());
 }
 
 bool ASurvivalPlayerCharacter::GetTeamInfo(FTeamInfo& TeamInfo)
