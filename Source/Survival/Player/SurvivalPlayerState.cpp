@@ -42,6 +42,24 @@ bool ASurvivalPlayerState::GetTeamInfo(FTeamInfo& TeamInfo)
 	return false;
 }
 
+TArray<ASurvivalPlayerCharacter*> ASurvivalPlayerState::GetSpawnedTeamMates()
+{
+	TArray<ASurvivalPlayerCharacter*> TeamMates;
+	for (FConstPawnIterator Iterator = GetWorld()->GetPawnIterator(); Iterator; ++Iterator)
+	{
+		ASurvivalPlayerCharacter* SurvivalPlayerCharacter = Cast<ASurvivalPlayerCharacter>(Iterator->Get());
+		if (SurvivalPlayerCharacter)
+		{
+			if (!SurvivalPlayerCharacter->IsLocallyControlled() && SurvivalPlayerCharacter->GetTeamIdx() == GetTeamIdx())
+			{
+				TeamMates.Add(SurvivalPlayerCharacter);
+			}
+		}
+	}
+
+	return TeamMates;
+}
+
 void ASurvivalPlayerState::OnRep_TeamIdx()
 {
 	AssignToTeam(TeamIdx);

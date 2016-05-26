@@ -19,6 +19,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Team)
 	bool GetTeamInfo(FTeamInfo& TeamInfo);
 
+	UFUNCTION(BlueprintCallable, Category = Team)
+	TArray<ASurvivalPlayerCharacter*> GetSpawnedTeamMates();
+
 private:
 	UPROPERTY(Transient, BlueprintReadOnly, ReplicatedUsing = OnRep_TeamIdx, Category = Team, meta = (AllowPrivateAccess = "true"))
 	int32 TeamIdx;
