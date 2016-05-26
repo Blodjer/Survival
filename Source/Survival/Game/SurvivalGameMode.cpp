@@ -150,11 +150,11 @@ void ASurvivalGameMode::Killed(const UDamageType* DamageType, AController* Kille
 		FString KillerName = Killer->PlayerState->GetHumanReadableName();
 		FString KilledPlayerName = KilledPlayer->PlayerState->GetHumanReadableName();
 
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString(KillerName + " killed " + KilledPlayerName));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString(KillerName + " killed " + KilledPlayerName));
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, DamageType->bCausedByWorld ? "World killed you" : "unknown killer");
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, DamageType->bCausedByWorld ? "World killed you" : "unknown killer");
 	}
 }
 
