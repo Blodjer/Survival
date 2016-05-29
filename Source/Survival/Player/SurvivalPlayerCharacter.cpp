@@ -53,6 +53,9 @@ ASurvivalPlayerCharacter::ASurvivalPlayerCharacter(const FObjectInitializer& Obj
 	bIsDead = false;
 	Health = 100.0f;
 
+	DamagingLandingVelocity = 1000.0f;
+	DeadlyLandingVelocity = 1500.0f;
+
 	bIsSprinting = false;
 
 	PickupRange = 250.0f;
@@ -174,6 +177,17 @@ void ASurvivalPlayerCharacter::Tick(float DeltaTime)
 	if (IsLocallyControlled())
 	{
 		UpdateTargetPickup();
+	}
+}
+
+void ASurvivalPlayerCharacter::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+	
+	if (FMath::Abs(GetVelocity().Z) > DamagingLandingVelocity)
+	{
+		float Damage = (FMath::Abs(GetVelocity().Z) - DamagingLandingVelocity) / (DeadlyLandingVelocity - DamagingLandingVelocity) * GetMaxHealth();
+		TakeDamage(Damage, FDamageEvent(), nullptr, Hit.GetActor());
 	}
 }
 

@@ -34,6 +34,8 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 public:
+	virtual void Landed(const FHitResult& Hit) override;
+
 	virtual void FellOutOfWorld(const class UDamageType& dmgType) override;
 
 	virtual float TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
@@ -209,6 +211,14 @@ protected:
 	// Current health
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = Character, meta = (ClampMin = "0.0", UIMin = "0.0"))
 	float Health;
+
+	// Landing velocity at which the character starts taking damage
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Character, meta = (ClampMin = "0.0", UIMin = "0.0"))
+	float DamagingLandingVelocity;
+
+	// Landing velocity at which the character dies
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Character, meta = (ClampMin = "0.0", UIMin = "0.0"))
+	float DeadlyLandingVelocity;
 
 	// Set by character movement to specify that this Character is currently sprinting
 	UPROPERTY(Transient, BlueprintReadOnly, ReplicatedUsing = OnRep_IsSprinting, Category = Character)
