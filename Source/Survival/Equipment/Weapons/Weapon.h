@@ -85,6 +85,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapon)
 	TSubclassOf<class AWeaponProjectile> ProjectileClass;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapon, meta = (ClampMin = "0.0", UIMin = "0.0"))
+	float Damage;
+
 	// Rate of fire in rpm (rounds per minute)
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapon)
 	float RateOfFire;
@@ -137,5 +140,8 @@ private:
 
 	UFUNCTION()
 	void OnRep_Reload();
+
+public:
+	FORCEINLINE float GetDamage() const { return Damage; };
 
 };

@@ -8,6 +8,8 @@ AWeapon::AWeapon()
 {
 	CurrentState = EWeaponState::Idle;
 
+	Damage = 25.0f;
+
 	RateOfFire = 750;
 
 	RecoilUpMin = 0.45f;

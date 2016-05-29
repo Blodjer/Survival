@@ -36,6 +36,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Projectile)
 	float LifeSpan;
 
+	UPROPERTY(Transient, BlueprintReadOnly, Category = Projectile)
+	float Damage;
+
 private:
 	// Projectile movement
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, meta = (AllowPrivateAccess = "true"))

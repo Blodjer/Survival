@@ -2,6 +2,7 @@
 
 #include "Survival.h"
 #include "WeaponProjectile.h"
+#include "Weapon.h"
 
 
 AWeaponProjectile::AWeaponProjectile()
@@ -54,6 +55,15 @@ void AWeaponProjectile::PostInitializeComponents()
 	CollisionComponent->MoveIgnoreActors.Add(GetOwner());
 
 	ProjectileMovement->OnProjectileStop.AddDynamic(this, &AWeaponProjectile::OnImpact);
+
+	if (GetOwner())
+	{
+		AWeapon* OwnerWeapon = Cast<AWeapon>(GetOwner());
+		if (OwnerWeapon)
+		{
+			Damage = OwnerWeapon->GetDamage();
+		}
+	}
 }
 
 void AWeaponProjectile::InitProjectile(FVector& Direction)
@@ -67,10 +77,10 @@ void AWeaponProjectile::OnImpact(const FHitResult& HitResult)
 	if (HitResult.GetActor() != nullptr)
 	{
 			FPointDamageEvent PointDamage = FPointDamageEvent();
-			PointDamage.Damage = 25.0f;
+			PointDamage.Damage = Damage;
 			PointDamage.HitInfo = HitResult;
 			PointDamage.ShotDirection = HitResult.ImpactNormal;
 
-			HitResult.GetActor()->TakeDamage(25.0f, PointDamage, GetInstigatorController(), this);
+			HitResult.GetActor()->TakeDamage(Damage, PointDamage, GetInstigatorController(), this);
 	}
 }
