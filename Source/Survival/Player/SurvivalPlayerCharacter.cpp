@@ -47,6 +47,7 @@ ASurvivalPlayerCharacter::ASurvivalPlayerCharacter(const FObjectInitializer& Obj
 
 	bIsFlashlightOn = false;
 	Flashlight->SetVisibility(bIsFlashlightOn);
+	FlashlightBatteryPowerDrain = 0.016f;
 
 	SurvivalCharacterMovement = Cast<USurvivalCharacterMovement>(Super::GetCharacterMovement());
 
@@ -56,6 +57,8 @@ ASurvivalPlayerCharacter::ASurvivalPlayerCharacter(const FObjectInitializer& Obj
 
 	DamagingLandingVelocity = 1000.0f;
 	DeadlyLandingVelocity = 1500.0f;
+
+	StartBatteryPower = 1.0f;
 
 	bIsSprinting = false;
 
@@ -89,6 +92,8 @@ void ASurvivalPlayerCharacter::PostInitializeComponents()
 			AmmunitionInventory.AddAmmo(Ammo.Type, Ammo.Amount);
 		}
 	}
+
+	CurrentBatteryPower = StartBatteryPower;
 
 	for (int32 i = 0; i < GetMesh()->GetNumMaterials(); i++)
 	{
@@ -182,6 +187,12 @@ void ASurvivalPlayerCharacter::Tick(float DeltaTime)
 	{
 		Flashlight->SetWorldRotation(GetBaseAimRotation());
 	}
+
+	if (bIsFlashlightOn)
+	{
+		DrainBatteryPower(FlashlightBatteryPowerDrain * DeltaTime);
+	}
+	Flashlight->SetIntensity(GetMaxFlashlightIntensity() * FMath::Pow(CurrentBatteryPower, 2.0f));
 
 	if (IsLocallyControlled())
 	{
@@ -311,11 +322,6 @@ void ASurvivalPlayerCharacter::Revive()
 	}
 }
 
-float ASurvivalPlayerCharacter::GetMaxHealth() const
-{
-	return GetClass()->GetDefaultObject<ASurvivalPlayerCharacter>()->Health;
-}
-
 void ASurvivalPlayerCharacter::Heal(float Value)
 {
 	Health = FMath::Min(Health + FMath::Max(0.0f, Value), GetMaxHealth());
@@ -367,6 +373,19 @@ int32 ASurvivalPlayerCharacter::RequestAmmo(TSubclassOf<AWeaponProjectile> Type,
 int32 ASurvivalPlayerCharacter::GetAmmoAmmountOfType(TSubclassOf<AWeaponProjectile> Type) const
 {
 	return AmmunitionInventory.GetAmmoAmmountOfType(Type);
+}
+
+void ASurvivalPlayerCharacter::AddBatteryPower(float Amount)
+{
+	if (Amount <= 0.0f)
+		return;
+
+	CurrentBatteryPower = FMath::Min(CurrentBatteryPower + Amount, 1.0f);
+}
+
+void ASurvivalPlayerCharacter::DrainBatteryPower(float Amount)
+{
+	CurrentBatteryPower = FMath::Max(0.0f, CurrentBatteryPower - FMath::Abs(Amount));
 }
 
 void ASurvivalPlayerCharacter::SetRagdollPhysics()
@@ -686,9 +705,13 @@ void ASurvivalPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(ASurvivalPlayerCharacter, bIsSprinting, COND_SkipOwner);
-	DOREPLIFETIME_CONDITION(ASurvivalPlayerCharacter, bIsFlashlightOn, COND_SkipOwner);
+
 	DOREPLIFETIME(ASurvivalPlayerCharacter, EquippedHandheld);
+	DOREPLIFETIME(ASurvivalPlayerCharacter, AmmunitionInventory);
+	DOREPLIFETIME(ASurvivalPlayerCharacter, CurrentBatteryPower);
+
+	DOREPLIFETIME_CONDITION(ASurvivalPlayerCharacter, bIsFlashlightOn, COND_SkipOwner);
+
 	DOREPLIFETIME(ASurvivalPlayerCharacter, Health);
 	DOREPLIFETIME(ASurvivalPlayerCharacter, bIsDead);
-	DOREPLIFETIME(ASurvivalPlayerCharacter, AmmunitionInventory);
 }

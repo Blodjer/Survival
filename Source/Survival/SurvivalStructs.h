@@ -77,6 +77,9 @@ public:
 
 	void AddAmmo(TSubclassOf<class AWeaponProjectile> Type, int32 Amount)
 	{
+		if (Amount <= 0)
+			return;
+
 		int32 i = IndexOf(Type);
 		if (i != INDEX_NONE)
 		{
@@ -104,7 +107,7 @@ public:
 
 	int32 const GetAmmoAmmountOfType(TSubclassOf<class AWeaponProjectile> Type) const
 	{
-		int32 i = AmmunitionTypes.IndexOfByKey(Type);
+		int32 i = IndexOf(Type);
 		if (i != INDEX_NONE)
 		{
 			return AmmunitionCounts[i];

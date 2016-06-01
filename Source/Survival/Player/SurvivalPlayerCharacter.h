@@ -50,10 +50,6 @@ private:
 public:
 	void Revive();
 
-	// The health value the player starts with
-	UFUNCTION(BlueprintPure, Category = Character)
-	float GetMaxHealth() const;
-
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Character)
 	void Heal(float Value);
 
@@ -75,12 +71,21 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Ammunition)
 	int32 GetAmmoAmmountOfType(TSubclassOf<class AWeaponProjectile> Type) const;
 
+	UFUNCTION(BlueprintCallable, Category = Battery)
+	void AddBatteryPower(float Amount);
+
+	UFUNCTION(BlueprintCallable, Category = Battery)
+	void DrainBatteryPower(float Amount);
+
 public:
 	UPROPERTY(BlueprintReadOnly, Transient, Category = Campfire)
 	class ACampfire* CapturingCampfire;
 
 	UPROPERTY(BlueprintReadOnly, Replicated, Transient, Category = Ammunition)
 	FAmmunitionInventory AmmunitionInventory;
+
+	UPROPERTY(BlueprintReadOnly, Replicated, Transient, Category = Battery)
+	float CurrentBatteryPower;
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = Character, meta = (AllowPrivateAccess = "true"))
@@ -252,6 +257,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Loadout)
 	TArray<FAmmo> StartAmmunition;
 
+	// Default battery power player spawn
+	UPROPERTY(EditDefaultsOnly, Category = Loadout, meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
+	float StartBatteryPower;
+
+	// Battery power drain per second
+	UPROPERTY(EditDefaultsOnly, Category = Flashlight, meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
+	float FlashlightBatteryPowerDrain;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Pickup)
 	float PickupRange;
 
@@ -272,6 +285,14 @@ public:
 
 	// Return the socket name for attaching handheld meshes
 	FORCEINLINE FName GetHandheldAttachPoint() const { return HandheldAttachPoint; }
+
+	// The health value the player starts with
+	UFUNCTION(BlueprintPure, Category = Character)
+	FORCEINLINE float GetMaxHealth() const { return GetClass()->GetDefaultObject<ASurvivalPlayerCharacter>()->Health; };
+
+	// The health value the player starts with
+	UFUNCTION(BlueprintPure, Category = Character)
+	FORCEINLINE float GetMaxFlashlightIntensity() const { return GetClass()->GetDefaultObject<ASurvivalPlayerCharacter>()->Flashlight->Intensity; };
 	
 private:
 	UFUNCTION()
