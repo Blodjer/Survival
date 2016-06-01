@@ -83,7 +83,7 @@ protected:
 protected:
 	// The projectile the weapon uses
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapon)
-	TSubclassOf<class AWeaponProjectile> ProjectileClass;
+	TSubclassOf<class AWeaponProjectile> ProjectileType;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapon, meta = (ClampMin = "0.0", UIMin = "0.0"))
 	float Damage;

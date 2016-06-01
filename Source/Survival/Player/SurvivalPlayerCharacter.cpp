@@ -5,6 +5,7 @@
 #include "Survival/Game/SurvivalGameMode.h"
 #include "SurvivalPlayerState.h"
 #include "Survival/Pickups/Pickup.h"
+#include "Survival/Equipment/Weapons/Weapon.h"
 
 ASurvivalPlayerCharacter::ASurvivalPlayerCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<USurvivalCharacterMovement>(ACharacter::CharacterMovementComponentName))
@@ -348,6 +349,11 @@ int32 ASurvivalPlayerCharacter::GetTeamIdx()
 	return -1;
 }
 
+AWeapon* ASurvivalPlayerCharacter::GetEquippedWeapon() const
+{
+	return EquippedHandheld != nullptr ? Cast<AWeapon>(EquippedHandheld) : nullptr;
+}
+
 void ASurvivalPlayerCharacter::AddAmmo(TSubclassOf<AWeaponProjectile> Type, int32 Amount)
 {
 	AmmunitionInventory.AddAmmo(Type, Amount);
@@ -356,6 +362,11 @@ void ASurvivalPlayerCharacter::AddAmmo(TSubclassOf<AWeaponProjectile> Type, int3
 int32 ASurvivalPlayerCharacter::RequestAmmo(TSubclassOf<AWeaponProjectile> Type, int32 Amount)
 {
 	return AmmunitionInventory.RequestAmmo(Type, Amount);
+}
+
+int32 ASurvivalPlayerCharacter::GetAmmoAmmountOfType(TSubclassOf<AWeaponProjectile> Type) const
+{
+	return AmmunitionInventory.GetAmmoAmmountOfType(Type);
 }
 
 void ASurvivalPlayerCharacter::SetRagdollPhysics()

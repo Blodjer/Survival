@@ -120,7 +120,7 @@ void AWeapon::ShootProjectile()
 
 void AWeapon::ServerShootProjectile_Implementation(FVector Origin, FVector_NetQuantizeNormal Direction)
 {
-	if (ProjectileClass == nullptr || GetWorld() == nullptr)
+	if (ProjectileType == nullptr || GetWorld() == nullptr)
 		return;
 
 	FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
@@ -128,7 +128,7 @@ void AWeapon::ServerShootProjectile_Implementation(FVector Origin, FVector_NetQu
 	SpawnParameters.Owner = this;
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	AWeaponProjectile* NewProjectile = GetWorld()->SpawnActor<AWeaponProjectile>(ProjectileClass, Origin, Direction.Rotation(), SpawnParameters);
+	AWeaponProjectile* NewProjectile = GetWorld()->SpawnActor<AWeaponProjectile>(ProjectileType, Origin, Direction.Rotation(), SpawnParameters);
 	if (NewProjectile)
 	{
 		NewProjectile->InitProjectile(Direction);
@@ -215,7 +215,7 @@ void AWeapon::Reload()
 
 	if (HasAuthority() || GetOwnerCharacter()->IsLocallyControlled())
 	{
-		CurrentRoundsInMagazine = GetOwnerCharacter()->RequestAmmo(ProjectileClass, MaxRoundsPerMagazine);
+		CurrentRoundsInMagazine = GetOwnerCharacter()->RequestAmmo(ProjectileType, MaxRoundsPerMagazine);
 	}
 }
 

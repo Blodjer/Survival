@@ -63,11 +63,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Team)
 	int32 GetTeamIdx();
 
+	UFUNCTION(BlueprintPure, Category = Equipment)
+	class AWeapon* GetEquippedWeapon() const;
+
 	UFUNCTION(BlueprintCallable, Category = Ammunition)
 	void AddAmmo(TSubclassOf<class AWeaponProjectile> Type, int32 Amount);
 
 	UFUNCTION(BlueprintCallable, Category = Ammunition)
 	int32 RequestAmmo(TSubclassOf<class AWeaponProjectile> Type, int32 Amount);
+
+	UFUNCTION(BlueprintCallable, Category = Ammunition)
+	int32 GetAmmoAmmountOfType(TSubclassOf<class AWeaponProjectile> Type) const;
 
 public:
 	UPROPERTY(BlueprintReadOnly, Transient, Category = Campfire)
@@ -153,7 +159,7 @@ private:
 	UFUNCTION(BlueprintCallable, Category = Equipment)
 	void Equip(AHandheld* Handheld);
 
-	UFUNCTION(Server, Reliable, WithValidation, Category = Handheld)
+	UFUNCTION(Server, Reliable, WithValidation, Category = Equipment)
 	void ServerEquip(AHandheld* Handheld);
 	void ServerEquip_Implementation(AHandheld* Handheld);
 	bool ServerEquip_Validate(AHandheld* Handheld) { return true; };
@@ -194,10 +200,6 @@ private:
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_IsFlashlightOn)
 	bool bIsFlashlightOn;
 
-	// The currently equipped handheld
-	UPROPERTY(Transient, ReplicatedUsing = OnRep_EquippedHandheld)
-	class AHandheld* EquippedHandheld;
-
 	UPROPERTY(Transient, Replicated)
 	bool bIsDying;
 
@@ -233,6 +235,10 @@ protected:
 	// Set by character movement to specify that this Character is currently sprinting
 	UPROPERTY(Transient, BlueprintReadOnly, ReplicatedUsing = OnRep_IsSprinting, Category = Character)
 	bool bIsSprinting;
+
+	// The currently equipped handheld
+	UPROPERTY(Transient, BlueprintReadOnly, ReplicatedUsing = OnRep_EquippedHandheld, Category = Equipment)
+	class AHandheld* EquippedHandheld;
 
 	// Socket name for attaching handheld meshes
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Equipment)
