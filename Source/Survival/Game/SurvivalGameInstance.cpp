@@ -134,8 +134,8 @@ bool USurvivalGameInstance::FindSessions(bool bIsLAN, bool bIsPresence, FString 
 			// Fill in all the SearchSettings
 			SessionSearch = MakeShareable(new FOnlineSessionSearch());
 			SessionSearch->bIsLanQuery = bIsLAN;
-			SessionSearch->MaxSearchResults = 100;
-			SessionSearch->PingBucketSize = 100;
+			SessionSearch->MaxSearchResults = MaxSearchResults;
+			SessionSearch->PingBucketSize = PingBucketSize;
 
 			if (bIsPresence)
 			{

@@ -8,7 +8,7 @@
 #include "SurvivalGameInstance.generated.h"
 
 
-UCLASS()
+UCLASS(config=Engine)
 class SURVIVAL_API USurvivalGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
@@ -103,6 +103,13 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = SurvivalNetwork)
 	virtual void ClearAllDelegates();
+
+protected:
+	UPROPERTY(Config)
+	int32 MaxSearchResults;
+
+	UPROPERTY(Config)
+	int32 PingBucketSize;
 
 private:
 	AGameSession* GetGameSession() const;
