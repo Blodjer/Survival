@@ -447,6 +447,11 @@ void ASurvivalPlayerCharacter::StopSprint()
 
 void ASurvivalPlayerCharacter::SetSprint(bool bShouldSprint)
 {
+	if (bShouldSprint)
+	{
+		StopCrouch();
+	}
+
 	if (SurvivalCharacterMovement)
 	{
 		SurvivalCharacterMovement->bWantsToSprint = bShouldSprint;
@@ -485,6 +490,11 @@ void ASurvivalPlayerCharacter::ToggleCrouch()
 
 void ASurvivalPlayerCharacter::StartCrouch()
 {
+	if (bIsSprinting)
+	{
+		StopSprint();
+	}
+
 	Crouch();
 }
 

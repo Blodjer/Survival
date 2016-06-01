@@ -26,10 +26,13 @@ bool USurvivalCharacterMovement::HasValidData() const
 float USurvivalCharacterMovement::GetMaxSpeed() const
 {
 	float MaxSpeed = Super::GetMaxSpeed();
-
+	
 	if (bWantsToSprint)
 	{
-		MaxSpeed = MaxWalkSpeedRunning;
+		if (SurvivalCharacterOwner == nullptr || (Velocity.GetSafeNormal2D() | SurvivalCharacterOwner->GetActorForwardVector()) > -0.1)
+		{
+			MaxSpeed = MaxWalkSpeedRunning;
+		}
 	}
 
 	return MaxSpeed;
