@@ -106,6 +106,8 @@ void AWeapon::ShootProjectile()
 	if (!GetWorld()->IsServer())
 	{
 		SimulateFire();
+
+		CurrentRoundsInMagazine--;
 	}
 
 	APlayerController* PlayerController = Cast<APlayerController>(GetOwnerCharacter()->GetController());
@@ -114,8 +116,6 @@ void AWeapon::ShootProjectile()
 		FRotator NewControlRotation = PlayerController->GetControlRotation().Add(FMath::FRandRange(RecoilUpMin, RecoilUpMax), FMath::FRandRange(-RecoilLeft, RecoilRight), 0.0f);
 		PlayerController->SetControlRotation(NewControlRotation);
 	}
-
-	CurrentRoundsInMagazine--;
 }
 
 void AWeapon::ServerShootProjectile_Implementation(FVector Origin, FVector_NetQuantizeNormal Direction)
