@@ -179,7 +179,10 @@ void AWeapon::StartReload()
 	if (bIsReloading && (GetOwnerCharacter()->IsLocallyControlled() && !HasAuthority()))
 		return;
 
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Magenta, "Reload");
+	if (GetOwnerCharacter()->IsLocallyControlled())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Magenta, "Reload...");
+	}
 
 	if (!HasAuthority() && GetOwnerCharacter()->IsLocallyControlled())
 	{
@@ -203,6 +206,11 @@ void AWeapon::Reload()
 	CurrentRoundsInMagazine = 20;
 
 	bIsReloading = false;
+
+	if (GetOwnerCharacter()->IsLocallyControlled())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Magenta, "Reload Complete");
+	}
 }
 
 void AWeapon::OnRep_BurstCount()
