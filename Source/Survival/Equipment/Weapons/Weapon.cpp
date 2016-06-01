@@ -88,8 +88,6 @@ void AWeapon::HandleFiring()
 		if (CurrentRoundsInMagazine > 0)
 		{
 			ShootProjectile();
-
-			CurrentRoundsInMagazine--;
 		}
 		else
 		{
@@ -116,6 +114,8 @@ void AWeapon::ShootProjectile()
 		FRotator NewControlRotation = PlayerController->GetControlRotation().Add(FMath::FRandRange(RecoilUpMin, RecoilUpMax), FMath::FRandRange(-RecoilLeft, RecoilRight), 0.0f);
 		PlayerController->SetControlRotation(NewControlRotation);
 	}
+
+	CurrentRoundsInMagazine--;
 }
 
 void AWeapon::ServerShootProjectile_Implementation(FVector Origin, FVector_NetQuantizeNormal Direction)
@@ -134,6 +134,7 @@ void AWeapon::ServerShootProjectile_Implementation(FVector Origin, FVector_NetQu
 		NewProjectile->InitProjectile(Direction);
 
 		BurstCount++;
+		CurrentRoundsInMagazine--;
 
 		SimulateFire();
 	}
@@ -215,7 +216,7 @@ void AWeapon::Reload()
 
 	if (HasAuthority() || GetOwnerCharacter()->IsLocallyControlled())
 	{
-		CurrentRoundsInMagazine = GetOwnerCharacter()->RequestAmmo(ProjectileType, MaxRoundsPerMagazine);
+		CurrentRoundsInMagazine = FMath::Clamp(CurrentRoundsInMagazine + GetOwnerCharacter()->RequestAmmo(ProjectileType, MaxRoundsPerMagazine - CurrentRoundsInMagazine), 0, MaxRoundsPerMagazine);
 	}
 }
 
