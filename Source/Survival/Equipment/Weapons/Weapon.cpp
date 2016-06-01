@@ -20,7 +20,7 @@ AWeapon::AWeapon()
 	Spread = 0.5f;
 
 	MaxRoundsPerMagazine = 20;
-	CurrentRoundsInMagazine = MaxRoundsPerMagazine;
+	CurrentRoundsInMagazine = 0;
 
 	NoAnimReloadDuration = 1.5f;
 
@@ -203,13 +203,19 @@ void AWeapon::ServerStartReload_Implementation()
 
 void AWeapon::Reload()
 {
-	CurrentRoundsInMagazine = 20;
-
 	bIsReloading = false;
 
 	if (GetOwnerCharacter()->IsLocallyControlled())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Magenta, "Reload Complete");
+	}
+
+	if (GetOwnerCharacter() == nullptr)
+		return;
+
+	if (HasAuthority() || GetOwnerCharacter()->IsLocallyControlled())
+	{
+		CurrentRoundsInMagazine = GetOwnerCharacter()->RequestAmmo(ProjectileClass, MaxRoundsPerMagazine);
 	}
 }
 
@@ -239,4 +245,6 @@ void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 
 	DOREPLIFETIME_CONDITION(AWeapon, BurstCount, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AWeapon, bIsReloading, COND_SkipOwner);
+
+	DOREPLIFETIME_CONDITION(AWeapon, CurrentRoundsInMagazine, COND_OwnerOnly);	
 }

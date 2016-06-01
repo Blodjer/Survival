@@ -81,6 +81,14 @@ void ASurvivalPlayerCharacter::PostInitializeComponents()
 		SpawnHandheld(StartEquipment[0]);
 	}
 
+	if (HasAuthority())
+	{
+		for (FAmmo& Ammo : StartAmmunition)
+		{
+			AmmunitionInventory.AddAmmo(Ammo.Type, Ammo.Amount);
+		}
+	}
+
 	for (int32 i = 0; i < GetMesh()->GetNumMaterials(); i++)
 	{
 		MeshMIDs.Add(GetMesh()->CreateAndSetMaterialInstanceDynamic(i));
@@ -338,6 +346,16 @@ int32 ASurvivalPlayerCharacter::GetTeamIdx()
 	}
 
 	return -1;
+}
+
+void ASurvivalPlayerCharacter::AddAmmo(TSubclassOf<AWeaponProjectile> Type, int32 Amount)
+{
+	AmmunitionInventory.AddAmmo(Type, Amount);
+}
+
+int32 ASurvivalPlayerCharacter::RequestAmmo(TSubclassOf<AWeaponProjectile> Type, int32 Amount)
+{
+	return AmmunitionInventory.RequestAmmo(Type, Amount);
 }
 
 void ASurvivalPlayerCharacter::SetRagdollPhysics()
@@ -651,4 +669,5 @@ void ASurvivalPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 	DOREPLIFETIME(ASurvivalPlayerCharacter, EquippedHandheld);
 	DOREPLIFETIME(ASurvivalPlayerCharacter, Health);
 	DOREPLIFETIME(ASurvivalPlayerCharacter, bIsDead);
+	DOREPLIFETIME(ASurvivalPlayerCharacter, AmmunitionInventory);
 }

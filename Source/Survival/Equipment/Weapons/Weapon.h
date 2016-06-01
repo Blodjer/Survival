@@ -129,6 +129,7 @@ private:
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_BurstCount)
 	int32 BurstCount;
 
+	UPROPERTY(Transient, BlueprintReadOnly, Replicated, Category = Weapon, meta = (AllowPrivateAccess = "true"))
 	int32 CurrentRoundsInMagazine;
 
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_Reload)
@@ -143,5 +144,7 @@ private:
 
 public:
 	FORCEINLINE float GetDamage() const { return Damage; };
+
+	FORCEINLINE int32 GetCurrentRoundsInMagazine() const { return CurrentRoundsInMagazine; };
 
 };

@@ -5,6 +5,7 @@
 #include "GameFramework/Character.h"
 #include "SurvivalCharacterMovement.h"
 #include "SurvivalPlayerController.h"
+#include "Survival/Equipment/Weapons/WeaponProjectile.h"
 #include "SurvivalPlayerCharacter.generated.h"
 
 UCLASS()
@@ -62,9 +63,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Team)
 	int32 GetTeamIdx();
 
+	UFUNCTION(BlueprintCallable, Category = Ammunition)
+	void AddAmmo(TSubclassOf<class AWeaponProjectile> Type, int32 Amount);
+
+	UFUNCTION(BlueprintCallable, Category = Ammunition)
+	int32 RequestAmmo(TSubclassOf<class AWeaponProjectile> Type, int32 Amount);
+
 public:
 	UPROPERTY(BlueprintReadOnly, Transient, Category = Campfire)
 	class ACampfire* CapturingCampfire;
+
+	UPROPERTY(BlueprintReadOnly, Replicated, Transient, Category = Ammunition)
+	FAmmunitionInventory AmmunitionInventory;
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = Character, meta = (AllowPrivateAccess = "true"))
@@ -231,6 +241,10 @@ protected:
 	// Default equipment spawned on player spawn
 	UPROPERTY(EditDefaultsOnly, Category = Loadout)
 	TArray<TSubclassOf<class AHandheld>> StartEquipment;
+	
+	// Default amount of ammo on player spawn
+	UPROPERTY(EditDefaultsOnly, Category = Loadout)
+	TArray<FAmmo> StartAmmunition;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Pickup)
 	float PickupRange;
