@@ -78,7 +78,7 @@ void AHandheld::UnEquip()
 {
 	ClearActionBindings();
 
-	// TODO: Detach
+	// TODO: Detach form Hand
 
 	bIsEquipped = false;
 }
@@ -86,6 +86,45 @@ void AHandheld::UnEquip()
 bool AHandheld::IsEquipped() const
 {
 	return bIsEquipped;
+}
+
+void AHandheld::ThrowAway()
+{
+	UnEquip();
+
+	if (PickupClass != nullptr)
+	{
+		if (HasAuthority() && GetWorld())
+		{
+			APickup* Pickup = GetWorld()->SpawnActor<APickup>(PickupClass, GetActorLocation(), GetActorRotation());
+			if (Pickup)
+			{
+				Pickup->SetReplicateMovement(true);
+				Pickup->GetPickupMesh()->SetSimulatePhysics(true);
+			}
+		}
+
+		Destroy(true);
+	}
+	else
+	{
+		if (OwnerCharacter == nullptr || !OwnerCharacter->IsLocallyControlled())
+		{
+			Mesh1P->SetWorldLocation(Mesh3P->GetComponentLocation());
+		}
+
+		Mesh3P->AttachTo(RootComponent, NAME_None, EAttachLocation::SnapToTarget);
+		DetachRootComponentFromParent(true);
+
+		Mesh1P->SetSimulatePhysics(true);
+		Mesh1P->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		Mesh1P->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+
+		SetOwner(nullptr);
+		SetOwnerCharacter(nullptr);
+
+		SetLifeSpan(5.0f);
+	}
 }
 
 void AHandheld::ClearActionBindings()
@@ -112,6 +151,11 @@ void AHandheld::ClearActionBindings()
 void AHandheld::OnRep_OwnerCharacter()
 {
 	SetOwnerCharacter(OwnerCharacter);
+
+	if (OwnerCharacter == nullptr)
+	{
+		ThrowAway();
+	}
 }
 
 void AHandheld::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const

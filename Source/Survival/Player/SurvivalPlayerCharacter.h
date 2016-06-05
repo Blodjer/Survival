@@ -48,7 +48,8 @@ private:
 	void Die();
 
 public:
-	void Revive();
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Character)
+	void Revive(float NewHealth);
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Character)
 	void Heal(float Value);

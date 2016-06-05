@@ -264,8 +264,7 @@ void ASurvivalPlayerCharacter::Die(const FDamageEvent& DamageEvent, AController*
 		{
 			GetWorldTimerManager().SetTimer(TimerHandle_Die, this, &ASurvivalPlayerCharacter::Die, DieDelay);
 
-			GetCharacterMovement()->StopMovementImmediately();
-			GetCharacterMovement()->DisableMovement();
+			DisableInput(GetPlayerController());
 
 			GetMesh1P()->SetVisibility(false, true);
 		}
@@ -309,7 +308,7 @@ void ASurvivalPlayerCharacter::Die()
 	DetachFromControllerPendingDestroy();
 }
 
-void ASurvivalPlayerCharacter::Revive()
+void ASurvivalPlayerCharacter::Revive(float NewHealth)
 {
 	if (bIsDying && !bIsDead)
 	{
@@ -317,6 +316,9 @@ void ASurvivalPlayerCharacter::Revive()
 		SetLifeSpan(0.0f);
 
 		bIsDying = false;
+		Health = FMath::Clamp(NewHealth, 1.0f, GetMaxHealth());
+
+		EnableInput(GetPlayerController());
 
 		GetMesh1P()->SetVisibility(true, true);
 	}
