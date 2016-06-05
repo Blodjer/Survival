@@ -29,6 +29,13 @@ AWeapon::AWeapon()
 	bIsReloading = false;
 }
 
+void AWeapon::UnEquip()
+{
+	StopFire();
+
+	Super::UnEquip();
+}
+
 void AWeapon::SetupInputActions()
 {
 	Super::SetupInputActions();

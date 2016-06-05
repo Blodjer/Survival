@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
+#include "Survival/Pickups/Pickup.h"
 #include "Handheld.generated.h"
 
 UCLASS(Abstract, NotBlueprintable)
@@ -13,6 +14,8 @@ class SURVIVAL_API AHandheld : public AActor
 public:
 	AHandheld();
 
+	virtual void PostInitializeComponents() override;
+
 	virtual void Tick(float DeltaSeconds) override;
 
 	virtual void Destroyed() override;
@@ -21,10 +24,10 @@ public:
 	void SetOwnerCharacter(ASurvivalPlayerCharacter* Character);
 
 	UFUNCTION(BlueprintCallable, Category = Handheld)
-	void Equip();
+	virtual void Equip();
 
 	UFUNCTION(BlueprintCallable, Category = Handheld)
-	void UnEquip();
+	virtual void UnEquip();
 
 	// Is the weapon currently equipped
 	UFUNCTION(BlueprintPure, Category = Handheld)
@@ -44,6 +47,8 @@ protected:
 		}
 	}
 
+	void ThrowAway();
+
 private:
 	// First person mesh. Seen only by owner.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Handheld, meta = (AllowPrivateAccess = "true"))
@@ -54,7 +59,7 @@ private:
 	class USkeletalMeshComponent* Mesh3P;
 
 	// The character actor that owns this handheld
-	UPROPERTY(Transient, ReplicatedUsing = OnRep_OwnerCharacter)
+	UPROPERTY(Transient, BlueprintReadOnly, ReplicatedUsing = OnRep_OwnerCharacter, meta = (AllowPrivateAccess = "true"))
 	class ASurvivalPlayerCharacter* OwnerCharacter;
 
 	// The input component from the owner
@@ -66,6 +71,10 @@ private:
 
 	// Is the weapon currently equipped
 	bool bIsEquipped;
+
+	// Pickup to spawn on throw away
+	UPROPERTY(EditDefaultsOnly, Category = Handheld, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class APickup> PickupClass;
 
 private:
 	// Remove all input actions binded to from this handheld to the owner's input
