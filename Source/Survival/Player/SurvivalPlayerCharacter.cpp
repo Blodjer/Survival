@@ -289,6 +289,8 @@ void ASurvivalPlayerCharacter::Die()
 
 	SetReplicateMovement(false);
 
+	DestroyInventory();
+
 	if (GetController())
 	{
 		APlayerController* PlayerController = Cast<APlayerController>(GetController());
@@ -306,11 +308,6 @@ void ASurvivalPlayerCharacter::Die()
 	else
 	{
 		Destroy();
-	}
-
-	if (EquippedHandheld)
-	{
-		EquippedHandheld->Destroy();
 	}
 
 	DetachFromControllerPendingDestroy();
@@ -576,6 +573,14 @@ void ASurvivalPlayerCharacter::SpawnHandheld(TSubclassOf<AHandheld> HandheldClas
 		NewHandheld->SetOwnerCharacter(this);
 
 		HandheldInventory.Add(NewHandheld);
+	}
+}
+
+void ASurvivalPlayerCharacter::DestroyInventory()
+{
+	for (AHandheld* Handheld : HandheldInventory)
+	{
+		Handheld->Destroy(true);
 	}
 }
 

@@ -162,6 +162,9 @@ private:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Equipment)
 	void SpawnHandheld(TSubclassOf<class AHandheld> HandheldClass);
 
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Equipment)
+	void DestroyInventory();
+
 	// Equip a hendheld actor
 	UFUNCTION(BlueprintCallable, Category = Equipment)
 	void Equip(AHandheld* Handheld);
