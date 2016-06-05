@@ -82,7 +82,12 @@ void ASurvivalPlayerCharacter::PostInitializeComponents()
 	// Spawn the first handheld from the loadout list
 	if (HasAuthority() && StartEquipment.Num() > 0)
 	{
-		SpawnHandheld(StartEquipment[0]);
+		for (TSubclassOf<AHandheld> HandheldClass : StartEquipment)
+		{
+			SpawnHandheld(HandheldClass);
+		}
+
+		Equip(HandheldInventory[0]);
 	}
 
 	if (HasAuthority())
@@ -133,6 +138,9 @@ void ASurvivalPlayerCharacter::SetupPlayerInputComponent(class UInputComponent* 
 	// Controller
 	InputComponent->BindAxis("TurnAtRate", this, &ASurvivalPlayerCharacter::TurnAtRate);
 	InputComponent->BindAxis("LookUpAtRate", this, &ASurvivalPlayerCharacter::LookUpAtRate);
+
+	InputComponent->BindAction("NextHandheld", IE_Pressed, this, &ASurvivalPlayerCharacter::NextHandheld);
+	InputComponent->BindAction("PreviousHandheld", IE_Pressed, this, &ASurvivalPlayerCharacter::PreviousHandheld);
 
 	InputComponent->BindAction("Flashlight", IE_Pressed, this, &ASurvivalPlayerCharacter::ToggleFlashlight);
 
@@ -357,7 +365,7 @@ int32 ASurvivalPlayerCharacter::GetTeamIdx()
 	return -1;
 }
 
-AWeapon* ASurvivalPlayerCharacter::GetEquippedWeapon() const
+AWeapon* ASurvivalPlayerCharacter::GetEquippedHandheld() const
 {
 	return EquippedHandheld != nullptr ? Cast<AWeapon>(EquippedHandheld) : nullptr;
 }
@@ -552,7 +560,7 @@ void ASurvivalPlayerCharacter::ServerSetFlashlightOn_Implementation(bool bOn)
 	SetFlashlightOn(bOn);
 }
 
-void ASurvivalPlayerCharacter::SpawnHandheld_Implementation(TSubclassOf<AHandheld> HandheldClass)
+void ASurvivalPlayerCharacter::SpawnHandheld(TSubclassOf<AHandheld> HandheldClass)
 {
 	if (HandheldClass == nullptr)
 		return;
@@ -563,9 +571,12 @@ void ASurvivalPlayerCharacter::SpawnHandheld_Implementation(TSubclassOf<AHandhel
 	SpawnParameters.Owner = this;
 
 	AHandheld* NewHandheld = GetWorld()->SpawnActor<AHandheld>(HandheldClass, SpawnParameters);
-	NewHandheld->SetOwnerCharacter(this);
+	if (NewHandheld)
+	{
+		NewHandheld->SetOwnerCharacter(this);
 
-	Equip(NewHandheld);
+		HandheldInventory.Add(NewHandheld);
+	}
 }
 
 void ASurvivalPlayerCharacter::Equip(AHandheld* Handheld)
@@ -599,6 +610,26 @@ void ASurvivalPlayerCharacter::SimulateEquip(AHandheld* Handheld)
 	}
 
 	EquippedHandheld = Handheld;
+}
+
+void ASurvivalPlayerCharacter::NextHandheld()
+{
+	if (HandheldInventory.Num() > 1)
+	{
+		const int32 HandheldIdx = HandheldInventory.IndexOfByKey(EquippedHandheld);
+		AHandheld* NextHandheld = HandheldInventory[(HandheldIdx + 1) % HandheldInventory.Num()];
+		Equip(NextHandheld);
+	}
+}
+
+void ASurvivalPlayerCharacter::PreviousHandheld()
+{
+	if (HandheldInventory.Num() > 1)
+	{
+		const int32 HandheldIdx = HandheldInventory.IndexOfByKey(EquippedHandheld);
+		AHandheld* NextHandheld = HandheldInventory[(HandheldIdx - 1 + HandheldInventory.Num()) % HandheldInventory.Num()];
+		Equip(NextHandheld);
+	}
 }
 
 void ASurvivalPlayerCharacter::UpdateTeamColors()
@@ -689,8 +720,13 @@ void ASurvivalPlayerCharacter::OnRep_IsFlashlightOn()
 	SetFlashlightOn(bIsFlashlightOn);
 }
 
-void ASurvivalPlayerCharacter::OnRep_EquippedHandheld()
+void ASurvivalPlayerCharacter::OnRep_EquippedHandheld(AHandheld* LastEquippedHandheld)
 {
+	if (LastEquippedHandheld != nullptr)
+	{
+		LastEquippedHandheld->UnEquip();
+	}
+
 	SimulateEquip(EquippedHandheld);
 }
 
@@ -709,6 +745,7 @@ void ASurvivalPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 	DOREPLIFETIME_CONDITION(ASurvivalPlayerCharacter, bIsSprinting, COND_SkipOwner);
 
 	DOREPLIFETIME(ASurvivalPlayerCharacter, EquippedHandheld);
+	DOREPLIFETIME(ASurvivalPlayerCharacter, HandheldInventory);
 	DOREPLIFETIME(ASurvivalPlayerCharacter, AmmunitionInventory);
 	DOREPLIFETIME(ASurvivalPlayerCharacter, CurrentBatteryPower);
 

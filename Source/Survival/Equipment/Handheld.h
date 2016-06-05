@@ -14,6 +14,8 @@ class SURVIVAL_API AHandheld : public AActor
 public:
 	AHandheld();
 
+	virtual void PostInitializeComponents() override;
+
 	virtual void Tick(float DeltaSeconds) override;
 
 	virtual void Destroyed() override;
@@ -22,10 +24,10 @@ public:
 	void SetOwnerCharacter(ASurvivalPlayerCharacter* Character);
 
 	UFUNCTION(BlueprintCallable, Category = Handheld)
-	void Equip();
+	virtual void Equip();
 
 	UFUNCTION(BlueprintCallable, Category = Handheld)
-	void UnEquip();
+	virtual void UnEquip();
 
 	// Is the weapon currently equipped
 	UFUNCTION(BlueprintPure, Category = Handheld)

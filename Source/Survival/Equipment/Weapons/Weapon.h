@@ -21,6 +21,8 @@ class SURVIVAL_API AWeapon : public AHandheld
 public:	
 	AWeapon();
 
+	virtual void UnEquip() override;
+
 protected:
 	virtual void SetupInputActions() override;
 

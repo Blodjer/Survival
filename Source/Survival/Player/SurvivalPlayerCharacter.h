@@ -61,7 +61,7 @@ public:
 	int32 GetTeamIdx();
 
 	UFUNCTION(BlueprintPure, Category = Equipment)
-	class AWeapon* GetEquippedWeapon() const;
+	class AWeapon* GetEquippedHandheld() const;
 
 	UFUNCTION(BlueprintCallable, Category = Ammunition)
 	void AddAmmo(TSubclassOf<class AWeaponProjectile> Type, int32 Amount);
@@ -81,6 +81,9 @@ public:
 public:
 	UPROPERTY(BlueprintReadOnly, Transient, Category = Campfire)
 	class ACampfire* CapturingCampfire;
+
+	UPROPERTY(BlueprintReadOnly, Replicated, Transient, Category = Equipment)
+	TArray<class AHandheld*> HandheldInventory;
 
 	UPROPERTY(BlueprintReadOnly, Replicated, Transient, Category = Ammunition)
 	FAmmunitionInventory AmmunitionInventory;
@@ -155,11 +158,9 @@ private:
 	void ServerSetFlashlightOn_Implementation(bool bOn);
 	bool ServerSetFlashlightOn_Validate(bool bOn) { return true; };
 
-	// Spawn a specific hendheld. Handled by server. TODO: Replace with Spawn Loadout/Equipment
-	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = Equipment)
+	// Spawn a specific hendheld. Handled by server
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Equipment)
 	void SpawnHandheld(TSubclassOf<class AHandheld> HandheldClass);
-	void SpawnHandheld_Implementation(TSubclassOf<class AHandheld> HandheldClass);
-	bool SpawnHandheld_Validate(TSubclassOf<class AHandheld> HandheldClass) { return true; };
 
 	// Equip a hendheld actor
 	UFUNCTION(BlueprintCallable, Category = Equipment)
@@ -172,6 +173,10 @@ private:
 
 	UFUNCTION()
 	void SimulateEquip(AHandheld* Handheld);
+
+	void NextHandheld();
+
+	void PreviousHandheld();
 
 	void UpdateTeamColors();
 
@@ -303,7 +308,7 @@ private:
 	void OnRep_IsFlashlightOn();
 	
 	UFUNCTION()
-	void OnRep_EquippedHandheld();
+	void OnRep_EquippedHandheld(AHandheld* LastEquippedHandheld);
 
 	UFUNCTION()
 	void OnRep_IsDead();

@@ -25,6 +25,13 @@ AHandheld::AHandheld()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
+void AHandheld::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	UnEquip();
+}
+
 void AHandheld::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
@@ -67,6 +74,9 @@ void AHandheld::Equip()
 	Mesh1P->AttachTo(OwnerCharacter->GetMesh1P(), AttachPoint);
 	Mesh3P->AttachTo(OwnerCharacter->GetMesh(), AttachPoint);
 
+	Mesh1P->SetVisibility(true);
+	Mesh3P->SetVisibility(true);
+
 	// TODO: Animation
 	
 	SetupInputActions();
@@ -78,7 +88,11 @@ void AHandheld::UnEquip()
 {
 	ClearActionBindings();
 
-	// TODO: Detach form Hand
+	//Mesh1P->DetachFromParent();
+	Mesh1P->SetVisibility(false);
+
+	//Mesh3P->DetachFromParent();
+	Mesh3P->SetVisibility(false);
 
 	bIsEquipped = false;
 }
