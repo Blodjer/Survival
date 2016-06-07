@@ -19,7 +19,7 @@ public:
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = Pickup)
 	void OnPickup(ASurvivalPlayerCharacter* PlayerCharacter);
-	void OnPickup_Implementation(ASurvivalPlayerCharacter* PlayerCharacter);
+	virtual void OnPickup_Implementation(ASurvivalPlayerCharacter* PlayerCharacter);
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void SimulatePickup();

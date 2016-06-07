@@ -63,6 +63,10 @@ public:
 	UFUNCTION(BlueprintPure, Category = Equipment)
 	class AWeapon* GetEquippedHandheld() const;
 
+	// Spawn a specific hendheld. Handled by server
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Equipment)
+	void SpawnHandheld(TSubclassOf<class AHandheld> HandheldClass);
+
 	UFUNCTION(BlueprintCallable, Category = Ammunition)
 	void AddAmmo(TSubclassOf<class AWeaponProjectile> Type, int32 Amount);
 
@@ -157,10 +161,6 @@ private:
 	void ServerSetFlashlightOn(bool bOn);
 	void ServerSetFlashlightOn_Implementation(bool bOn);
 	bool ServerSetFlashlightOn_Validate(bool bOn) { return true; };
-
-	// Spawn a specific hendheld. Handled by server
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Equipment)
-	void SpawnHandheld(TSubclassOf<class AHandheld> HandheldClass);
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Equipment)
 	void DestroyInventory();
