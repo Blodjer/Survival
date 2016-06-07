@@ -86,8 +86,6 @@ void ASurvivalPlayerCharacter::PostInitializeComponents()
 		{
 			AddHandheldToInventory(HandheldClass);
 		}
-
-		Equip(HandheldInventory[0]);
 	}
 
 	if (HasAuthority())
@@ -572,6 +570,11 @@ void ASurvivalPlayerCharacter::AddHandheldToInventory(TSubclassOf<AHandheld> Han
 		NewHandheld->SetOwnerCharacter(this);
 
 		HandheldInventory.Add(NewHandheld);
+
+		if (HandheldInventory.Num() == 1 && EquippedHandheld == nullptr)
+		{
+			Equip(NewHandheld);
+		}
 	}
 }
 
