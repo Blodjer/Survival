@@ -65,7 +65,10 @@ public:
 
 	// Spawn a specific hendheld. Handled by server
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Equipment)
-	void SpawnHandheld(TSubclassOf<class AHandheld> HandheldClass);
+	void AddHandheldToInventory(TSubclassOf<class AHandheld> HandheldClass);
+
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Equipment)
+	void RemoveHandheldFromInventory(class AHandheld* Handheld);
 
 	UFUNCTION(BlueprintCallable, Category = Ammunition)
 	void AddAmmo(TSubclassOf<class AWeaponProjectile> Type, int32 Amount);
