@@ -559,6 +559,9 @@ void ASurvivalPlayerCharacter::AddHandheldToInventory(TSubclassOf<AHandheld> Han
 	if (HandheldClass == nullptr)
 		return;
 
+	if (HandheldInventory.ContainsByPredicate([HandheldClass](AHandheld* Handheld) { return Handheld->IsA(HandheldClass); }))
+		return;
+
 	FActorSpawnParameters SpawnParameters;
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParameters.Instigator = GetInstigator();
