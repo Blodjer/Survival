@@ -33,6 +33,8 @@ public:
 	UFUNCTION(BlueprintPure, Category = Handheld)
 	bool IsEquipped() const;
 
+	void ThrowAway();
+
 protected:
 	// Setup the input for this weapon. Use BindInputAction(...) to bind actions to the owner character
 	virtual void SetupInputActions() {};
@@ -46,8 +48,6 @@ protected:
 			InputActionBindings.Add(OwnerInputComponent->BindAction(ActionName, KeyEvent, Object, Func));
 		}
 	}
-
-	void ThrowAway();
 
 private:
 	// First person mesh. Seen only by owner.

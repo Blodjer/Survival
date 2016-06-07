@@ -21,9 +21,9 @@ void AGadget::ServerUse_Implementation()
 
 	SimulateUse();
 
-	if (bIsDisposable)
+	if (bIsDisposable && GetOwnerCharacter() != nullptr)
 	{
-		ThrowAway();
+		GetOwnerCharacter()->RemoveHandheldFromInventory(this);
 	}
 }
 

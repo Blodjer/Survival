@@ -7,7 +7,7 @@ void APickupEquipment::OnPickup_Implementation(ASurvivalPlayerCharacter* PlayerC
 {
 	if (HandheldClass != nullptr)
 	{
-		PlayerCharacter->SpawnHandheld(HandheldClass);
+		PlayerCharacter->AddHandheldToInventory(HandheldClass);
 	}
 
 	Super::OnPickup_Implementation(PlayerCharacter);
