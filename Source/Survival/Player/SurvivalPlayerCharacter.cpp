@@ -264,23 +264,25 @@ void ASurvivalPlayerCharacter::Die(const FDamageEvent& DamageEvent, AController*
 	}
 	else
 	{
-		bIsDying = true;
-		
 		ASurvivalPlayerController* SurvivalPlayerController = GetPlayerController();
 		float DieDelay = SurvivalPlayerController ? SurvivalPlayerController->GetMinDieDelay() : 0.0f;
 		if (DieDelay >= 0.1f)
 		{
 			GetWorldTimerManager().SetTimer(TimerHandle_Die, this, &ASurvivalPlayerCharacter::Die, DieDelay);
-
-			DisableInput(GetPlayerController());
-
-			GetMesh1P()->SetVisibility(false, true);
+			Injure();
 		}
 		else
 		{
 			Die();
 		}
 	}
+}
+
+void ASurvivalPlayerCharacter::Injure()
+{
+	bIsDying = true;
+
+	DisableInput(GetPlayerController());
 }
 
 void ASurvivalPlayerCharacter::Die()
@@ -315,17 +317,14 @@ void ASurvivalPlayerCharacter::Die()
 
 void ASurvivalPlayerCharacter::Revive(float NewHealth)
 {
-	if (bIsDying && !bIsDead)
+	if (!bIsDead)
 	{
 		GetWorldTimerManager().ClearTimer(TimerHandle_Die);
-		SetLifeSpan(0.0f);
 
 		bIsDying = false;
 		Health = FMath::Clamp(NewHealth, 1.0f, GetMaxHealth());
 
 		EnableInput(GetPlayerController());
-
-		GetMesh1P()->SetVisibility(true, true);
 	}
 }
 
@@ -758,6 +757,18 @@ void ASurvivalPlayerCharacter::OnRep_IsDead()
 	}
 }
 
+void ASurvivalPlayerCharacter::OnRep_IsDying()
+{
+	if (bIsDying)
+	{
+		Injure();
+	}
+	else
+	{
+		Revive(Health);
+	}
+}
+
 void ASurvivalPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -773,4 +784,5 @@ void ASurvivalPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 
 	DOREPLIFETIME(ASurvivalPlayerCharacter, Health);
 	DOREPLIFETIME(ASurvivalPlayerCharacter, bIsDead);
+	DOREPLIFETIME(ASurvivalPlayerCharacter, bIsDying);
 }

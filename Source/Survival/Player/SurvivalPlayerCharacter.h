@@ -44,6 +44,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Character)
 	void Die(const FDamageEvent& DamageEvent, AController* Killer, bool bImmediately = true);
 
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Character)
+	void Injure();
+
 private:
 	void Die();
 
@@ -217,7 +220,7 @@ private:
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_IsFlashlightOn)
 	bool bIsFlashlightOn;
 
-	UPROPERTY(Transient, Replicated)
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_IsDying)
 	bool bIsDying;
 
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_IsDead)
@@ -318,5 +321,8 @@ private:
 
 	UFUNCTION()
 	void OnRep_IsDead();
+
+	UFUNCTION()
+	void OnRep_IsDying();
 
 };
