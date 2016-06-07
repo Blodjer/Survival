@@ -104,7 +104,9 @@ bool AHandheld::IsEquipped() const
 
 void AHandheld::ThrowAway()
 {
-	UnEquip();
+	ClearActionBindings();
+
+	bIsEquipped = false;
 
 	if (PickupClass != nullptr)
 	{

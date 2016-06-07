@@ -84,7 +84,7 @@ void ASurvivalPlayerCharacter::PostInitializeComponents()
 	{
 		for (TSubclassOf<AHandheld> HandheldClass : StartEquipment)
 		{
-			SpawnHandheld(HandheldClass);
+			AddHandheldToInventory(HandheldClass);
 		}
 
 		Equip(HandheldInventory[0]);
@@ -557,7 +557,7 @@ void ASurvivalPlayerCharacter::ServerSetFlashlightOn_Implementation(bool bOn)
 	SetFlashlightOn(bOn);
 }
 
-void ASurvivalPlayerCharacter::SpawnHandheld(TSubclassOf<AHandheld> HandheldClass)
+void ASurvivalPlayerCharacter::AddHandheldToInventory(TSubclassOf<AHandheld> HandheldClass)
 {
 	if (HandheldClass == nullptr)
 		return;
@@ -573,6 +573,21 @@ void ASurvivalPlayerCharacter::SpawnHandheld(TSubclassOf<AHandheld> HandheldClas
 		NewHandheld->SetOwnerCharacter(this);
 
 		HandheldInventory.Add(NewHandheld);
+	}
+}
+
+void ASurvivalPlayerCharacter::RemoveHandheldFromInventory(AHandheld* Handheld)
+{
+	if (Handheld == nullptr)
+		return;
+
+	Handheld->ThrowAway();
+	HandheldInventory.Remove(Handheld);
+
+	if (EquippedHandheld == Handheld)
+	{
+		EquippedHandheld = nullptr;
+		PreviousHandheld();
 	}
 }
 
@@ -619,7 +634,7 @@ void ASurvivalPlayerCharacter::SimulateEquip(AHandheld* Handheld)
 
 void ASurvivalPlayerCharacter::NextHandheld()
 {
-	if (HandheldInventory.Num() > 1)
+	if (HandheldInventory.Num() > 1 || (EquippedHandheld == nullptr && HandheldInventory.Num() > 0))
 	{
 		const int32 HandheldIdx = HandheldInventory.IndexOfByKey(EquippedHandheld);
 		AHandheld* NextHandheld = HandheldInventory[(HandheldIdx + 1) % HandheldInventory.Num()];
@@ -629,7 +644,7 @@ void ASurvivalPlayerCharacter::NextHandheld()
 
 void ASurvivalPlayerCharacter::PreviousHandheld()
 {
-	if (HandheldInventory.Num() > 1)
+	if (HandheldInventory.Num() > 1 || (EquippedHandheld == nullptr && HandheldInventory.Num() > 0))
 	{
 		const int32 HandheldIdx = HandheldInventory.IndexOfByKey(EquippedHandheld);
 		AHandheld* NextHandheld = HandheldInventory[(HandheldIdx - 1 + HandheldInventory.Num()) % HandheldInventory.Num()];
