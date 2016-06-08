@@ -45,7 +45,7 @@ public:
 	void Die(const FDamageEvent& DamageEvent, AController* Killer, bool bImmediately = true);
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Character)
-	void Injure();
+	void InjureLethal();
 
 private:
 	void Die();
@@ -221,7 +221,7 @@ private:
 	bool bIsFlashlightOn;
 
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_IsDying)
-	bool bIsDying;
+	bool bIsLethalInjured;
 
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_IsDead)
 	bool bIsDead;
@@ -308,6 +308,10 @@ public:
 	// The health value the player starts with
 	UFUNCTION(BlueprintPure, Category = Character)
 	FORCEINLINE float GetMaxFlashlightIntensity() const { return GetClass()->GetDefaultObject<ASurvivalPlayerCharacter>()->Flashlight->Intensity; };
+
+	// Is the player lethal injured and will die soon
+	UFUNCTION(BlueprintPure, Category = Character)
+	FORCEINLINE bool IsLethalInjured() const { return bIsLethalInjured; };
 	
 private:
 	UFUNCTION()

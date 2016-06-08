@@ -51,7 +51,7 @@ ASurvivalPlayerCharacter::ASurvivalPlayerCharacter(const FObjectInitializer& Obj
 
 	SurvivalCharacterMovement = Cast<USurvivalCharacterMovement>(Super::GetCharacterMovement());
 
-	bIsDying = false;
+	bIsLethalInjured = false;
 	bIsDead = false;
 	Health = 100.0f;
 
@@ -267,7 +267,7 @@ void ASurvivalPlayerCharacter::Die(const FDamageEvent& DamageEvent, AController*
 		if (DieDelay >= 0.1f)
 		{
 			GetWorldTimerManager().SetTimer(TimerHandle_Die, this, &ASurvivalPlayerCharacter::Die, DieDelay);
-			Injure();
+			InjureLethal();
 		}
 		else
 		{
@@ -276,9 +276,9 @@ void ASurvivalPlayerCharacter::Die(const FDamageEvent& DamageEvent, AController*
 	}
 }
 
-void ASurvivalPlayerCharacter::Injure()
+void ASurvivalPlayerCharacter::InjureLethal()
 {
-	bIsDying = true;
+	bIsLethalInjured = true;
 
 	DisableInput(GetPlayerController());
 }
@@ -319,7 +319,7 @@ void ASurvivalPlayerCharacter::Revive(float NewHealth)
 	{
 		GetWorldTimerManager().ClearTimer(TimerHandle_Die);
 
-		bIsDying = false;
+		bIsLethalInjured = false;
 		Health = FMath::Clamp(NewHealth, 1.0f, GetMaxHealth());
 
 		EnableInput(GetPlayerController());
@@ -765,9 +765,9 @@ void ASurvivalPlayerCharacter::OnRep_IsDead()
 
 void ASurvivalPlayerCharacter::OnRep_IsDying()
 {
-	if (bIsDying)
+	if (bIsLethalInjured)
 	{
-		Injure();
+		InjureLethal();
 	}
 	else
 	{
@@ -790,5 +790,5 @@ void ASurvivalPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 
 	DOREPLIFETIME(ASurvivalPlayerCharacter, Health);
 	DOREPLIFETIME(ASurvivalPlayerCharacter, bIsDead);
-	DOREPLIFETIME(ASurvivalPlayerCharacter, bIsDying);
+	DOREPLIFETIME(ASurvivalPlayerCharacter, bIsLethalInjured);
 }
