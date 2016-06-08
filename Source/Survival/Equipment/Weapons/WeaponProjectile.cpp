@@ -78,7 +78,7 @@ void AWeaponProjectile::InitProjectile(FVector& Direction)
 
 void AWeaponProjectile::OnImpact(const FHitResult& HitResult)
 {
-	if (HitResult.GetActor() != nullptr)
+	if (HasAuthority() && HitResult.GetActor() != nullptr)
 	{
 			FPointDamageEvent PointDamage = FPointDamageEvent();
 			PointDamage.Damage = Damage;
@@ -88,5 +88,5 @@ void AWeaponProjectile::OnImpact(const FHitResult& HitResult)
 			HitResult.GetActor()->TakeDamage(Damage, PointDamage, GetInstigatorController(), this);
 	}
 
-	Destroy(true);
+	//Destroy(true);
 }

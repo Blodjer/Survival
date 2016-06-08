@@ -173,6 +173,9 @@ void AWeapon::SimulateFire()
 		}
 	}
 
+	// TODO: Remove
+	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetOwnerCharacter()->GetBaseAimRotation().Vector() * 100000.0f, FColor::White, false, 0.15f);
+
 	OnSimulateFire();
 }
 
