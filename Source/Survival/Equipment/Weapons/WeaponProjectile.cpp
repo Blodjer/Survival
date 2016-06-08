@@ -14,6 +14,10 @@ AWeaponProjectile::AWeaponProjectile()
 	CollisionComponent->bTraceComplexOnMove = true;
 	RootComponent = CollisionComponent;
 
+	ParticleSystem = CreateDefaultSubobject<UParticleSystemComponent>("ParticleSystem");
+	ParticleSystem->bAutoActivate = true;
+	ParticleSystem->AttachTo(RootComponent);
+
 	// Create the projectile movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovement");
 	ProjectileMovement->UpdatedComponent = CollisionComponent;
@@ -83,4 +87,6 @@ void AWeaponProjectile::OnImpact(const FHitResult& HitResult)
 
 			HitResult.GetActor()->TakeDamage(Damage, PointDamage, GetInstigatorController(), this);
 	}
+
+	Destroy(true);
 }
