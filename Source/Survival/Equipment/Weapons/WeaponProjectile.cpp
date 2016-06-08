@@ -89,4 +89,5 @@ void AWeaponProjectile::OnImpact(const FHitResult& HitResult)
 	}
 
 	//Destroy(true);
+	SetLifeSpan(0.5f);
 }
