@@ -8,6 +8,8 @@ APickup::APickup()
 	PickupMesh = CreateDefaultSubobject<UStaticMeshComponent>("PickupMesh");
 	RootComponent = PickupMesh;
 
+	PickupName = "";
+
 	bReplicates = true;
 
 	PrimaryActorTick.bCanEverTick = false;

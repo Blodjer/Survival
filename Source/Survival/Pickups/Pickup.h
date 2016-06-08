@@ -29,6 +29,10 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Pickup, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* PickupMesh;
 
+	// Name displayed when a player aim's at the Pickup
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Pickup, meta = (AllowPrivateAccess = "true"))
+	FName PickupName;
+
 public:
 	FORCEINLINE UStaticMeshComponent* GetPickupMesh() const { return PickupMesh; };
 
