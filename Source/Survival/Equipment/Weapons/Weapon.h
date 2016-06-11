@@ -26,6 +26,8 @@ public:
 protected:
 	virtual void SetupInputActions() override;
 
+	virtual void BeforeDrop() override;
+
 	// [client + server]
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	void StartFire();

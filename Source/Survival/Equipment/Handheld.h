@@ -32,8 +32,8 @@ public:
 	// Is the weapon currently equipped
 	UFUNCTION(BlueprintPure, Category = Handheld)
 	bool IsEquipped() const;
-
-	void ThrowAway();
+	
+	void Drop(bool bIsWaste = false);
 
 protected:
 	// Setup the input for this weapon. Use BindInputAction(...) to bind actions to the owner character
@@ -48,6 +48,8 @@ protected:
 			InputActionBindings.Add(OwnerInputComponent->BindAction(ActionName, KeyEvent, Object, Func));
 		}
 	}
+
+	virtual void BeforeDrop() {};
 
 private:
 	// First person mesh. Seen only by owner.
@@ -72,7 +74,10 @@ private:
 	// Is the weapon currently equipped
 	bool bIsEquipped;
 
-	// Pickup to spawn on throw away
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_IsWasted)
+	bool bIsWaste;
+
+	// Pickup to drop
 	UPROPERTY(EditDefaultsOnly, Category = Handheld, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class APickup> PickupClass;
 
@@ -83,6 +88,9 @@ private:
 private:
 	UFUNCTION()
 	void OnRep_OwnerCharacter();
+
+	UFUNCTION()
+	void OnRep_IsWasted();
 
 public:
 	// Return the first person mesh

@@ -199,6 +199,14 @@ private:
 	void ServerPickup_Implementation(class APickup* Pickup);
 	bool ServerPickup_Validate(class APickup* Pickup) { return true; };
 
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Equipment)
+	void DropHandheld();
+
+	UFUNCTION(Server, Reliable, WithValidation, Category = Equipment)
+	void ServerDropHandheld();
+	void ServerDropHandheld_Implementation();
+	bool ServerDropHandheld_Validate() { return true; };
+
 private:
 	// First person mesh. Seen only by owner.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character, meta = (AllowPrivateAccess = "true"))

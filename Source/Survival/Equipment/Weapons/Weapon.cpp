@@ -50,6 +50,14 @@ void AWeapon::SetupInputActions()
 	// TODO: Firemode
 }
 
+void AWeapon::BeforeDrop()
+{
+	if (GetOwnerCharacter() == nullptr && ProjectileType != nullptr)
+		return;
+
+	GetOwnerCharacter()->AddAmmo(ProjectileType, GetCurrentRoundsInMagazine());	
+}
+
 void AWeapon::StartFire()
 {
 	if (bIsReloading)

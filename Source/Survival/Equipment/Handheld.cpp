@@ -18,6 +18,7 @@ AHandheld::AHandheld()
 	Mesh3P->AttachTo(Mesh1P);
 
 	bIsEquipped = false;
+	bIsWaste = false;
 
 	bReplicates = true;
 	bNetUseOwnerRelevancy = true;
@@ -102,21 +103,34 @@ bool AHandheld::IsEquipped() const
 	return bIsEquipped;
 }
 
-void AHandheld::ThrowAway()
+void AHandheld::Drop(bool bIsWaste)
 {
+	if (GetOwnerCharacter() == nullptr)
+		return;
+
+	BeforeDrop();
+
 	ClearActionBindings();
 
-	bIsEquipped = false;
+	GetOwnerCharacter()->RemoveHandheldFromInventory(this);
 
-	if (PickupClass != nullptr)
+	bIsEquipped = false;
+	this->bIsWaste = bIsWaste;
+	if (!bIsWaste && PickupClass != nullptr)
 	{
 		if (HasAuthority() && GetWorld())
 		{
-			APickup* Pickup = GetWorld()->SpawnActor<APickup>(PickupClass, GetActorLocation(), GetActorRotation());
+			FTransform PickupTransform(GetActorRotation(), GetActorLocation());
+			APickup* Pickup = GetWorld()->SpawnActorDeferred<APickup>(PickupClass, PickupTransform, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn);
 			if (Pickup)
 			{
-				Pickup->SetReplicateMovement(true);
-				Pickup->GetPickupMesh()->SetSimulatePhysics(true);
+				FVector PickupVelocity = FVector::ZeroVector;
+				if (GetOwnerCharacter())
+				{
+					PickupVelocity = GetOwnerCharacter()->GetVelocity() + GetOwnerCharacter()->GetControlRotation().Vector() * 180.0f;
+				}
+				Pickup->StartSimulatePhysics(PickupVelocity);
+				UGameplayStatics::FinishSpawningActor(Pickup, PickupTransform);
 			}
 		}
 
@@ -124,22 +138,29 @@ void AHandheld::ThrowAway()
 	}
 	else
 	{
-		if (OwnerCharacter == nullptr || !OwnerCharacter->IsLocallyControlled())
+		if (!OwnerCharacter->IsLocallyControlled())
 		{
 			Mesh1P->SetWorldLocation(Mesh3P->GetComponentLocation());
 		}
 
 		Mesh3P->AttachTo(RootComponent, NAME_None, EAttachLocation::SnapToTarget);
-		DetachRootComponentFromParent(true);
+		DetachRootComponentFromParent();
+
+		if (OwnerCharacter->IsLocallyControlled())
+			SetActorLocation(OwnerCharacter->GetMesh1P()->GetSocketLocation(OwnerCharacter->GetHandheldAttachPoint()));
+		else
+			SetActorLocation(OwnerCharacter->GetMesh()->GetSocketLocation(OwnerCharacter->GetHandheldAttachPoint()));
+
+		Mesh1P->SetVisibility(true);
+		Mesh3P->SetVisibility(true);
 
 		Mesh1P->SetSimulatePhysics(true);
-		Mesh1P->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		Mesh1P->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+		Mesh1P->SetCollisionProfileName("PickupPhysic");
+		Mesh1P->SetAllPhysicsLinearVelocity(GetOwnerCharacter() ? GetOwnerCharacter()->GetVelocity() : FVector::ZeroVector);
+		
+		SetLifeSpan(10.0f);
 
-		SetOwner(nullptr);
-		SetOwnerCharacter(nullptr);
-
-		SetLifeSpan(5.0f);
+		TearOff();
 	}
 }
 
@@ -167,10 +188,15 @@ void AHandheld::ClearActionBindings()
 void AHandheld::OnRep_OwnerCharacter()
 {
 	SetOwnerCharacter(OwnerCharacter);
+}
 
-	if (OwnerCharacter == nullptr)
+void AHandheld::OnRep_IsWasted()
+{
+	if (bIsWaste)
 	{
-		ThrowAway();
+		Drop(true);
+
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Magenta, "oiadghod");
 	}
 }
 
@@ -179,4 +205,5 @@ void AHandheld::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetim
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AHandheld, OwnerCharacter);
+	DOREPLIFETIME(AHandheld, bIsWaste);
 }

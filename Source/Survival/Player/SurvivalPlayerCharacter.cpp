@@ -140,6 +140,8 @@ void ASurvivalPlayerCharacter::SetupPlayerInputComponent(class UInputComponent* 
 	InputComponent->BindAction("NextHandheld", IE_Pressed, this, &ASurvivalPlayerCharacter::NextHandheld);
 	InputComponent->BindAction("PreviousHandheld", IE_Pressed, this, &ASurvivalPlayerCharacter::PreviousHandheld);
 
+	InputComponent->BindAction("DropHandheld", IE_Pressed, this, &ASurvivalPlayerCharacter::DropHandheld);
+
 	InputComponent->BindAction("Flashlight", IE_Pressed, this, &ASurvivalPlayerCharacter::ToggleFlashlight);
 
 	InputComponent->BindAction("Pickup", IE_Pressed, this, &ASurvivalPlayerCharacter::Pickup);
@@ -586,7 +588,6 @@ void ASurvivalPlayerCharacter::RemoveHandheldFromInventory(AHandheld* Handheld)
 	if (Handheld == nullptr)
 		return;
 
-	Handheld->ThrowAway();
 	HandheldInventory.Remove(Handheld);
 
 	if (EquippedHandheld == Handheld)
@@ -726,6 +727,19 @@ void ASurvivalPlayerCharacter::ServerPickup_Implementation(APickup* Pickup)
 		return;
 
 	Pickup->Pickup(this);
+}
+
+void ASurvivalPlayerCharacter::DropHandheld()
+{
+	ServerDropHandheld();
+}
+
+void ASurvivalPlayerCharacter::ServerDropHandheld_Implementation()
+{
+	if (EquippedHandheld)
+	{
+		EquippedHandheld->Drop();
+	}
 }
 
 void ASurvivalPlayerCharacter::OnRep_IsSprinting()

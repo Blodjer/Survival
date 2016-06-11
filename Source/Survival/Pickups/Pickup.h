@@ -13,15 +13,25 @@ class SURVIVAL_API APickup : public AActor
 public:
 	APickup();
 
+	virtual void Tick(float DeltaSeconds) override;
+
+	virtual void OnRep_ReplicateMovement() override;
+
 	UFUNCTION()
 	void Pickup(ASurvivalPlayerCharacter* PlayerCharacter);
+
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Pickup)
+	void StartSimulatePhysics(FVector Velocity = FVector::ZeroVector);
+
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Pickup)
+	void StopSimulatePhysics();
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = Pickup)
 	void OnPickup(ASurvivalPlayerCharacter* PlayerCharacter);
 	virtual void OnPickup_Implementation(ASurvivalPlayerCharacter* PlayerCharacter);
 
-	UFUNCTION(NetMulticast, Unreliable)
+	UFUNCTION(NetMulticast, Unreliable, BlueprintCosmetic)
 	void SimulatePickup();
 	void SimulatePickup_Implementation();
 

@@ -23,7 +23,7 @@ void AGadget::ServerUse_Implementation()
 
 	if (bIsDisposable && GetOwnerCharacter() != nullptr)
 	{
-		GetOwnerCharacter()->RemoveHandheldFromInventory(this);
+		Drop(true);
 	}
 }
 
