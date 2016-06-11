@@ -15,7 +15,7 @@ AHandheld::AHandheld()
 	// Create the third person mesh
 	Mesh3P = CreateDefaultSubobject<USkeletalMeshComponent>("Mesh3P");
 	Mesh3P->SetOwnerNoSee(true);
-	Mesh3P->AttachTo(Mesh1P);
+	Mesh3P->SetupAttachment(Mesh1P);
 
 	bIsEquipped = false;
 	bIsWaste = false;
@@ -72,8 +72,8 @@ void AHandheld::Equip()
 
 	// Attach meshes to owner meshes
 	FName AttachPoint = OwnerCharacter->GetHandheldAttachPoint();
-	Mesh1P->AttachTo(OwnerCharacter->GetMesh1P(), AttachPoint);
-	Mesh3P->AttachTo(OwnerCharacter->GetMesh(), AttachPoint);
+	Mesh1P->AttachToComponent(OwnerCharacter->GetMesh1P(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false), AttachPoint);
+	Mesh3P->AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false), AttachPoint);
 
 	Mesh1P->SetVisibility(true);
 	Mesh3P->SetVisibility(true);
@@ -143,7 +143,7 @@ void AHandheld::Drop(bool bIsWaste)
 			Mesh1P->SetWorldLocation(Mesh3P->GetComponentLocation());
 		}
 
-		Mesh3P->AttachTo(RootComponent, NAME_None, EAttachLocation::SnapToTarget);
+		Mesh3P->AttachToComponent(RootComponent, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
 		DetachRootComponentFromParent();
 
 		if (OwnerCharacter->IsLocallyControlled())

@@ -12,7 +12,7 @@ ACampfire::ACampfire()
 	RootComponent = CaptureSphere;
 
 	SmokeParticleSystem = CreateDefaultSubobject<UParticleSystemComponent>("Smoke");
-	SmokeParticleSystem->AttachTo(RootComponent);
+	SmokeParticleSystem->SetupAttachment(RootComponent);
 
 	OwningTeamIdx = -1;
 	DominantTeamIdx = -1;
@@ -92,7 +92,7 @@ bool ACampfire::IsCaptured()
 	return CaptureValue >= 1.0f;
 }
 
-void ACampfire::OnBeginOverlap(AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ACampfire::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	ASurvivalPlayerCharacter* SurvivalPlayerCharacter = Cast<ASurvivalPlayerCharacter>(OtherActor);
 	if (SurvivalPlayerCharacter)
@@ -110,7 +110,7 @@ void ACampfire::OnBeginOverlap(AActor* OtherActor, UPrimitiveComponent* OtherCom
 	}
 }
 
-void ACampfire::OnEndOverlap(AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void ACampfire::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	ASurvivalPlayerCharacter* SurvivalPlayerCharacter = Cast<ASurvivalPlayerCharacter>(OtherActor);
 	if (SurvivalPlayerCharacter)

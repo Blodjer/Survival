@@ -16,7 +16,7 @@ AWeaponProjectile::AWeaponProjectile()
 
 	ParticleSystem = CreateDefaultSubobject<UParticleSystemComponent>("ParticleSystem");
 	ParticleSystem->bAutoActivate = true;
-	ParticleSystem->AttachTo(RootComponent);
+	ParticleSystem->SetupAttachment(RootComponent);
 
 	// Create the projectile movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovement");

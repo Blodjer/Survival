@@ -19,13 +19,13 @@ ASurvivalPlayerCharacter::ASurvivalPlayerCharacter(const FObjectInitializer& Obj
 
 	// Create CameraComponent for the first person camera
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
-	Camera->AttachTo(GetCapsuleComponent());
+	Camera->SetupAttachment(GetCapsuleComponent());
 	Camera->RelativeLocation = FVector(0, 0, BaseEyeHeight);
 	Camera->bUsePawnControlRotation = true;
 
 	// Create an extra MeshComponent for the first person mesh
 	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>("Mesh1P");
-	Mesh1P->AttachTo(Camera);
+	Mesh1P->SetupAttachment(Camera);
 	Mesh1P->SetOnlyOwnerSee(true);
 	Mesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Mesh1P->CastShadow = false;
@@ -35,7 +35,7 @@ ASurvivalPlayerCharacter::ASurvivalPlayerCharacter(const FObjectInitializer& Obj
 
 	//Create SpotLightComponent for the flashlight
 	Flashlight = CreateDefaultSubobject<USpotLightComponent>("Flashlight");
-	Flashlight->AttachTo(Camera);
+	Flashlight->SetupAttachment(Camera);
 	Flashlight->OuterConeAngle = 28.0f;
 	Flashlight->InnerConeAngle = 20.0f;
 	Flashlight->Intensity = 1.5f;
