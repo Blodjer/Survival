@@ -180,7 +180,6 @@ private:
 	void ServerEquip_Implementation(AHandheld* Handheld);
 	bool ServerEquip_Validate(AHandheld* Handheld) { return true; };
 
-	UFUNCTION()
 	void SimulateEquip(AHandheld* Handheld);
 
 	void NextHandheld();
@@ -235,6 +234,9 @@ private:
 	bool bIsDead;
 
 	FTimerHandle TimerHandle_Die;
+
+	UPROPERTY(Transient)
+	class AHandheld* PreviousEquippedHandheld;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = Pickup, meta = (AllowPrivateAccess = "true"))
 	class APickup* TargetingPickup;

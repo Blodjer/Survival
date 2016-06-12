@@ -283,6 +283,13 @@ void ASurvivalPlayerCharacter::InjureLethal()
 	bIsLethalInjured = true;
 
 	DisableInput(GetPlayerController());
+
+	if (EquippedHandheld != nullptr)
+	{
+		PreviousEquippedHandheld = EquippedHandheld;
+		EquippedHandheld->UnEquip();
+		EquippedHandheld = nullptr;
+	}
 }
 
 void ASurvivalPlayerCharacter::Die()
@@ -323,6 +330,11 @@ void ASurvivalPlayerCharacter::Revive(float NewHealth)
 
 		bIsLethalInjured = false;
 		Health = FMath::Clamp(NewHealth, 1.0f, GetMaxHealth());
+
+		if (PreviousEquippedHandheld != nullptr)
+		{
+			Equip(PreviousEquippedHandheld);
+		}
 
 		EnableInput(GetPlayerController());
 	}
@@ -624,6 +636,8 @@ void ASurvivalPlayerCharacter::ServerEquip_Implementation(AHandheld* Handheld)
 
 void ASurvivalPlayerCharacter::SimulateEquip(AHandheld* Handheld)
 {
+	PreviousEquippedHandheld = EquippedHandheld;
+
 	if (EquippedHandheld != nullptr)
 	{
 		EquippedHandheld->UnEquip();
