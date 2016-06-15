@@ -233,6 +233,26 @@ float ASurvivalPlayerCharacter::TakeDamage(float Damage, FDamageEvent const& Dam
 		return 0.0f;
 	}
 	
+	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
+	{
+		FPointDamageEvent* const PointDamageEvent = (FPointDamageEvent*)&DamageEvent;
+		FName HitBoneName = PointDamageEvent->HitInfo.BoneName;
+
+		float DamageMultiplier = 1.0f;
+		for (FHitZone& HitZone : HitZones)
+		{
+			if (GetMesh()->BoneIsChildOf(HitBoneName, HitZone.ParentBoneName) || HitBoneName == HitZone.ParentBoneName)
+			{
+				DamageMultiplier = HitZone.DamageMultiplier;
+			}
+		}
+		Damage *= DamageMultiplier;
+
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Magenta, HitBoneName.ToString());
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Magenta, FString::FromInt(GetMesh()->GetBoneIndex(HitBoneName)));
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Magenta, FString::SanitizeFloat(DamageMultiplier));
+	}
+	
 	Damage = FMath::Max(0.0f, Damage);
 
 	const float TakenDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);

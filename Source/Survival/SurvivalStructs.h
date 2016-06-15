@@ -120,5 +120,21 @@ public:
 	{
 		return AmmunitionTypes;
 	}
+};
 
+USTRUCT(BlueprintType)
+struct SURVIVAL_API FHitZone
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = HitZone)
+	FName ParentBoneName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = HitZone)
+	float DamageMultiplier;
+
+	FHitZone() : DamageMultiplier(1.0f)
+	{
+
+	}
 };

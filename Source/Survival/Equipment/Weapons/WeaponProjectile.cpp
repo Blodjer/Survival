@@ -80,12 +80,12 @@ void AWeaponProjectile::OnImpact(const FHitResult& HitResult)
 {
 	if (HasAuthority() && HitResult.GetActor() != nullptr)
 	{
-			FPointDamageEvent PointDamage = FPointDamageEvent();
-			PointDamage.Damage = Damage;
-			PointDamage.HitInfo = HitResult;
-			PointDamage.ShotDirection = HitResult.ImpactNormal;
+		FPointDamageEvent PointDamage = FPointDamageEvent();
+		PointDamage.Damage = Damage;
+		PointDamage.HitInfo = HitResult;
+		PointDamage.ShotDirection = HitResult.ImpactNormal;
 
-			HitResult.GetActor()->TakeDamage(Damage, PointDamage, GetInstigatorController(), this);
+		HitResult.GetActor()->TakeDamage(Damage, PointDamage, GetInstigatorController(), this);
 	}
 
 	//Destroy(true);

@@ -348,6 +348,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = Character, meta = (ClampMin = "0.0", UIMin = "0.0"))
 	float Health;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Character)
+	TArray<FHitZone> HitZones;
+
 	// Landing velocity at which the character starts taking damage
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Character, meta = (ClampMin = "0.0", UIMin = "0.0"))
 	float DamagingLandingVelocity;
