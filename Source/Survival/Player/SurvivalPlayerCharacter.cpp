@@ -5,6 +5,7 @@
 #include "Survival/Game/SurvivalGameMode.h"
 #include "SurvivalPlayerState.h"
 #include "Survival/Pickups/Pickup.h"
+#include "Pickups/PickupEquipment.h"
 #include "Survival/Equipment/Weapons/Weapon.h"
 
 ASurvivalPlayerCharacter::ASurvivalPlayerCharacter(const FObjectInitializer& ObjectInitializer)
@@ -413,6 +414,27 @@ int32 ASurvivalPlayerCharacter::GetAmmoAmmountOfType(TSubclassOf<AWeaponProjecti
 	return AmmunitionInventory.GetAmmoAmmountOfType(Type);
 }
 
+bool ASurvivalPlayerCharacter::CanPickup(APickup* Pickup)
+{
+	if (Pickup == nullptr)
+		return false;
+
+	if (Pickup->IsA(APickupEquipment::StaticClass()))
+	{
+		APickupEquipment* PickupEquipment = Cast<APickupEquipment>(Pickup);
+		EHandheldType PickupHandheldType = PickupEquipment->HandheldClass.GetDefaultObject()->GetHandheldType();
+		
+		int AvailableSlots = HandheldInventorySlots.GetAvailableSlots(PickupHandheldType);
+		if (EquippedHandheld && EquippedHandheld->GetHandheldType() == PickupHandheldType)
+		{
+			AvailableSlots--;
+		}
+		return AvailableSlots > 0;
+	}
+
+	return true;
+}
+
 void ASurvivalPlayerCharacter::AddBatteryPower(float Amount)
 {
 	if (Amount <= 0.0f)
@@ -794,6 +816,9 @@ void ASurvivalPlayerCharacter::UpdateTargetPickup()
 void ASurvivalPlayerCharacter::Pickup()
 {
 	if (TargetingPickup == nullptr)
+		return;
+
+	if (!CanPickup(TargetingPickup))
 		return;
 
 	ServerPickup(TargetingPickup);

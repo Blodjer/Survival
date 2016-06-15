@@ -75,20 +75,12 @@ struct SURVIVAL_API FHandheldInventorySlotManager
 		return "";
 	}
 
-	int32 GetMaxSlots(AHandheld* Handheld)
-	{
-		if (Handheld == nullptr)
-			return 0;
-
-		return GetMaxSlots(Handheld->GetHandheldType());
-	}
-
-	int32 GetMaxSlots(EHandheldType Type)
+	int32 GetAvailableSlots(EHandheldType Type)
 	{
 		int32 i = 0;
 		for (FHandheldInventorySlot Slot : Slots)
 		{
-			if (Slot.Type == Type)
+			if (Slot.Type == Type && Slot.AssignedHandheld == nullptr)
 			{
 				i++;
 			}
@@ -170,6 +162,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Ammunition)
 	int32 GetAmmoAmmountOfType(TSubclassOf<class AWeaponProjectile> Type) const;
+
+	UFUNCTION(BlueprintCallable, Category = Pickup)
+	bool CanPickup(APickup* Pickup);
 
 	UFUNCTION(BlueprintCallable, Category = Battery)
 	void AddBatteryPower(float Amount);
