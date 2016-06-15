@@ -507,6 +507,11 @@ void ASurvivalPlayerCharacter::SetSprint(bool bShouldSprint)
 	if (bShouldSprint)
 	{
 		StopCrouch();
+
+		if (EquippedHandheld != nullptr)
+		{
+			EquippedHandheld->OnCharacterStopUse();
+		}
 	}
 
 	if (SurvivalCharacterMovement)

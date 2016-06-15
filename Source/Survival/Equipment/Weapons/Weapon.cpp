@@ -38,6 +38,16 @@ void AWeapon::UnEquip()
 	Super::UnEquip();
 }
 
+void AWeapon::OnCharacterStopUse()
+{
+	Super::OnCharacterStopUse();
+
+	if (HasAuthority() || (GetOwnerCharacter() && GetOwnerCharacter()->IsLocallyControlled()))
+	{
+		StopFire();
+	}
+}
+
 void AWeapon::SetupInputActions()
 {
 	Super::SetupInputActions();
@@ -62,7 +72,7 @@ void AWeapon::BeforeDrop()
 
 void AWeapon::StartFire()
 {
-	if (bIsReloading)
+	if (!CanFire())
 		return;
 
 	if (!HasAuthority())
@@ -187,6 +197,11 @@ void AWeapon::SimulateFire()
 	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetOwnerCharacter()->GetBaseAimRotation().Vector() * 100000.0f, FColor::White, false, 0.15f);
 
 	OnSimulateFire();
+}
+
+bool AWeapon::CanFire()
+{
+	return !bIsReloading && GetOwnerCharacter() && !GetOwnerCharacter()->IsSprinting();
 }
 
 void AWeapon::StartReload()

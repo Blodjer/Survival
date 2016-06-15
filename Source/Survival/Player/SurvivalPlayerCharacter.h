@@ -412,13 +412,16 @@ public:
 	UFUNCTION(BlueprintPure, Category = Character)
 	FORCEINLINE float GetMaxHealth() const { return GetClass()->GetDefaultObject<ASurvivalPlayerCharacter>()->Health; };
 
-	// The health value the player starts with
-	UFUNCTION(BlueprintPure, Category = Character)
-	FORCEINLINE float GetMaxFlashlightIntensity() const { return GetClass()->GetDefaultObject<ASurvivalPlayerCharacter>()->Flashlight->Intensity; };
-
 	// Is the player lethal injured and will die soon
 	UFUNCTION(BlueprintPure, Category = Character)
 	FORCEINLINE bool IsLethalInjured() const { return bIsLethalInjured; };
+
+	// Is the player currently sprinting
+	FORCEINLINE bool IsSprinting() const { return bIsSprinting; };
+
+	// The health value the player starts with
+	UFUNCTION(BlueprintPure, Category = Character)
+	FORCEINLINE float GetMaxFlashlightIntensity() const { return GetClass()->GetDefaultObject<ASurvivalPlayerCharacter>()->Flashlight->Intensity; };
 	
 private:
 	UFUNCTION()

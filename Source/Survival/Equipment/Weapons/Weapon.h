@@ -23,6 +23,8 @@ public:
 
 	virtual void UnEquip() override;
 
+	virtual void OnCharacterStopUse() override;
+
 protected:
 	virtual void SetupInputActions() override;
 
@@ -70,6 +72,9 @@ protected:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Weapon)
 	void OnSimulateFire();
+
+	UFUNCTION(BlueprintPure, Category = Weapon)
+	virtual bool CanFire();
 
 	// [client + server]
 	UFUNCTION(BlueprintCallable, Category = Weapon)

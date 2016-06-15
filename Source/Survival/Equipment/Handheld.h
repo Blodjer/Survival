@@ -44,6 +44,8 @@ public:
 	
 	void Drop(bool bIsWaste = false);
 
+	virtual void OnCharacterStopUse() {};
+
 protected:
 	// Setup the input for this weapon. Use BindInputAction(...) to bind actions to the owner character
 	virtual void SetupInputActions() {};
