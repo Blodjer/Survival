@@ -5,8 +5,97 @@
 #include "GameFramework/Character.h"
 #include "SurvivalCharacterMovement.h"
 #include "SurvivalPlayerController.h"
+#include "Survival/Equipment/Handheld.h"
 #include "Survival/Equipment/Weapons/WeaponProjectile.h"
 #include "SurvivalPlayerCharacter.generated.h"
+
+USTRUCT(BlueprintType)
+struct SURVIVAL_API FHandheldInventorySlot
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Slot)
+	EHandheldType Type;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Slot)
+	FName SocketName;
+
+	UPROPERTY(Transient)
+	AHandheld* AssignedHandheld;
+
+	FHandheldInventorySlot() : Type(EHandheldType::Unknown), SocketName(""), AssignedHandheld(nullptr)
+	{
+		
+	}
+};
+
+USTRUCT(BlueprintType)
+struct SURVIVAL_API FHandheldInventorySlotManager
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, NotReplicated, Category = Inventory)
+	TArray<FHandheldInventorySlot> Slots;
+
+	FName Store(AHandheld* Handheld)
+	{
+		for (FHandheldInventorySlot& Slot : Slots)
+		{
+			if (Slot.AssignedHandheld == nullptr && Slot.Type == Handheld->GetHandheldType())
+			{
+				Slot.AssignedHandheld = Handheld;
+				return Slot.SocketName;
+			}
+		}
+
+		return "";
+	}
+
+	void Take(AHandheld* Handheld)
+	{
+		for (FHandheldInventorySlot& Slot : Slots)
+		{
+			if (Slot.AssignedHandheld == Handheld)
+			{
+				Slot.AssignedHandheld = nullptr;
+			}
+		}
+	}
+
+	FName GetSocketName(AHandheld* Handheld)
+	{
+		for (FHandheldInventorySlot Slot : Slots)
+		{
+			if (Slot.AssignedHandheld == Handheld)
+			{
+				return Slot.SocketName;
+			}
+		}
+
+		return "";
+	}
+
+	int32 GetMaxSlots(AHandheld* Handheld)
+	{
+		if (Handheld == nullptr)
+			return 0;
+
+		return GetMaxSlots(Handheld->GetHandheldType());
+	}
+
+	int32 GetMaxSlots(EHandheldType Type)
+	{
+		int32 i = 0;
+		for (FHandheldInventorySlot Slot : Slots)
+		{
+			if (Slot.Type == Type)
+			{
+				i++;
+			}
+		}
+		return i;
+	}
+};
 
 UCLASS()
 class SURVIVAL_API ASurvivalPlayerCharacter : public ACharacter
@@ -95,6 +184,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Replicated, Transient, Category = Equipment)
 	TArray<class AHandheld*> HandheldInventory;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Equipment)
+	FHandheldInventorySlotManager HandheldInventorySlots;
+
 	UPROPERTY(BlueprintReadOnly, Replicated, Transient, Category = Ammunition)
 	FAmmunitionInventory AmmunitionInventory;
 
@@ -181,6 +273,8 @@ private:
 	bool ServerEquip_Validate(AHandheld* Handheld) { return true; };
 
 	void SimulateEquip(AHandheld* Handheld);
+
+	void SimulateUnEquip(AHandheld* Handheld);
 
 	void NextHandheld();
 

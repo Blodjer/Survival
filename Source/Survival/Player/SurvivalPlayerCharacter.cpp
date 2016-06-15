@@ -592,6 +592,20 @@ void ASurvivalPlayerCharacter::AddHandheldToInventory(TSubclassOf<AHandheld> Han
 		{
 			Equip(NewHandheld);
 		}
+		else
+		{
+			FName InventorySocketName = HandheldInventorySlots.Store(NewHandheld);
+			if (!InventorySocketName.IsNone())
+			{
+				NewHandheld->GetMesh1P()->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false), InventorySocketName);
+				NewHandheld->GetMesh3P()->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false), InventorySocketName);
+			}
+			else
+			{
+				NewHandheld->GetMesh1P()->SetVisibility(false);
+				NewHandheld->GetMesh3P()->SetVisibility(false);
+			}
+		}
 	}
 }
 
@@ -601,6 +615,7 @@ void ASurvivalPlayerCharacter::RemoveHandheldFromInventory(AHandheld* Handheld)
 		return;
 
 	HandheldInventory.Remove(Handheld);
+	HandheldInventorySlots.Take(Handheld);
 
 	if (EquippedHandheld == Handheld)
 	{
@@ -621,6 +636,7 @@ void ASurvivalPlayerCharacter::Equip(AHandheld* Handheld)
 {
 	if (HasAuthority())
 	{
+		SimulateUnEquip(EquippedHandheld);
 		SimulateEquip(Handheld);
 	}
 	else
@@ -638,18 +654,41 @@ void ASurvivalPlayerCharacter::SimulateEquip(AHandheld* Handheld)
 {
 	PreviousEquippedHandheld = EquippedHandheld;
 
-	if (EquippedHandheld != nullptr)
-	{
-		EquippedHandheld->UnEquip();
-	}
-
 	if (Handheld != nullptr)
 	{
+		HandheldInventorySlots.Take(Handheld);
+
+		Handheld->GetMesh1P()->AttachToComponent(GetMesh1P(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false), GetHandheldAttachPoint());
+		Handheld->GetMesh3P()->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false), GetHandheldAttachPoint());
+
+		Handheld->GetMesh1P()->SetVisibility(true);
+		Handheld->GetMesh3P()->SetVisibility(true);
+
 		Handheld->SetOwnerCharacter(this);
 		Handheld->Equip();
 	}
 
 	EquippedHandheld = Handheld;
+}
+
+void ASurvivalPlayerCharacter::SimulateUnEquip(AHandheld* Handheld)
+{
+	if (Handheld != nullptr)
+	{
+		FName InventorySocketName = HandheldInventorySlots.Store(Handheld);
+		if (!InventorySocketName.IsNone())
+		{
+			Handheld->GetMesh1P()->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false), InventorySocketName);
+			Handheld->GetMesh3P()->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false), InventorySocketName);
+		}
+		else
+		{
+			Handheld->GetMesh1P()->SetVisibility(false);
+			Handheld->GetMesh3P()->SetVisibility(false);
+		}
+
+		Handheld->UnEquip();
+	}
 }
 
 void ASurvivalPlayerCharacter::NextHandheld()
@@ -775,10 +814,7 @@ void ASurvivalPlayerCharacter::OnRep_IsFlashlightOn()
 
 void ASurvivalPlayerCharacter::OnRep_EquippedHandheld(AHandheld* LastEquippedHandheld)
 {
-	if (LastEquippedHandheld != nullptr)
-	{
-		LastEquippedHandheld->UnEquip();
-	}
+	SimulateUnEquip(LastEquippedHandheld);
 
 	SimulateEquip(EquippedHandheld);
 }

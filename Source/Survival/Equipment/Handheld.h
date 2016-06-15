@@ -6,6 +6,15 @@
 #include "Survival/Pickups/Pickup.h"
 #include "Handheld.generated.h"
 
+UENUM(BlueprintType)
+enum class EHandheldType : uint8
+{
+	PrimaryWeapon,
+	SecondaryWeapon,
+	Gadget,
+	Unknown UMETA(Hidden)
+};
+
 UCLASS(Abstract, NotBlueprintable)
 class SURVIVAL_API AHandheld : public AActor
 {
@@ -50,6 +59,10 @@ protected:
 	}
 
 	virtual void BeforeDrop() {};
+
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = Handheld)
+	EHandheldType Type;
 
 private:
 	// First person mesh. Seen only by owner.
@@ -101,5 +114,8 @@ public:
 
 	// Return the character actor that owns this handheld
 	FORCEINLINE ASurvivalPlayerCharacter* GetOwnerCharacter() const { return OwnerCharacter; }
+
+	// Return the type of the handheld
+	FORCEINLINE EHandheldType GetHandheldType() const { return Type; };
 
 };

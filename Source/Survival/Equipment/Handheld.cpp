@@ -17,6 +17,8 @@ AHandheld::AHandheld()
 	Mesh3P->SetOwnerNoSee(true);
 	Mesh3P->SetupAttachment(Mesh1P);
 
+	Type = EHandheldType::Unknown;
+
 	bIsEquipped = false;
 	bIsWaste = false;
 
@@ -70,14 +72,6 @@ void AHandheld::Equip()
 	if (OwnerCharacter == nullptr)
 		return;
 
-	// Attach meshes to owner meshes
-	FName AttachPoint = OwnerCharacter->GetHandheldAttachPoint();
-	Mesh1P->AttachToComponent(OwnerCharacter->GetMesh1P(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false), AttachPoint);
-	Mesh3P->AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false), AttachPoint);
-
-	Mesh1P->SetVisibility(true);
-	Mesh3P->SetVisibility(true);
-
 	// TODO: Animation
 	
 	SetupInputActions();
@@ -88,12 +82,6 @@ void AHandheld::Equip()
 void AHandheld::UnEquip()
 {
 	ClearActionBindings();
-
-	//Mesh1P->DetachFromParent();
-	Mesh1P->SetVisibility(false);
-
-	//Mesh3P->DetachFromParent();
-	Mesh3P->SetVisibility(false);
 
 	bIsEquipped = false;
 }

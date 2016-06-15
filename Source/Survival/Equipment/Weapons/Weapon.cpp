@@ -6,6 +6,8 @@
 
 AWeapon::AWeapon()
 {
+	Type = EHandheldType::PrimaryWeapon;
+
 	CurrentState = EWeaponState::Idle;
 
 	Damage = 25.0f;

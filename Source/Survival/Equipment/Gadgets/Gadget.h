@@ -9,7 +9,10 @@ UCLASS(Abstract, Blueprintable)
 class SURVIVAL_API AGadget : public AHandheld
 {
 	GENERATED_BODY()
-	
+
+public:
+	AGadget();
+
 protected:
 	virtual void SetupInputActions() override;
 

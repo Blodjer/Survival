@@ -3,6 +3,11 @@
 #include "Survival.h"
 #include "Gadget.h"
 
+AGadget::AGadget()
+{
+	Type = EHandheldType::Gadget;
+}
+
 void AGadget::SetupInputActions()
 {
 	Super::SetupInputActions();
