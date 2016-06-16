@@ -57,5 +57,5 @@ void UFlashingPointLightComponent::ToggleLight()
 	{
 		CurrentPatternIndex = (CurrentPatternIndex + 1) % FlashingPattern.Num();
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle_ToggleLight, this, &UFlashingPointLightComponent::ToggleLight, FlashingPattern[CurrentPatternIndex], false);
-	
+	}
 }
