@@ -9,6 +9,8 @@ APickup::APickup()
 	PickupMesh->SetCollisionProfileName("Pickup");
 	RootComponent = PickupMesh;
 
+	SimulatingPhysicsProfileName = "PickupPhysic";
+	
 	PickupName = "";
 
 	bReplicates = true;
@@ -16,52 +18,11 @@ APickup::APickup()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-void APickup::Tick(float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-	
-	if (HasAuthority() && GetRootComponent()->IsSimulatingPhysics() && GetVelocity().Size() < 1.0f && GetWorld()->GetTimeSeconds() - CreationTime > 2.0f)
-	{
-		StopSimulatePhysics();
-	}
-}
-
-void APickup::OnRep_ReplicateMovement()
-{
-	Super::OnRep_ReplicateMovement();
-	
-	if (bReplicateMovement)
-	{
-		StartSimulatePhysics();
-	}
-	else
-	{
-		StopSimulatePhysics();
-	}
-}
-
 void APickup::Pickup(ASurvivalPlayerCharacter* PlayerCharacter)
 {
 	OnPickup(PlayerCharacter);
 
 	Destroy();
-}
-
-void APickup::StartSimulatePhysics(FVector Velocity)
-{
-	SetReplicateMovement(true);
-	PickupMesh->SetSimulatePhysics(true);
-	PickupMesh->SetCollisionProfileName("PickupPhysic");
-	PickupMesh->GetBodyInstance()->bUseCCD = true;
-	PickupMesh->SetAllPhysicsLinearVelocity(Velocity);
-}
-
-void APickup::StopSimulatePhysics()
-{
-	SetReplicateMovement(false);
-	PickupMesh->SetSimulatePhysics(false);
-	PickupMesh->SetCollisionProfileName("Pickup");
-	PickupMesh->GetBodyInstance()->bUseCCD = false;
 }
 
 void APickup::OnPickup_Implementation(ASurvivalPlayerCharacter* PlayerCharacter)

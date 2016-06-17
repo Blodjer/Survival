@@ -2,29 +2,19 @@
 
 #pragma once
 
-#include "GameFramework/Actor.h"
+#include "Survival/Components/DroppablePhysicsActor.h"
 #include "Pickup.generated.h"
 
 UCLASS()
-class SURVIVAL_API APickup : public AActor
+class SURVIVAL_API APickup : public ADroppablePhysicsActor
 {
 	GENERATED_BODY()
 	
 public:
 	APickup();
 
-	virtual void Tick(float DeltaSeconds) override;
-
-	virtual void OnRep_ReplicateMovement() override;
-
 	UFUNCTION()
 	void Pickup(ASurvivalPlayerCharacter* PlayerCharacter);
-
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Pickup)
-	void StartSimulatePhysics(FVector Velocity = FVector::ZeroVector);
-
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Pickup)
-	void StopSimulatePhysics();
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = Pickup)
