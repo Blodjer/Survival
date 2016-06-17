@@ -10,6 +10,8 @@ UFlashingPointLightComponent::UFlashingPointLightComponent()
 
 	CurrentPatternIndex = 0;
 
+	StartWithLightOn = true;
+
 	bWantsInitializeComponent = true;
 }
 
@@ -35,11 +37,14 @@ void UFlashingPointLightComponent::SetFlashingPattern(float FlashTime)
 
 void UFlashingPointLightComponent::StartOn()
 {
-	SetVisibility(true);
-
 	if (FlashingPattern.Num() > 0)
 	{
+		SetVisibility(StartWithLightOn);
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle_ToggleLight, this, &UFlashingPointLightComponent::ToggleLight, FlashingPattern[0], false);
+	}
+	else
+	{
+		SetVisibility(false);
 	}
 }
 
@@ -57,5 +62,9 @@ void UFlashingPointLightComponent::ToggleLight()
 	{
 		CurrentPatternIndex = (CurrentPatternIndex + 1) % FlashingPattern.Num();
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle_ToggleLight, this, &UFlashingPointLightComponent::ToggleLight, FlashingPattern[CurrentPatternIndex], false);
+	}
+	else
+	{
+		StopOff();
 	}
 }

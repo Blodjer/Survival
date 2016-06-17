@@ -35,6 +35,9 @@ private:
 	
 	int32 CurrentPatternIndex;
 
+	UPROPERTY(EditAnywhere, Category = Light)
+	bool StartWithLightOn;
+
 	FTimerHandle TimerHandle_ToggleLight;
 	
 };
