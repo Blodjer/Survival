@@ -18,6 +18,16 @@ APickup::APickup()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
+void APickup::Interact_Implementation(ASurvivalPlayerCharacter* PlayerCharacter)
+{
+	Pickup(PlayerCharacter);
+}
+
+bool APickup::IsInteractable_Implementation(ASurvivalPlayerCharacter* PlayerCharacter)
+{
+	return PlayerCharacter ? PlayerCharacter->CanPickup(this) : false;
+}
+
 void APickup::Pickup(ASurvivalPlayerCharacter* PlayerCharacter)
 {
 	OnPickup(PlayerCharacter);

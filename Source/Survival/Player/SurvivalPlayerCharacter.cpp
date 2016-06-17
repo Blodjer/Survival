@@ -63,7 +63,7 @@ ASurvivalPlayerCharacter::ASurvivalPlayerCharacter(const FObjectInitializer& Obj
 
 	bIsSprinting = false;
 
-	PickupRange = 250.0f;
+	InteractionRange = 250.0f;
 	
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -145,7 +145,7 @@ void ASurvivalPlayerCharacter::SetupPlayerInputComponent(class UInputComponent* 
 
 	InputComponent->BindAction("Flashlight", IE_Pressed, this, &ASurvivalPlayerCharacter::ToggleFlashlight);
 
-	InputComponent->BindAction("Pickup", IE_Pressed, this, &ASurvivalPlayerCharacter::Pickup);
+	InputComponent->BindAction("Interact", IE_Pressed, this, &ASurvivalPlayerCharacter::Interact);
 }
 
 void ASurvivalPlayerCharacter::PossessedBy(AController* NewController)
@@ -205,7 +205,7 @@ void ASurvivalPlayerCharacter::Tick(float DeltaTime)
 
 	if (IsLocallyControlled())
 	{
-		UpdateTargetPickup();
+		UpdateTargetInteractable();
 	}
 }
 
@@ -414,11 +414,21 @@ int32 ASurvivalPlayerCharacter::GetAmmoAmmountOfType(TSubclassOf<AWeaponProjecti
 	return AmmunitionInventory.GetAmmoAmmountOfType(Type);
 }
 
+const TScriptInterface<IInteractable> ASurvivalPlayerCharacter::GetTargetingInteractableInterface() const
+{
+	IInteractable* TargetingInterface = Cast<IInteractable>(TargetingInteractableActor);
+	TScriptInterface<IInteractable> TargetingScriptInterface = TScriptInterface<IInteractable>();
+	TargetingScriptInterface.SetObject(TargetingInteractableActor);
+	TargetingScriptInterface.SetInterface(TargetingInterface);
+
+	return TargetingScriptInterface;
+}
+
 bool ASurvivalPlayerCharacter::CanPickup(APickup* Pickup)
 {
 	if (Pickup == nullptr)
 		return false;
-
+	
 	if (Pickup->IsA(APickupEquipment::StaticClass()))
 	{
 		APickupEquipment* PickupEquipment = Cast<APickupEquipment>(Pickup);
@@ -775,14 +785,14 @@ void ASurvivalPlayerCharacter::UpdateTeamColors()
 	}
 }
 
-void ASurvivalPlayerCharacter::UpdateTargetPickup()
+void ASurvivalPlayerCharacter::UpdateTargetInteractable()
 {
-	APickup* NewTargetPickup;
+	AActor* NewTargetInteractable = nullptr;
 
 	FHitResult HitResult;
 
 	FVector TraceStart = GetCamera()->GetComponentLocation();
-	FVector TraceEnd = TraceStart + GetBaseAimRotation().Vector() * PickupRange;
+	FVector TraceEnd = TraceStart + GetBaseAimRotation().Vector() * InteractionRange;
 
 	FCollisionQueryParams CollisionQueryParams;
 	CollisionQueryParams.AddIgnoredActor(this);
@@ -790,46 +800,65 @@ void ASurvivalPlayerCharacter::UpdateTargetPickup()
 
 	if (GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECollisionChannel::ECC_Camera, CollisionQueryParams))
 	{
-		NewTargetPickup = Cast<APickup>(HitResult.GetActor());
+		if (HitResult.GetActor() && HitResult.GetActor()->GetClass() && HitResult.GetActor()->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+		{
+			NewTargetInteractable = HitResult.GetActor();
+		}
+	}
+
+	if (TargetingInteractableActor != NewTargetInteractable)
+	{
+		if (TargetingInteractableActor)
+		{
+			for (auto Component : TargetingInteractableActor->GetComponentsByClass(UPrimitiveComponent::StaticClass()))
+			{
+				Cast<UPrimitiveComponent>(Component)->SetRenderCustomDepth(false);
+			}
+		}
+
+		if (NewTargetInteractable)
+		{
+			for (auto Component : NewTargetInteractable->GetComponentsByClass(UPrimitiveComponent::StaticClass()))
+			{
+				Cast<UPrimitiveComponent>(Component)->SetRenderCustomDepth(true);
+			}
+		}
+	}
+
+	TargetingInteractableActor = NewTargetInteractable;
+}
+
+void ASurvivalPlayerCharacter::Interact()
+{
+	if (!HasAuthority())
+	{
+		if (TargetingInteractableActor == nullptr || !TargetingInteractableActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+			return;
+
+		TScriptInterface<IInteractable> TargetingScriptInterface = GetTargetingInteractableInterface();
+
+		if (TargetingScriptInterface->Execute_IsInteractable(TargetingInteractableActor, this))
+		{
+			ServerInteract(TargetingInteractableActor);
+		}
 	}
 	else
 	{
-		NewTargetPickup = nullptr;
+		ServerInteract(TargetingInteractableActor);
 	}
+}
 
-	if (TargetingPickup != NewTargetPickup)
+void ASurvivalPlayerCharacter::ServerInteract_Implementation(AActor* Interactable)
+{
+	if (Interactable == nullptr || !Interactable->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+		return;
+
+	TScriptInterface<IInteractable> TargetingScriptInterface = GetTargetingInteractableInterface();
+
+	if (TargetingScriptInterface->Execute_IsInteractable(Interactable, this))
 	{
-		if (TargetingPickup && TargetingPickup->GetPickupMesh())
-		{
-			TargetingPickup->GetPickupMesh()->SetRenderCustomDepth(false);
-		}
-
-		if (NewTargetPickup && NewTargetPickup->GetPickupMesh())
-		{
-			NewTargetPickup->GetPickupMesh()->SetRenderCustomDepth(true);
-		}
+		TargetingScriptInterface->Execute_Interact(Interactable, this);
 	}
-
-	TargetingPickup = NewTargetPickup;
-}
-
-void ASurvivalPlayerCharacter::Pickup()
-{
-	if (TargetingPickup == nullptr)
-		return;
-
-	if (!CanPickup(TargetingPickup))
-		return;
-
-	ServerPickup(TargetingPickup);
-}
-
-void ASurvivalPlayerCharacter::ServerPickup_Implementation(APickup* Pickup)
-{
-	if (Pickup == nullptr || Pickup->IsPendingKill())
-		return;
-
-	Pickup->Pickup(this);
 }
 
 void ASurvivalPlayerCharacter::DropHandheld()
@@ -897,6 +926,7 @@ void ASurvivalPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 
 	DOREPLIFETIME(ASurvivalPlayerCharacter, EquippedHandheld);
 	DOREPLIFETIME(ASurvivalPlayerCharacter, HandheldInventory);
+	DOREPLIFETIME(ASurvivalPlayerCharacter, HandheldInventorySlots);
 	DOREPLIFETIME(ASurvivalPlayerCharacter, AmmunitionInventory);
 	DOREPLIFETIME(ASurvivalPlayerCharacter, CurrentBatteryPower);
 

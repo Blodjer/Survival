@@ -6,14 +6,21 @@
 #include "Pickup.generated.h"
 
 UCLASS()
-class SURVIVAL_API APickup : public ADroppablePhysicsActor
+class SURVIVAL_API APickup : public ADroppablePhysicsActor, public IInteractable
 {
 	GENERATED_BODY()
 	
 public:
 	APickup();
 
-	UFUNCTION()
+	virtual void Interact_Implementation(ASurvivalPlayerCharacter* PlayerCharacter) override;
+
+	virtual bool IsInteractable_Implementation(ASurvivalPlayerCharacter* PlayerCharacter) override;
+
+	FORCEINLINE virtual FName IInteractable::GetInteractableName_Implementation() const override { return PickupName; };
+
+	FORCEINLINE virtual FString IInteractable::GetInteractionVerb_Implementation() const override { return "Pickup"; };
+
 	void Pickup(ASurvivalPlayerCharacter* PlayerCharacter);
 
 protected:

@@ -170,6 +170,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Ammunition)
 	int32 GetAmmoAmmountOfType(TSubclassOf<class AWeaponProjectile> Type) const;
 
+	UFUNCTION(BlueprintPure, Category = Interactable)
+	const TScriptInterface<IInteractable> GetTargetingInteractableInterface() const;
+
 	UFUNCTION(BlueprintCallable, Category = Pickup)
 	bool CanPickup(APickup* Pickup);
 
@@ -284,15 +287,15 @@ private:
 
 	void UpdateTeamColors();
 
-	UFUNCTION(BlueprintCallable, Category = Pickup)
-	void UpdateTargetPickup();
+	UFUNCTION(BlueprintCallable, Category = Interactable)
+	void UpdateTargetInteractable();
 
-	void Pickup();
+	void Interact();
 
-	UFUNCTION(Server, Reliable, WithValidation, Category = Pickup)
-	void ServerPickup(class APickup* Pickup);
-	void ServerPickup_Implementation(class APickup* Pickup);
-	bool ServerPickup_Validate(class APickup* Pickup) { return true; };
+	UFUNCTION(Server, Reliable, WithValidation, Category = Interactable)
+	void ServerInteract(class AActor* Interactable);
+	void ServerInteract_Implementation(class AActor* Interactable);
+	bool ServerInteract_Validate(class AActor* Interactable) { return true; };
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Equipment)
 	void DropHandheld();
@@ -334,8 +337,8 @@ private:
 	UPROPERTY(Transient)
 	class AHandheld* PreviousEquippedHandheld;
 
-	UPROPERTY(Transient, BlueprintReadOnly, Category = Pickup, meta = (AllowPrivateAccess = "true"))
-	class APickup* TargetingPickup;
+	UPROPERTY(Transient, BlueprintReadOnly, Category = Interactable, meta = (AllowPrivateAccess = "true"))
+	class AActor* TargetingInteractableActor;
 
 protected:
 	// Base controller turn rate, in deg/sec
@@ -389,9 +392,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Flashlight, meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
 	float FlashlightBatteryPowerDrain;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Pickup)
-	float PickupRange;
-
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Interactable)
+	float InteractionRange;
+	
 	UPROPERTY(Transient, BlueprintReadOnly, Category = Material)
 	TArray<UMaterialInstanceDynamic*> MeshMIDs;
 
