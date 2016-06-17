@@ -14,10 +14,10 @@ struct SURVIVAL_API FHandheldInventorySlot
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Slot)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, NotReplicated, Category = Slot)
 	EHandheldType Type;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Slot)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, NotReplicated, Category = Slot)
 	FName SocketName;
 
 	UPROPERTY(Transient)
@@ -34,7 +34,7 @@ struct SURVIVAL_API FHandheldInventorySlotManager
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly, NotReplicated, Category = Inventory)
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
 	TArray<FHandheldInventorySlot> Slots;
 
 	FName Store(AHandheld* Handheld)
@@ -43,7 +43,11 @@ struct SURVIVAL_API FHandheldInventorySlotManager
 		{
 			if (Slot.AssignedHandheld == nullptr && Slot.Type == Handheld->GetHandheldType())
 			{
-				Slot.AssignedHandheld = Handheld;
+				if (Handheld->HasAuthority())
+				{
+					Slot.AssignedHandheld = Handheld;
+				}
+
 				return Slot.SocketName;
 			}
 		}
@@ -57,7 +61,10 @@ struct SURVIVAL_API FHandheldInventorySlotManager
 		{
 			if (Slot.AssignedHandheld == Handheld)
 			{
-				Slot.AssignedHandheld = nullptr;
+				if (Handheld->HasAuthority())
+				{
+					Slot.AssignedHandheld = nullptr;
+				}
 			}
 		}
 	}
@@ -179,7 +186,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Replicated, Transient, Category = Equipment)
 	TArray<class AHandheld*> HandheldInventory;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Equipment)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = Equipment)
 	FHandheldInventorySlotManager HandheldInventorySlots;
 
 	UPROPERTY(BlueprintReadOnly, Replicated, Transient, Category = Ammunition)
