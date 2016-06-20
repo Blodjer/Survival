@@ -173,6 +173,8 @@ public:
 	UFUNCTION(BlueprintPure, Category = Interactable)
 	const TScriptInterface<IInteractable> GetTargetingInteractableInterface() const;
 
+	const TScriptInterface<IInteractable> GetInteractableInterface(AActor* Actor) const;
+
 	UFUNCTION(BlueprintCallable, Category = Pickup)
 	bool CanPickup(APickup* Pickup);
 

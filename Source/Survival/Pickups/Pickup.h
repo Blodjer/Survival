@@ -17,6 +17,8 @@ public:
 
 	virtual bool IsInteractable_Implementation(ASurvivalPlayerCharacter* PlayerCharacter) override;
 
+	FORCEINLINE virtual bool IsRenderedAsInteractable_Implementation() override { return true; };
+
 	FORCEINLINE virtual FName IInteractable::GetInteractableName_Implementation() const override { return PickupName; };
 
 	FORCEINLINE virtual FString IInteractable::GetInteractionVerb_Implementation() const override { return "Pickup"; };

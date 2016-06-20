@@ -414,14 +414,19 @@ int32 ASurvivalPlayerCharacter::GetAmmoAmmountOfType(TSubclassOf<AWeaponProjecti
 	return AmmunitionInventory.GetAmmoAmmountOfType(Type);
 }
 
-const TScriptInterface<IInteractable> ASurvivalPlayerCharacter::GetTargetingInteractableInterface() const
+const TScriptInterface<IInteractable> ASurvivalPlayerCharacter::GetInteractableInterface(AActor* Actor) const
 {
-	IInteractable* TargetingInterface = Cast<IInteractable>(TargetingInteractableActor);
+	IInteractable* TargetingInterface = Cast<IInteractable>(Actor);
 	TScriptInterface<IInteractable> TargetingScriptInterface = TScriptInterface<IInteractable>();
-	TargetingScriptInterface.SetObject(TargetingInteractableActor);
+	TargetingScriptInterface.SetObject(Actor);
 	TargetingScriptInterface.SetInterface(TargetingInterface);
 
 	return TargetingScriptInterface;
+}
+
+const TScriptInterface<IInteractable> ASurvivalPlayerCharacter::GetTargetingInteractableInterface() const
+{
+	return GetInteractableInterface(TargetingInteractableActor);
 }
 
 bool ASurvivalPlayerCharacter::CanPickup(APickup* Pickup)
@@ -802,7 +807,10 @@ void ASurvivalPlayerCharacter::UpdateTargetInteractable()
 	{
 		if (HitResult.GetActor() && HitResult.GetActor()->GetClass() && HitResult.GetActor()->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
 		{
-			NewTargetInteractable = HitResult.GetActor();
+			if (GetInteractableInterface(HitResult.GetActor())->Execute_IsRenderedAsInteractable(HitResult.GetActor()))
+			{
+				NewTargetInteractable = HitResult.GetActor();
+			}
 		}
 	}
 

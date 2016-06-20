@@ -22,6 +22,9 @@ public:
 	bool IsInteractable(ASurvivalPlayerCharacter* PlayerCharacter);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Interactable)
+	bool IsRenderedAsInteractable();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Interactable)
 	FName GetInteractableName() const;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Interactable)
