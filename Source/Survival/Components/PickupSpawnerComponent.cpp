@@ -5,13 +5,13 @@
 
 UPickupSpawnerComponent::UPickupSpawnerComponent()
 {
-	bVisualizeComponent = true;
 	bWantsBeginPlay = true;
 	bAutoActivate = true;
 	
-#if WITH_EDITOR
+#if WITH_EDITORONLY_DATA
 	PrimaryComponentTick.bCanEverTick = true;
 	bTickInEditor = true;
+	bVisualizeComponent = true;
 #else
 	PrimaryComponentTick.bCanEverTick = false;
 	bTickInEditor = false;
