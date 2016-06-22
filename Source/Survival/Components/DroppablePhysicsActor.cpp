@@ -13,7 +13,7 @@ void ADroppablePhysicsActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (HasAuthority() && PhysicsRootComponent != nullptr && PhysicsRootComponent->IsSimulatingPhysics() && GetVelocity().Size() < 1.0f && GetWorld()->GetTimeSeconds() - CreationTime > 2.0f)
+	if (HasAuthority() && PhysicsRootComponent != nullptr && PhysicsRootComponent->IsSimulatingPhysics() && GetVelocity().Size() < 1.0f && GetWorld()->GetTimeSeconds() - CreationTime > 1.0f)
 	{
 		StopSimulatePhysics();
 	}
@@ -41,11 +41,10 @@ void ADroppablePhysicsActor::StartSimulatePhysics(FVector Velocity)
 		return;
 
 	DefaultPhysicProfileName = PhysicsRootComponent->GetCollisionProfileName();
-
+	
 	SetReplicateMovement(true);
+	PhysicsRootComponent->SetCollisionProfileName(SimulatingPhysicsProfileName.IsNone() ? DefaultPhysicProfileName : SimulatingPhysicsProfileName);
 	PhysicsRootComponent->SetSimulatePhysics(true);
-	PhysicsRootComponent->SetCollisionProfileName(SimulatingPhysicsProfileName);
-	PhysicsRootComponent->GetBodyInstance()->bUseCCD = true;
 	PhysicsRootComponent->SetAllPhysicsLinearVelocity(Velocity);
 }
 
@@ -55,7 +54,7 @@ void ADroppablePhysicsActor::StopSimulatePhysics()
 		return;
 
 	SetReplicateMovement(false);
-	PhysicsRootComponent->SetSimulatePhysics(false);
 	PhysicsRootComponent->SetCollisionProfileName(DefaultPhysicProfileName);
-	PhysicsRootComponent->GetBodyInstance()->bUseCCD = false;
+	PhysicsRootComponent->SetSimulatePhysics(false);
+	PhysicsRootComponent->UnWeldChildren();
 }
