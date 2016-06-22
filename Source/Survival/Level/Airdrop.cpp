@@ -97,12 +97,12 @@ void AAirdrop::Init(FVector LandingLocation)
 
 	MovementComponent->SetUpdatedComponent(RootComponent);
 
+	MovementComponent->Duration = (StartLocation - LandingLocation).Size() / Speed;
+
 	MovementComponent->ControlPoints.Empty();
 	MovementComponent->AddControlPointPosition(FVector::ZeroVector, true);
 	MovementComponent->AddControlPointPosition(LandingLocation, false);
 	MovementComponent->FinaliseControlPoints();
-
-	MovementComponent->Duration = (StartLocation - LandingLocation).Size() / Speed;
 
 	MovementComponent->RestartMovement();
 }

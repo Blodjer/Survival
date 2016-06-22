@@ -19,8 +19,9 @@ public:
 
 	virtual void BeginPlay() override;
 	
-	virtual void Tick( float DeltaSeconds ) override;
+	virtual void Tick(float DeltaSeconds) override;
 
+	UFUNCTION(BlueprintCallable, Category = Airdrop)
 	virtual void Init(FVector LandingLocation);
 
 protected:
@@ -41,13 +42,13 @@ protected:
 	ADroppablePhysicsActor* Payload;
 
 private:
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = AirDrop, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Airdrop, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* BalloonMesh;
 	
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = AirDrop, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Airdrop, meta = (AllowPrivateAccess = "true"))
 	UBoxComponent* PayloadCollision;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = AirDrop, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Airdrop, meta = (AllowPrivateAccess = "true"))
 	UInterpToMovementComponent* MovementComponent;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Cable, meta = (AllowPrivateAccess = "true"))
@@ -65,16 +66,16 @@ private:
 	UPROPERTY(BlueprintReadOnly, Category = Cable, meta = (AllowPrivateAccess = "true"))
 	TArray<UCableComponent*> CableComponents;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = AirDrop, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Airdrop, meta = (AllowPrivateAccess = "true"))
 	float Speed;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = AirDrop, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Airdrop, meta = (AllowPrivateAccess = "true"))
 	float EscapeDistance;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = AirDrop, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Airdrop, meta = (AllowPrivateAccess = "true"))
 	float EscapeSpeed;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = AirDrop, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Airdrop, meta = (AllowPrivateAccess = "true"))
 	float ReleasePayloadHeight;
 
 	FVector StartLocation;
