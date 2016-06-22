@@ -7,6 +7,7 @@ UPickupSpawnerComponent::UPickupSpawnerComponent()
 {
 	bWantsBeginPlay = true;
 	bAutoActivate = true;
+	bUseAttachParentBound = true;
 	
 #if WITH_EDITORONLY_DATA
 	PrimaryComponentTick.bCanEverTick = true;
@@ -82,7 +83,7 @@ void UPickupSpawnerComponent::UpdateVisualizeBox()
 	}
 
 	FVector Location = GetComponentLocation() + GetComponentRotation().RotateVector(FVector(0, 0, MaxExtend.Z));
-	DrawDebugBox(GetWorld(), Location, MaxExtend, GetComponentRotation().Quaternion(), FColor::Magenta, false, -1, 0, 1);
+	DrawDebugSolidBox(GetWorld(), Location, MaxExtend, GetComponentRotation().Quaternion(), FColor(255, 0, 255, 10), false);
 }
 #endif
 
@@ -126,6 +127,10 @@ void UPickupSpawnerComponent::Spawn()
 		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		SpawnParameters.Owner = GetAttachmentRootActor();
 
-		GetWorld()->SpawnActor<ADroppablePhysicsActor>(SpawnPickupClass, GetComponentLocation(), GetComponentRotation(), SpawnParameters);
+		APickup* Pickup = GetWorld()->SpawnActor<APickup>(SpawnPickupClass, GetComponentLocation(), GetComponentRotation(), SpawnParameters);
+		if (Pickup)
+		{
+			Pickup->AttachToComponent(this, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true));
+		}
 	}
 }
