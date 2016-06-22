@@ -659,8 +659,10 @@ void ASurvivalPlayerCharacter::AddHandheldToInventory(TSubclassOf<AHandheld> Han
 			FName InventorySocketName = HandheldInventorySlots.Store(NewHandheld);
 			if (!InventorySocketName.IsNone())
 			{
-				NewHandheld->GetMesh1P()->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false), InventorySocketName);
-				NewHandheld->GetMesh3P()->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false), InventorySocketName);
+				NewHandheld->GetMesh1P()->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, InventorySocketName);
+				NewHandheld->GetMesh3P()->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, InventorySocketName);
+
+				NewHandheld->GetMesh1P()->SetVisibility(false);
 			}
 			else
 			{
@@ -720,8 +722,8 @@ void ASurvivalPlayerCharacter::SimulateEquip(AHandheld* Handheld)
 	{
 		HandheldInventorySlots.Take(Handheld);
 
-		Handheld->GetMesh1P()->AttachToComponent(GetMesh1P(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false), GetHandheldAttachPoint());
-		Handheld->GetMesh3P()->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false), GetHandheldAttachPoint());
+		Handheld->GetMesh1P()->AttachToComponent(GetMesh1P(), FAttachmentTransformRules::SnapToTargetIncludingScale, GetHandheldAttachPoint());
+		Handheld->GetMesh3P()->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, GetHandheldAttachPoint());
 
 		Handheld->GetMesh1P()->SetVisibility(true);
 		Handheld->GetMesh3P()->SetVisibility(true);
@@ -737,16 +739,27 @@ void ASurvivalPlayerCharacter::SimulateUnEquip(AHandheld* Handheld)
 {
 	if (Handheld != nullptr)
 	{
-		FName InventorySocketName = HandheldInventorySlots.Store(Handheld);
-		if (!InventorySocketName.IsNone())
+		if (HasAuthority())
 		{
-			Handheld->GetMesh1P()->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false), InventorySocketName);
-			Handheld->GetMesh3P()->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false), InventorySocketName);
+			FName InventorySocketName = HandheldInventorySlots.Store(Handheld);
+			if (!InventorySocketName.IsNone())
+			{
+				Handheld->GetMesh1P()->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, InventorySocketName);
+				Handheld->GetMesh3P()->AttachToComponent(Handheld->GetMesh1P(), FAttachmentTransformRules::SnapToTargetIncludingScale, InventorySocketName);
+
+				Handheld->GetMesh1P()->SetVisibility(false);
+			}
+			else
+			{
+				Handheld->GetMesh1P()->SetVisibility(false);
+				Handheld->GetMesh3P()->SetVisibility(false);
+			}
 		}
 		else
 		{
+			Handheld->GetMesh3P()->AttachToComponent(Handheld->GetMesh1P(), FAttachmentTransformRules::SnapToTargetIncludingScale);
+
 			Handheld->GetMesh1P()->SetVisibility(false);
-			Handheld->GetMesh3P()->SetVisibility(false);
 		}
 
 		Handheld->UnEquip();
