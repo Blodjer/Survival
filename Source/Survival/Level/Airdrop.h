@@ -22,7 +22,7 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 	UFUNCTION(BlueprintCallable, Category = Airdrop)
-	virtual void Init(FVector LandingLocation);
+	void Init(FVector LandingLocation, TSubclassOf<ADroppablePhysicsActor> PayloadClass);
 
 protected:
 	UFUNCTION()
@@ -35,7 +35,7 @@ protected:
 	void StartEscapeRoute();
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Payload)
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = Payload)
 	TSubclassOf<ADroppablePhysicsActor> PayloadClass;
 
 	UPROPERTY(BlueprintReadOnly, Category = Payload)

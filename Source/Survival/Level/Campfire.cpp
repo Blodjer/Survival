@@ -2,6 +2,7 @@
 
 #include "Survival.h"
 #include "Campfire.h"
+#include "Game/SurvivalGameMode.h"
 
 ACampfire::ACampfire()
 {

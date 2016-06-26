@@ -138,3 +138,31 @@ struct SURVIVAL_API FHitZone
 
 	}
 };
+
+USTRUCT(BlueprintType)
+struct SURVIVAL_API FFloatSpan
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = FloatSpan)
+	float Min;
+
+	UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = FloatSpan)
+	float Max;
+
+	FFloatSpan() : Min(0.0f), Max(0.0f)
+	{
+		
+	}
+
+	FFloatSpan(float Min, float Max)
+	{
+		this->Min = Min;
+		this->Max = Max;
+	}
+
+	FORCEINLINE float Random() const
+	{
+		return FMath::RandRange(Min, Max);
+	}
+};

@@ -57,6 +57,44 @@ void AAirdrop::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	MovementComponent->OnInterpToStop.AddDynamic(this, &AAirdrop::OnLanded);
+}
+
+void AAirdrop::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	StartLocation = GetActorLocation();
+
+	if (Payload == nullptr)
+	{
+		FVector TestLandingLocation;
+		if (MovementComponent->ControlPoints.Num() > 0)
+		{
+			FVector PositionControlPoint = MovementComponent->ControlPoints.Last().PositionControlPoint;
+			TestLandingLocation = MovementComponent->ControlPoints.Last().bPositionIsRelative ? PositionControlPoint + GetActorLocation() : PositionControlPoint;
+		}
+		else
+		{
+			TestLandingLocation = FVector::ZeroVector;
+		}
+
+		Init(TestLandingLocation, PayloadClass);
+	}
+}
+
+void AAirdrop::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if ((GetActorLocation() - LandingLocation).Z <= ReleasePayloadHeight)
+	{
+		ReleasePayload();
+	}
+}
+
+void AAirdrop::Init(FVector LandingLocation, TSubclassOf<ADroppablePhysicsActor> PayloadClass)
+{
+	this->PayloadClass = PayloadClass;
 
 	if (PayloadClass != nullptr)
 	{
@@ -71,27 +109,7 @@ void AAirdrop::PostInitializeComponents()
 			Payload->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
 		}
 	}
-}
 
-void AAirdrop::BeginPlay()
-{
-	Super::BeginPlay();
-	
-	StartLocation = GetActorLocation();
-}
-
-void AAirdrop::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	if ((GetActorLocation() - LandingLocation).Z <= ReleasePayloadHeight)
-	{
-		ReleasePayload();
-	}
-}
-
-void AAirdrop::Init(FVector LandingLocation)
-{
 	this->StartLocation = GetActorLocation();
 	this->LandingLocation = LandingLocation;
 

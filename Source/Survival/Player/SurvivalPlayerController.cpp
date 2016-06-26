@@ -3,6 +3,7 @@
 #include "Survival.h"
 #include "SurvivalPlayerController.h"
 #include "Helper/SurvivalCheatManager.h"
+#include "Game/SurvivalGameMode.h"
 
 ASurvivalPlayerController::ASurvivalPlayerController()
 {

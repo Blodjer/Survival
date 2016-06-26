@@ -6,7 +6,8 @@
 #include "Survival/Spawner/SurvivalPlayerStart.h"
 #include "Survival/Player/SurvivalPlayerState.h"
 #include "Survival/Level/Campfire.h"
-
+#include "Survival/Level/Airdrop.h"
+#include "Survival/Spawner/AirdropLandingZone.h"
 
 ASurvivalGameMode::ASurvivalGameMode()
 {
@@ -18,6 +19,8 @@ ASurvivalGameMode::ASurvivalGameMode()
 
 	Teams.Add(FTeamInfo("Alpha", FColor::Blue));
 	Teams.Add(FTeamInfo("Bravo", FColor::Red));
+
+	AirdropInterval = FFloatSpan(60.0f, 120.0f);
 }
 
 void ASurvivalGameMode::PostInitializeComponents()
@@ -143,6 +146,13 @@ void ASurvivalGameMode::Tick(float DeltaTime)
 	}
 }
 
+void ASurvivalGameMode::StartMatch()
+{
+	Super::StartMatch();
+
+	GetWorldTimerManager().SetTimer(TimerHandle_SendAirdrop, this, &ASurvivalGameMode::DetermineNextAirdrop, AirdropInterval.Random(), false);
+}
+
 void ASurvivalGameMode::Killed(const UDamageType* DamageType, AController* Killer, AController* KilledPlayer)
 {
 	if (Killer != nullptr && Killer->PlayerState != nullptr && KilledPlayer != nullptr && KilledPlayer->PlayerState != nullptr)
@@ -161,6 +171,11 @@ void ASurvivalGameMode::Killed(const UDamageType* DamageType, AController* Kille
 void ASurvivalGameMode::RegisterCampfire(ACampfire* Campfire)
 {
 	Campfires.Add(Campfire);
+}
+
+void ASurvivalGameMode::RegisterAirdropLandingZone(AAirdropLandingZone* LandingZone)
+{
+	AirdropLandingZones.Add(LandingZone);
 }
 
 bool ASurvivalGameMode::DetermineMatchWinner(int32& WinnerTeamIdx)
@@ -229,4 +244,71 @@ bool ASurvivalGameMode::DetermineMatchWinner(int32& WinnerTeamIdx)
 	}
 
 	return false;
+}
+
+void ASurvivalGameMode::DetermineNextAirdrop()
+{
+	if (AirdropSupplies.Num() == 0 || AirdropLandingZones.Num() == 0)
+	{
+		GetWorldTimerManager().SetTimer(TimerHandle_SendAirdrop, this, &ASurvivalGameMode::DetermineNextAirdrop, AirdropInterval.Random(), false);
+		return;
+	}
+
+	TSubclassOf<AAirdropSupplyBox> SupplyClass;
+	AAirdropLandingZone* LandingZoneActor = nullptr;
+
+	float TimeInMinutes = GetGameState<ASurvivalGameState>() ? GetGameState<ASurvivalGameState>()->GetMatchTime() / 60.0f : 0.0f;
+
+	float TotalProbability = 0.0f;
+	for (FAirdropSupply Supply : AirdropSupplies)
+	{
+		TotalProbability += Supply.GetProbability(TimeInMinutes);
+	}
+
+	float SupplyProbabilityIndex = FMath::RandRange(0.0f, TotalProbability);
+
+	float i = 0.0f;
+	for (FAirdropSupply Supply : AirdropSupplies)
+	{
+		i += Supply.GetProbability(TimeInMinutes);
+		if (i >= SupplyProbabilityIndex)
+		{
+			SupplyClass = Supply.SupplyClass;
+			break;
+		}
+	}
+
+	TArray<AAirdropLandingZone*> QualifiedLandingZones;
+	for (AAirdropLandingZone* LandingZone : AirdropLandingZones)
+	{
+		if (LandingZone->GetAirDropSupplies().Contains(SupplyClass))
+		{
+			QualifiedLandingZones.Add(LandingZone);
+		}
+	}
+
+	if (QualifiedLandingZones.Num() > 0)
+	{
+		LandingZoneActor = QualifiedLandingZones[FMath::RandRange(0, QualifiedLandingZones.Num() - 1)];
+	}
+
+	SendAirdrop(SupplyClass, LandingZoneActor);
+
+	GetWorldTimerManager().SetTimer(TimerHandle_SendAirdrop, this, &ASurvivalGameMode::DetermineNextAirdrop, AirdropInterval.Random(), false);
+}
+
+void ASurvivalGameMode::SendAirdrop(TSubclassOf<AAirdropSupplyBox> Payload, AAirdropLandingZone* LandingZone)
+{
+	if (Payload == nullptr || LandingZone == nullptr)
+		return;
+
+	const FVector SpawnOffset(0.0f, 4500.0f, 10000.0f);
+	const FTransform SpawnTransform(LandingZone->GetActorLocation() + SpawnOffset);
+
+	AAirdrop* Airdrop = GetWorld()->SpawnActorDeferred<AAirdrop>(AirdropClass, SpawnTransform, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+	if (Airdrop)
+	{
+		Airdrop->Init(LandingZone->GetActorLocation(), Payload);
+		UGameplayStatics::FinishSpawningActor(Airdrop, SpawnTransform);
+	}
 }
