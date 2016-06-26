@@ -103,6 +103,8 @@ protected:
 	TArray<class AAirdropLandingZone*> AirdropLandingZones;
 
 private:
+	TMap<TSubclassOf<AAirdropSupplyBox>, int32> SuppliesProbabilityModifier;
+
 	FTimerHandle TimerHandle_SendAirdrop;
 	
 };

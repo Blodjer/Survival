@@ -254,28 +254,43 @@ void ASurvivalGameMode::DetermineNextAirdrop()
 		return;
 	}
 
-	TSubclassOf<AAirdropSupplyBox> SupplyClass;
+	TSubclassOf<AAirdropSupplyBox> SupplyClass = nullptr;
 	AAirdropLandingZone* LandingZoneActor = nullptr;
 
 	float TimeInMinutes = GetGameState<ASurvivalGameState>() ? GetGameState<ASurvivalGameState>()->GetMatchTime() / 60.0f : 0.0f;
 
 	float TotalProbability = 0.0f;
+	TArray<float> Probabilities;
 	for (FAirdropSupply Supply : AirdropSupplies)
 	{
-		TotalProbability += Supply.GetProbability(TimeInMinutes);
+		float Probability = Supply.GetProbability(TimeInMinutes);
+		if (SuppliesProbabilityModifier.Contains(Supply.SupplyClass))
+		{
+			Probability += Probability * 0.4f * SuppliesProbabilityModifier[Supply.SupplyClass];
+		}
+
+		TotalProbability += Probability;
+		Probabilities.Add(Probability);
 	}
 
 	float SupplyProbabilityIndex = FMath::RandRange(0.0f, TotalProbability);
 
-	float i = 0.0f;
-	for (FAirdropSupply Supply : AirdropSupplies)
+	float CurrentProbabilityIndex = 0.0f;
+	for (int32 i = 0; i < Probabilities.Num(); i++)
 	{
-		i += Supply.GetProbability(TimeInMinutes);
-		if (i >= SupplyProbabilityIndex)
+		CurrentProbabilityIndex += Probabilities[i];
+		if (CurrentProbabilityIndex >= SupplyProbabilityIndex && SupplyClass == nullptr)
 		{
-			SupplyClass = Supply.SupplyClass;
-			break;
+			SupplyClass = AirdropSupplies[i].SupplyClass;
+			SuppliesProbabilityModifier.FindOrAdd(SupplyClass) = 1;
 		}
+		else
+		{
+			int& p = SuppliesProbabilityModifier.FindOrAdd(AirdropSupplies[i].SupplyClass);
+			p = FMath::Max(1, p) + 1;
+		}
+
+		GEngine->AddOnScreenDebugMessage(-1, 120.0f, FColor::Magenta, AirdropSupplies[i].SupplyClass->GetDefaultObjectName().ToString().Append(FString::FromInt(SuppliesProbabilityModifier[AirdropSupplies[i].SupplyClass])));
 	}
 
 	TArray<AAirdropLandingZone*> QualifiedLandingZones;
