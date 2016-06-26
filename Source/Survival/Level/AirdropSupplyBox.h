@@ -15,6 +15,8 @@ public:
 
 	virtual void Open() override;
 
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 private:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = SupplyBox, meta = (AllowPrivateAccess = "true"))
 	class UFlashingPointLightComponent* LightSignal;

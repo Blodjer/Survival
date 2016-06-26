@@ -20,3 +20,15 @@ void AAirdropSupplyBox::Open()
 
 	LightSignal->StopOff();
 }
+
+void AAirdropSupplyBox::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	TArray<AActor*> AttachedActors;
+	GetAttachedActors(AttachedActors);
+	for (AActor* Actor : AttachedActors)
+	{
+		Actor->Destroy(true);
+	}
+
+	Super::EndPlay(EndPlayReason);
+}
