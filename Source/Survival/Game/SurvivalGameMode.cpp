@@ -289,8 +289,6 @@ void ASurvivalGameMode::DetermineNextAirdrop()
 			int& p = SuppliesProbabilityModifier.FindOrAdd(AirdropSupplies[i].SupplyClass);
 			p = FMath::Max(1, p) + 1;
 		}
-
-		GEngine->AddOnScreenDebugMessage(-1, 120.0f, FColor::Magenta, AirdropSupplies[i].SupplyClass->GetDefaultObjectName().ToString().Append(FString::FromInt(SuppliesProbabilityModifier[AirdropSupplies[i].SupplyClass])));
 	}
 
 	TArray<AAirdropLandingZone*> QualifiedLandingZones;
