@@ -18,6 +18,10 @@ ACampfire::ACampfire()
 	OwningTeamIdx = -1;
 	DominantTeamIdx = -1;
 
+	ClusterIdx = -1;
+
+	bIsActive = true;
+
 	CaptureDuration = 18.0f;
 	CaptureDurationMuliplier = 0.5f;
 
@@ -40,9 +44,9 @@ void ACampfire::OnConstruction(const FTransform& Transform)
 	SmokeParticleSystem->SetColorParameter("SmokeColor", SmokeBaseColor);
 }
 
-void ACampfire::BeginPlay()
+void ACampfire::PostInitializeComponents()
 {
-	Super::BeginPlay();
+	Super::PostInitializeComponents();
 	
 	if (HasAuthority() && GetWorld())
 	{
@@ -86,6 +90,15 @@ void ACampfire::Tick(float DeltaTime)
 
 	FLinearColor SmokeColor = FMath::Lerp(SmokeBaseColor, OwnerBaseColor, FMath::Pow(CaptureValue, 4));
 	SmokeParticleSystem->SetColorParameter("SmokeColor", SmokeColor);
+}
+
+void ACampfire::SetActive(bool bActive)
+{
+	SetActorHiddenInGame(!bActive);
+	SetActorEnableCollision(bActive);
+	SetActorTickEnabled(bActive);
+
+	bIsActive = bActive;
 }
 
 bool ACampfire::IsCaptured()
@@ -195,6 +208,11 @@ void ACampfire::OnRep_OwningTeam()
 	}
 }
 
+void ACampfire::OnRep_IsActive()
+{
+	SetActive(bIsActive);
+}
+
 void ACampfire::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -202,4 +220,5 @@ void ACampfire::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 	DOREPLIFETIME(ACampfire, CaptureValue);
 	DOREPLIFETIME(ACampfire, OwningTeamIdx);
 	DOREPLIFETIME(ACampfire, DominantTeamIdx);
+	DOREPLIFETIME(ACampfire, bIsActive);
 }

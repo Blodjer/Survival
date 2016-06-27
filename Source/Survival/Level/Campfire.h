@@ -15,19 +15,22 @@ public:
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
-	virtual void BeginPlay() override;
+	virtual void PostInitializeComponents() override;
 	
 	virtual void Tick( float DeltaSeconds ) override;
 
 public:
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Campfire)
+	virtual void SetActive(bool bActive);
+
 	UFUNCTION(BlueprintPure, Category = Campfire)
 	bool IsCaptured();
 
 private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Campfire, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Campfire, meta = (AllowPrivateAccess = "true"))
 	USphereComponent* CaptureSphere;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Smoke, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Smoke, meta = (AllowPrivateAccess = "true"))
 	UParticleSystemComponent* SmokeParticleSystem;
 
 	UPROPERTY(BlueprintReadOnly, Category = Campfire, meta = (AllowPrivateAccess = "true"))
@@ -41,6 +44,12 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, Transient, Category = Campfire, meta = (AllowPrivateAccess = "true"))
 	FLinearColor OwnerBaseColor;
+
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = Campfire, meta = (ClampMin = "-1", UIMin = "-1", AllowPrivateAccess = "true"))
+	int32 ClusterIdx;
+
+	UPROPERTY(BlueprintReadOnly, Transient, ReplicatedUsing = OnRep_IsActive, Category = Campfire, meta = (AllowPrivateAccess = "true"))
+	bool bIsActive;
 
 	// The time it takes to capture and neutralize the campfire
 	UPROPERTY(EditDefaultsOnly, Category = Campfire, meta = (ClampMin = "0", UIMin = "0", AllowPrivateAccess = "true"))
@@ -71,6 +80,9 @@ private:
 	UFUNCTION()
 	void OnRep_OwningTeam();
 
+	UFUNCTION()
+	void OnRep_IsActive();
+
 public:
 	FORCEINLINE USphereComponent* GetCaptureSphere() const { return CaptureSphere; }
 
@@ -81,4 +93,6 @@ public:
 	FORCEINLINE FLinearColor GetOwnerBaseColor() const { return OwnerBaseColor; }
 
 	FORCEINLINE int32 GetOwningTeamIdx() const { return OwningTeamIdx; }
+
+	FORCEINLINE int32 GetClusterIdx() const { return ClusterIdx; }
 };
