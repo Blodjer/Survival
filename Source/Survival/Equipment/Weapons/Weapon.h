@@ -6,11 +6,19 @@
 #include "Weapon.generated.h"
 
 UENUM()
-enum EWeaponState
+enum class EWeaponState : uint8
 {
 	Idle,
 	Firing,
 	Reloading
+};
+
+UENUM(BlueprintType)
+enum class EFireMode : uint8
+{
+	Automatic,
+	Burst,
+	SemiAutomatic
 };
 
 UCLASS(Abstract, Blueprintable)
@@ -20,6 +28,8 @@ class SURVIVAL_API AWeapon : public AHandheld
 	
 public:	
 	AWeapon();
+
+	virtual void PostInitializeComponents() override;
 
 	virtual void UnEquip() override;
 
@@ -89,6 +99,21 @@ protected:
 	// [client + server]
 	void Reload();
 
+	void SwitchFireMode();
+
+	// [server]
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSwitchFireMode();
+	void ServerSwitchFireMode_Implementation();
+	bool ServerSwitchFireMode_Validate() { return true; };
+
+	void SimulateSwitchFireMode();
+
+	UFUNCTION(BlueprintPure, Category = Weapon)
+	EFireMode GetBestFireMode();
+
+	bool IsValidFireMode(EFireMode FireMode);
+
 protected:
 	// The projectile the weapon uses
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapon)
@@ -115,6 +140,13 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = Weapon, meta = (ClampMin = "0.0", UIMin = "0.0"))
 	float Spread;
+
+	UPROPERTY(EditDefaultsOnly, Category = FireModes)
+	bool bAutomatic;
+	UPROPERTY(EditDefaultsOnly, Category = FireModes)
+	bool bBurst;
+	UPROPERTY(EditDefaultsOnly, Category = FireModes)
+	bool bSemiAutomatic;
 
 	UPROPERTY(EditDefaultsOnly, Category = Weapon)
 	TSubclassOf<UCameraShake> CameraShake;
@@ -144,12 +176,18 @@ private:
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_Reload)
 	bool bIsReloading;
 
+	UPROPERTY(Transient, BlueprintReadOnly, ReplicatedUsing = OnRep_FireMode, Category = Weapon, meta = (AllowPrivateAccess = "true"))
+	EFireMode FireMode;
+
 private:
 	UFUNCTION()
 	void OnRep_BurstCount();
 
 	UFUNCTION()
 	void OnRep_Reload();
+
+	UFUNCTION()
+	void OnRep_FireMode();
 
 public:
 	FORCEINLINE float GetDamage() const { return Damage; };

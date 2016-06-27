@@ -24,11 +24,22 @@ AWeapon::AWeapon()
 	MaxRoundsPerMagazine = 20;
 	CurrentRoundsInMagazine = 0;
 
+	bAutomatic = false;
+	bBurst = false;
+	bSemiAutomatic = true;
+
 	NoAnimReloadDuration = 1.5f;
 
 	BurstCount = 0;
 
 	bIsReloading = false;
+}
+
+void AWeapon::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	FireMode = GetBestFireMode();
 }
 
 void AWeapon::UnEquip()
@@ -57,9 +68,9 @@ void AWeapon::SetupInputActions()
 
 	BindInputAction("Reload", IE_Pressed, this, &AWeapon::StartReload);
 
-	// TODO: Zoom
+	BindInputAction("SwitchFireMode", IE_Pressed, this, &AWeapon::SwitchFireMode);
 
-	// TODO: Firemode
+	// TODO: Zoom
 }
 
 void AWeapon::BeforeDrop()
@@ -93,6 +104,9 @@ void AWeapon::ServerStartFire_Implementation()
 
 void AWeapon::StopFire()
 {
+	if (FireMode == EFireMode::Burst && BurstCount < 3)
+		return;
+
 	if (!HasAuthority())
 	{
 		ServerStopFire();
@@ -112,17 +126,20 @@ void AWeapon::HandleFiring()
 {
 	if (GetOwnerCharacter() != nullptr && GetOwnerCharacter()->IsLocallyControlled())
 	{
-		if (CurrentRoundsInMagazine > 0)
+		if (CurrentRoundsInMagazine > 0 &&
+			(FireMode == EFireMode::Automatic ||
+			(FireMode == EFireMode::Burst && BurstCount < 3) ||
+			(FireMode == EFireMode::SemiAutomatic && BurstCount < 1)))
 		{
 			ShootProjectile();
+
+			GetWorldTimerManager().SetTimer(TimerHandle_HandleFiring, this, &AWeapon::HandleFiring, 60.0f / RateOfFire, false);
 		}
 		else
 		{
 			StopFire();
 		}
 	}
-	
-	GetWorldTimerManager().SetTimer(TimerHandle_HandleFiring, this, &AWeapon::HandleFiring, 60.0f / RateOfFire, false);
 }
 
 void AWeapon::ShootProjectile()
@@ -135,6 +152,7 @@ void AWeapon::ShootProjectile()
 		SimulateFire();
 
 		CurrentRoundsInMagazine--;
+		BurstCount++;
 	}
 
 	APlayerController* PlayerController = Cast<APlayerController>(GetOwnerCharacter()->GetController());
@@ -238,18 +256,81 @@ void AWeapon::Reload()
 {
 	bIsReloading = false;
 
+	if (GetOwnerCharacter() == nullptr)
+		return;
+
 	if (GetOwnerCharacter()->IsLocallyControlled())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Magenta, "Reload Complete");
 	}
 
-	if (GetOwnerCharacter() == nullptr)
-		return;
-
 	if (HasAuthority() || GetOwnerCharacter()->IsLocallyControlled())
 	{
 		CurrentRoundsInMagazine = FMath::Clamp(CurrentRoundsInMagazine + GetOwnerCharacter()->RequestAmmo(ProjectileType, MaxRoundsPerMagazine - CurrentRoundsInMagazine), 0, MaxRoundsPerMagazine);
 	}
+}
+
+void AWeapon::SwitchFireMode()
+{
+	if (bAutomatic + bBurst + bSemiAutomatic <= 1)
+		return;
+
+	if (GetOwnerCharacter() == nullptr)
+		return;
+
+	if (GetOwnerCharacter()->IsLocallyControlled())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Magenta, "Switch Fire Mode");
+	}
+
+	if (!HasAuthority() && GetOwnerCharacter()->IsLocallyControlled())
+	{
+		ServerSwitchFireMode();
+	}
+
+	for (uint8 i = 1; i < 2; i++)
+	{
+		EFireMode NextFireMode = (EFireMode)(((uint8)FireMode + i) % 3);
+		if (IsValidFireMode(NextFireMode))
+		{
+			FireMode = NextFireMode;
+			break;
+		}
+	}
+}
+
+void AWeapon::ServerSwitchFireMode_Implementation()
+{
+	SwitchFireMode();
+}
+
+void AWeapon::SimulateSwitchFireMode()
+{
+	// TODO: Play Sound
+}
+
+EFireMode AWeapon::GetBestFireMode()
+{
+	if (bAutomatic)
+		return EFireMode::Automatic;
+	if (bBurst)
+		return EFireMode::Burst;
+	if (bSemiAutomatic)
+		return EFireMode::SemiAutomatic;
+
+	return EFireMode::SemiAutomatic;
+}
+
+bool AWeapon::IsValidFireMode(EFireMode FireMode)
+{
+	if (FireMode == EFireMode::Automatic && bAutomatic)
+		return true;
+	if (FireMode == EFireMode::Burst && bBurst)
+		return true;
+	if (FireMode == EFireMode::SemiAutomatic && bSemiAutomatic)
+		return true;
+
+	return false;
 }
 
 void AWeapon::OnRep_BurstCount()
@@ -272,6 +353,11 @@ void AWeapon::OnRep_Reload()
 	}
 }
 
+void AWeapon::OnRep_FireMode()
+{
+	SimulateSwitchFireMode();
+}
+
 void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -279,5 +365,7 @@ void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	DOREPLIFETIME_CONDITION(AWeapon, BurstCount, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AWeapon, bIsReloading, COND_SkipOwner);
 
-	DOREPLIFETIME_CONDITION(AWeapon, CurrentRoundsInMagazine, COND_OwnerOnly);	
+	DOREPLIFETIME_CONDITION(AWeapon, CurrentRoundsInMagazine, COND_OwnerOnly);
+
+	DOREPLIFETIME_CONDITION(AWeapon, FireMode, COND_SkipOwner);
 }
