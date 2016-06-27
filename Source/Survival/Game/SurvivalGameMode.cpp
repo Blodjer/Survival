@@ -21,6 +21,8 @@ ASurvivalGameMode::ASurvivalGameMode()
 	Teams.Add(FTeamInfo("Bravo", FColor::Red));
 
 	AirdropInterval = FFloatSpan(60.0f, 120.0f);
+
+	ActiveCampfireCluster = -1;
 }
 
 void ASurvivalGameMode::PostInitializeComponents()
@@ -31,6 +33,8 @@ void ASurvivalGameMode::PostInitializeComponents()
 	{
 		Teams.Add(FTeamInfo());
 	}
+
+	DetermineActiveCampfireCluster();
 }
 
 void ASurvivalGameMode::InitGameState()
@@ -178,19 +182,53 @@ void ASurvivalGameMode::RegisterAirdropLandingZone(AAirdropLandingZone* LandingZ
 	AirdropLandingZones.Add(LandingZone);
 }
 
+void ASurvivalGameMode::DetermineActiveCampfireCluster()
+{
+	ActiveCampfires.Empty();
+
+	if (Campfires.Num() == 0)
+		return;
+
+	TArray<int32> ClusterIdxs;
+	for (ACampfire* Campfire : Campfires)
+	{
+		if (Campfire->GetClusterIdx() != -1)
+		{
+			ClusterIdxs.Add(Campfire->GetClusterIdx());
+		}
+	}
+
+	if (ClusterIdxs.Num() <= 1)
+		return;
+
+	ActiveCampfireCluster = ClusterIdxs[FMath::RandRange(0, ClusterIdxs.Num() - 1)];
+	for (ACampfire* Campfire : Campfires)
+	{
+		if (Campfire->GetClusterIdx() != ActiveCampfireCluster && Campfire->GetClusterIdx() != -1)
+		{
+			Campfire->SetActive(false);
+		}
+		else
+		{
+			Campfire->SetActive(true);
+			ActiveCampfires.Add(Campfire);
+		}
+	}
+}
+
 bool ASurvivalGameMode::DetermineMatchWinner(int32& WinnerTeamIdx)
 {
 	// Captured all Campfires
 	for (int32 TeamIdx = 0; TeamIdx < Teams.Num(); TeamIdx++)
 	{
 		int32 OwnedCampfires = 0;
-		for (ACampfire* Campfire : Campfires)
+		for (ACampfire* Campfire : ActiveCampfires)
 		{
 			if (Campfire->IsCaptured() && Campfire->GetOwningTeamIdx() == TeamIdx)
 			{
 				OwnedCampfires++;
 
-				if (OwnedCampfires == Campfires.Num())
+				if (OwnedCampfires == ActiveCampfires.Num())
 				{
 					WinnerTeamIdx = TeamIdx;
 					return true;

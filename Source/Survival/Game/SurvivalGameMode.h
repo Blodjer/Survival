@@ -68,6 +68,8 @@ public:
 	float MinDieDelay;
 
 protected:
+	virtual void DetermineActiveCampfireCluster();
+
 	virtual bool DetermineMatchWinner(int32& WinnerTeamIdx);
 
 	virtual void DetermineNextAirdrop();
@@ -100,9 +102,15 @@ protected:
 	TArray<class ACampfire*> Campfires;
 
 	UPROPERTY(BlueprintReadOnly, Category = GameMode)
+	TArray<class ACampfire*> ActiveCampfires;
+
+	UPROPERTY(BlueprintReadOnly, Category = GameMode)
 	TArray<class AAirdropLandingZone*> AirdropLandingZones;
 
 private:
+	UPROPERTY(BlueprintReadOnly, Category = GameMode, meta = (AllowPrivateAccess = "true"))
+	int32 ActiveCampfireCluster;
+
 	TMap<TSubclassOf<AAirdropSupplyBox>, int32> SuppliesProbabilityModifier;
 
 	FTimerHandle TimerHandle_SendAirdrop;
