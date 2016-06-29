@@ -285,14 +285,14 @@ void AWeapon::Reload()
 	if (GetOwnerCharacter() == nullptr)
 		return;
 
+	if (HasAuthority() || GetOwnerCharacter()->IsLocallyControlled())
+	{
+		CurrentRoundsInMagazine = FMath::Clamp(CurrentRoundsInMagazine + GetOwnerCharacter()->RequestAmmo(ProjectileType, MaxRoundsPerMagazine - CurrentRoundsInMagazine + (CurrentRoundsInMagazine > 0 ? 1 : 0)), 0, MaxRoundsPerMagazine + 1);
+	}
+
 	if (GetOwnerCharacter()->IsLocallyControlled())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Magenta, "Reload Complete");
-	}
-
-	if (HasAuthority() || GetOwnerCharacter()->IsLocallyControlled())
-	{
-		CurrentRoundsInMagazine = FMath::Clamp(CurrentRoundsInMagazine + GetOwnerCharacter()->RequestAmmo(ProjectileType, MaxRoundsPerMagazine - CurrentRoundsInMagazine), 0, MaxRoundsPerMagazine);
 	}
 }
 
