@@ -33,6 +33,8 @@ AWeapon::AWeapon()
 	BurstCount = 0;
 
 	bIsReloading = false;
+
+	LastShotTime = FLT_MIN;
 }
 
 void AWeapon::PostInitializeComponents()
@@ -153,6 +155,8 @@ void AWeapon::ShootProjectile()
 
 		CurrentRoundsInMagazine--;
 		BurstCount++;
+
+		LastShotTime = GetWorld()->GetTimeSeconds();
 	}
 
 	APlayerController* PlayerController = Cast<APlayerController>(GetOwnerCharacter()->GetController());
@@ -183,6 +187,8 @@ void AWeapon::ServerShootProjectile_Implementation(FVector Origin, FVector_NetQu
 
 		SimulateFire();
 	}
+
+	LastShotTime = GetWorld()->GetTimeSeconds();
 }
 
 void AWeapon::StartSimulateFire()
@@ -219,7 +225,10 @@ void AWeapon::SimulateFire()
 
 bool AWeapon::CanFire()
 {
-	return !bIsReloading && GetOwnerCharacter() && !GetOwnerCharacter()->IsSprinting();
+	if (GetWorld() == nullptr || GetOwnerCharacter() == nullptr)
+		return false;
+
+	return LastShotTime + 60.0f / RateOfFire <= GetWorld()->GetTimeSeconds() && !bIsReloading && !GetOwnerCharacter()->IsSprinting();
 }
 
 void AWeapon::StartReload()

@@ -179,6 +179,9 @@ private:
 	UPROPERTY(Transient, BlueprintReadOnly, ReplicatedUsing = OnRep_FireMode, Category = Weapon, meta = (AllowPrivateAccess = "true"))
 	EFireMode FireMode;
 
+	UPROPERTY(Transient)
+	float LastShotTime;
+
 private:
 	UFUNCTION()
 	void OnRep_BurstCount();
