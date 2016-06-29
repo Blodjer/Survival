@@ -183,8 +183,6 @@ void AHandheld::OnRep_IsWasted()
 	if (bIsWaste)
 	{
 		Drop(true);
-
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Magenta, "oiadghod");
 	}
 }
 

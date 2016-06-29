@@ -287,11 +287,6 @@ void AWeapon::SwitchFireMode()
 	if (GetOwnerCharacter() == nullptr)
 		return;
 
-	if (GetOwnerCharacter()->IsLocallyControlled())
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Magenta, "Switch Fire Mode");
-	}
-
 	if (!HasAuthority() && GetOwnerCharacter()->IsLocallyControlled())
 	{
 		ServerSwitchFireMode();
