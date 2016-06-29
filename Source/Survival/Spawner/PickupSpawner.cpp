@@ -9,5 +9,7 @@ APickupSpawner::APickupSpawner()
 	PickupSpawnerComponent = CreateDefaultSubobject<UPickupSpawnerComponent>("PickupSpawner");
 	RootComponent = PickupSpawnerComponent;
 
+	bNetLoadOnClient = false;
+
 	PrimaryActorTick.bCanEverTick = false;
 }
