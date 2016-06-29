@@ -31,6 +31,8 @@ public:
 
 	virtual void PostInitializeComponents() override;
 
+	virtual void Tick(float DeltaSeconds) override;
+
 	virtual void UnEquip() override;
 
 	virtual void OnCharacterStopUse() override;
@@ -139,7 +141,19 @@ protected:
 	float RecoilRight;
 
 	UPROPERTY(EditDefaultsOnly, Category = Weapon, meta = (ClampMin = "0.0", UIMin = "0.0"))
-	float Spread;
+	float RecoilFirstShotMultiplier;
+
+	UPROPERTY(EditDefaultsOnly, Category = Weapon, meta = (ClampMin = "0.0", UIMin = "0.0"))
+	float SpreadBase;
+
+	UPROPERTY(EditDefaultsOnly, Category = Weapon, meta = (ClampMin = "0.0", UIMin = "0.0"))
+	float SpreadMax;
+
+	UPROPERTY(EditDefaultsOnly, Category = Weapon, meta = (ClampMin = "0.0", UIMin = "0.0"))
+	float SpreadIncrease;
+
+	UPROPERTY(EditDefaultsOnly, Category = Weapon, meta = (ClampMin = "0.0", UIMin = "0.0"))
+	float SpreadDecrease;
 
 	UPROPERTY(EditDefaultsOnly, Category = FireModes)
 	bool bAutomatic;
@@ -158,9 +172,6 @@ protected:
 	float NoAnimReloadDuration;
 
 private:
-	// The current weapon state
-	EWeaponState CurrentState;
-
 	// Time loop between shots. Different uses by owner and others
 	FTimerHandle TimerHandle_HandleFiring;
 
@@ -181,6 +192,9 @@ private:
 
 	UPROPERTY(Transient)
 	float LastShotTime;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = Weapon, meta = (AllowPrivateAccess = "true"))
+	float CurrentSpread;
 
 private:
 	UFUNCTION()

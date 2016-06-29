@@ -8,8 +8,6 @@ AWeapon::AWeapon()
 {
 	Type = EHandheldType::PrimaryWeapon;
 
-	CurrentState = EWeaponState::Idle;
-
 	Damage = 25.0f;
 
 	RateOfFire = 750;
@@ -18,8 +16,12 @@ AWeapon::AWeapon()
 	RecoilUpMax = 0.65f;
 	RecoilLeft = 0.35f;
 	RecoilRight = 0.35f;
+	RecoilFirstShotMultiplier = 1.4f;
 
-	Spread = 0.5f;
+	SpreadBase = 0.3f;
+	SpreadMax = 2.0f;
+	SpreadIncrease = 0.15f;
+	SpreadDecrease = 1.5f;
 
 	MaxRoundsPerMagazine = 20;
 	CurrentRoundsInMagazine = 0;
@@ -35,6 +37,8 @@ AWeapon::AWeapon()
 	bIsReloading = false;
 
 	LastShotTime = FLT_MIN;
+
+	CurrentSpread = 0.0f;
 }
 
 void AWeapon::PostInitializeComponents()
@@ -42,6 +46,16 @@ void AWeapon::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	FireMode = GetBestFireMode();
+}
+
+void AWeapon::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (LastShotTime + 60.0f / RateOfFire <= GetWorld()->GetTimeSeconds())
+	{
+		CurrentSpread = FMath::Max(CurrentSpread - SpreadDecrease * DeltaSeconds, 0.0f);
+	}
 }
 
 void AWeapon::UnEquip()
@@ -146,7 +160,7 @@ void AWeapon::HandleFiring()
 
 void AWeapon::ShootProjectile()
 {
-	FVector Direction = FMath::VRandCone(GetOwnerCharacter()->GetBaseAimRotation().Vector(), FMath::DegreesToRadians(Spread));
+	FVector Direction = FMath::VRandCone(GetOwnerCharacter()->GetBaseAimRotation().Vector(), FMath::DegreesToRadians(SpreadBase + CurrentSpread));
 	ServerShootProjectile(GetOwnerCharacter()->GetCamera()->GetComponentLocation(), Direction);
 
 	if (!GetWorld()->IsServer())
@@ -162,9 +176,12 @@ void AWeapon::ShootProjectile()
 	APlayerController* PlayerController = Cast<APlayerController>(GetOwnerCharacter()->GetController());
 	if (PlayerController)
 	{
-		FRotator NewControlRotation = PlayerController->GetControlRotation().Add(FMath::FRandRange(RecoilUpMin, RecoilUpMax), FMath::FRandRange(-RecoilLeft, RecoilRight), 0.0f);
+		float RecoilMultiplier = BurstCount == 1 ? RecoilFirstShotMultiplier : 1.0f;
+		FRotator NewControlRotation = PlayerController->GetControlRotation().Add(FMath::FRandRange(RecoilUpMin * RecoilMultiplier, RecoilUpMax * RecoilMultiplier), FMath::FRandRange(-RecoilLeft, RecoilRight), 0.0f);
 		PlayerController->SetControlRotation(NewControlRotation);
 	}
+
+	CurrentSpread = FMath::Min(CurrentSpread + SpreadIncrease, SpreadMax);
 }
 
 void AWeapon::ServerShootProjectile_Implementation(FVector Origin, FVector_NetQuantizeNormal Direction)
