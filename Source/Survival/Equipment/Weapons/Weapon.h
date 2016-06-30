@@ -3,6 +3,7 @@
 #pragma once
 
 #include "WeaponProjectile.h"
+#include "Survival/Player/SurvivalCharacterMovement.h"
 #include "Weapon.generated.h"
 
 UENUM()
@@ -19,6 +20,47 @@ enum class EFireMode : uint8
 	Automatic,
 	Burst,
 	SemiAutomatic
+};
+
+USTRUCT(BlueprintType)
+struct SURVIVAL_API FWeaponMovementValues : public FCharacterMovementValues
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data)
+	float StandingIdle_ADS;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data)
+	float StandingMove_ADS;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data)
+	float CrouchingIdle_ADS;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data)
+	float CrouchingMove_ADS;
+
+	virtual float GetValue(ACharacter* Character) const override
+	{
+		if (Character == nullptr)
+			return StandingIdle_ADS;
+
+		float value = 0.0f;
+
+		if (false) // bIsADS
+		{
+			bool bIsMoving = !Character->GetVelocity().IsNearlyZero(0.5f);
+			if (Character->bIsCrouched)
+				value = bIsMoving ? CrouchingMove_ADS : CrouchingIdle_ADS;
+			else
+				value = bIsMoving ? StandingMove_ADS : StandingIdle_ADS;
+		}
+		else
+		{
+			value = FCharacterMovementValues::GetValue(Character);
+		}
+
+		return value;
+	}
 };
 
 UCLASS(Abstract, Blueprintable)
@@ -144,16 +186,19 @@ protected:
 	float RecoilFirstShotMultiplier;
 
 	UPROPERTY(EditDefaultsOnly, Category = Weapon, meta = (ClampMin = "0.0", UIMin = "0.0"))
-	float SpreadBase;
+	UDataTable* SpreadDataTable;
 
-	UPROPERTY(EditDefaultsOnly, Category = Weapon, meta = (ClampMin = "0.0", UIMin = "0.0"))
-	float SpreadMax;
+	UFUNCTION(BlueprintPure, Category = Weapon)
+	float GetSpreadBase() const;
 
-	UPROPERTY(EditDefaultsOnly, Category = Weapon, meta = (ClampMin = "0.0", UIMin = "0.0"))
-	float SpreadIncrease;
+	UFUNCTION(BlueprintPure, Category = Weapon)
+	float GetSpreadMax() const;
 
-	UPROPERTY(EditDefaultsOnly, Category = Weapon, meta = (ClampMin = "0.0", UIMin = "0.0"))
-	float SpreadDecrease;
+	UFUNCTION(BlueprintPure, Category = Weapon)
+	float GetSpreadIncrease() const;
+
+	UFUNCTION(BlueprintPure, Category = Weapon)
+	float GetSpreadDecrease() const;
 
 	UPROPERTY(EditDefaultsOnly, Category = FireModes)
 	bool bAutomatic;
