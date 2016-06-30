@@ -370,6 +370,18 @@ protected:
 	UPROPERTY(Transient, BlueprintReadOnly, ReplicatedUsing = OnRep_IsSprinting, Category = Character)
 	bool bIsSprinting;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Character, meta = (ClampMin = "0.0", UIMin = "0.0"))
+	float Stamina;
+
+	UPROPERTY(EditDefaultsOnly, Category = Character, meta = (ClampMin = "0.0", UIMin = "0.0"))
+	float StaminaDecrease;
+
+	UPROPERTY(BlueprintReadOnly, Category = Character)
+	float StaminaDecreaseOffset;
+
+	UPROPERTY(EditDefaultsOnly, Category = Character)
+	FCharacterMovementValues StaminaIncrease;
+
 	// The currently equipped handheld
 	UPROPERTY(Transient, BlueprintReadOnly, ReplicatedUsing = OnRep_EquippedHandheld, Category = Equipment)
 	class AHandheld* EquippedHandheld;
@@ -425,6 +437,11 @@ public:
 
 	// Is the player currently sprinting
 	FORCEINLINE bool IsSprinting() const { return bIsSprinting; };
+
+	FORCEINLINE float GetStamina() const { return Stamina; };
+
+	UFUNCTION(BlueprintPure, Category = Character)
+	FORCEINLINE float GetMaxStamina() const { return GetClass()->GetDefaultObject<ASurvivalPlayerCharacter>()->Stamina; };
 
 	// The health value the player starts with
 	UFUNCTION(BlueprintPure, Category = Character)

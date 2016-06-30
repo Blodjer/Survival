@@ -3,6 +3,7 @@
 #pragma once
 
 #include "WeaponProjectile.h"
+#include "Survival/Player/SurvivalCharacterMovement.h"
 #include "Weapon.generated.h"
 
 UENUM()
@@ -19,6 +20,47 @@ enum class EFireMode : uint8
 	Automatic,
 	Burst,
 	SemiAutomatic
+};
+
+USTRUCT(BlueprintType)
+struct SURVIVAL_API FWeaponMovementValues : public FCharacterMovementValues
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data)
+	float StandingAimingIdle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data)
+	float StandingAimingMove;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data)
+	float CrouchingAimingIdle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data)
+	float CrouchingAimingMove;
+
+	float GetValue(ACharacter* Character, bool bIsAiming) const
+	{
+		if (Character == nullptr)
+			return StandingAimingIdle;
+
+		float value = 0.0f;
+
+		if (bIsAiming)
+		{
+			bool bIsMoving = !Character->GetVelocity().IsNearlyZero(0.5f);
+			if (Character->bIsCrouched)
+				value = bIsMoving ? CrouchingAimingMove : CrouchingAimingIdle;
+			else
+				value = bIsMoving ? StandingAimingMove : StandingAimingIdle;
+		}
+		else
+		{
+			value = FCharacterMovementValues::GetValue(Character);
+		}
+
+		return value;
+	}
 };
 
 UCLASS(Abstract, Blueprintable)
@@ -88,6 +130,12 @@ protected:
 	UFUNCTION(BlueprintPure, Category = Weapon)
 	virtual bool CanFire();
 
+	UFUNCTION(BlueprintCallable, Category = Weapon)
+	void StartAiming();
+
+	UFUNCTION(BlueprintCallable, Category = Weapon)
+	void StopAiming();
+
 	// [client + server]
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	void StartReload();
@@ -143,17 +191,20 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Weapon, meta = (ClampMin = "0.0", UIMin = "0.0"))
 	float RecoilFirstShotMultiplier;
 
-	UPROPERTY(EditDefaultsOnly, Category = Weapon, meta = (ClampMin = "0.0", UIMin = "0.0"))
-	float SpreadBase;
+	UPROPERTY(EditDefaultsOnly, Category = Weapon)
+	UDataTable* SpreadDataTable;
 
-	UPROPERTY(EditDefaultsOnly, Category = Weapon, meta = (ClampMin = "0.0", UIMin = "0.0"))
-	float SpreadMax;
+	UFUNCTION(BlueprintPure, Category = Weapon)
+	float GetSpreadBase() const;
 
-	UPROPERTY(EditDefaultsOnly, Category = Weapon, meta = (ClampMin = "0.0", UIMin = "0.0"))
-	float SpreadIncrease;
+	UFUNCTION(BlueprintPure, Category = Weapon)
+	float GetSpreadMax() const;
 
-	UPROPERTY(EditDefaultsOnly, Category = Weapon, meta = (ClampMin = "0.0", UIMin = "0.0"))
-	float SpreadDecrease;
+	UFUNCTION(BlueprintPure, Category = Weapon)
+	float GetSpreadIncrease() const;
+
+	UFUNCTION(BlueprintPure, Category = Weapon)
+	float GetSpreadDecrease() const;
 
 	UPROPERTY(EditDefaultsOnly, Category = FireModes)
 	bool bAutomatic;
@@ -164,6 +215,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = Weapon)
 	TSubclassOf<UCameraShake> CameraShake;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = Weapon)
+	bool bIsAiming;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapon, meta = (ClampMin = "0", UIMin = "0"))
 	int32 MaxRoundsPerMagazine;

@@ -31,7 +31,8 @@ float USurvivalCharacterMovement::GetMaxSpeed() const
 	{
 		if (SurvivalCharacterOwner == nullptr || (Velocity.GetSafeNormal2D() | SurvivalCharacterOwner->GetActorForwardVector()) > -0.1)
 		{
-			MaxSpeed = MaxWalkSpeedRunning;
+			float MaxWalkSpeedRunningOffset = MaxWalkSpeedRunning - MaxWalkSpeed;
+			MaxSpeed = FMath::Clamp(MaxWalkSpeed + MaxWalkSpeedRunningOffset * SurvivalCharacterOwner->GetStamina(), MaxWalkSpeed + MaxWalkSpeedRunningOffset * 0.25f, MaxWalkSpeedRunning);
 		}
 	}
 

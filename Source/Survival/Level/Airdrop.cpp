@@ -48,6 +48,7 @@ AAirdrop::AAirdrop()
 	ReleasePayloadHeight = 300.0f;
 
 	bReplicates = true;
+	bAlwaysRelevant = true;
 
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -145,6 +146,8 @@ void AAirdrop::ReleasePayload()
 
 		FVector Velocity = (LandingLocation - StartLocation) / MovementComponent->Duration;
 		Payload->StartSimulatePhysics(Velocity);
+
+		Payload->SetLifeSpan(120.0f);
 		
 		Payload = nullptr;
 

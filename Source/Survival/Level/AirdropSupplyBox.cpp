@@ -12,6 +12,9 @@ AAirdropSupplyBox::AAirdropSupplyBox()
 	LightSignal->AttenuationRadius = 1650.0f;
 	LightSignal->SetFlashingPattern(0.7f);
 	LightSignal->SetupAttachment(RootComponent);
+
+	bAlwaysRelevant = true;
+	bNetUseOwnerRelevancy = true;
 }
 
 void AAirdropSupplyBox::Open()

@@ -5,6 +5,39 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "SurvivalCharacterMovement.generated.h"
 
+USTRUCT(BlueprintType)
+struct SURVIVAL_API FCharacterMovementValues : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data)
+	float StandingIdle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data)
+	float StandingMove;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data)
+	float CrouchingIdle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data)
+	float CrouchingMove;
+
+	float GetValue(ACharacter* Character) const
+	{
+		if (Character == nullptr)
+			return StandingIdle;
+
+		float value = 0.0f;
+
+		bool bIsMoving = !Character->GetVelocity().IsNearlyZero(0.5f);
+		if (Character->bIsCrouched)
+			value = bIsMoving ? CrouchingMove : CrouchingIdle;
+		else
+			value = bIsMoving ? StandingMove : StandingIdle;
+
+		return value;
+	}
+};
 
 UCLASS()
 class SURVIVAL_API USurvivalCharacterMovement : public UCharacterMovementComponent

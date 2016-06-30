@@ -18,17 +18,14 @@ AWeapon::AWeapon()
 	RecoilRight = 0.35f;
 	RecoilFirstShotMultiplier = 1.4f;
 
-	SpreadBase = 0.3f;
-	SpreadMax = 2.0f;
-	SpreadIncrease = 0.15f;
-	SpreadDecrease = 1.5f;
-
 	MaxRoundsPerMagazine = 20;
 	CurrentRoundsInMagazine = 0;
 
 	bAutomatic = false;
 	bBurst = false;
 	bSemiAutomatic = true;
+
+	bIsAiming = false;
 
 	NoAnimReloadDuration = 1.5f;
 
@@ -54,7 +51,7 @@ void AWeapon::Tick(float DeltaSeconds)
 
 	if (LastShotTime + 60.0f / RateOfFire <= GetWorld()->GetTimeSeconds())
 	{
-		CurrentSpread = FMath::Max(CurrentSpread - SpreadDecrease * DeltaSeconds, 0.0f);
+		CurrentSpread = FMath::Max(CurrentSpread - GetSpreadDecrease() * DeltaSeconds, 0.0f);
 	}
 }
 
@@ -82,11 +79,12 @@ void AWeapon::SetupInputActions()
 	BindInputAction("Fire", IE_Pressed, this, &AWeapon::StartFire);
 	BindInputAction("Fire", IE_Released, this, &AWeapon::StopFire);
 
+	BindInputAction("Aim", IE_Pressed, this, &AWeapon::StartAiming);
+	BindInputAction("Aim", IE_Released, this, &AWeapon::StopAiming);
+
 	BindInputAction("Reload", IE_Pressed, this, &AWeapon::StartReload);
 
 	BindInputAction("SwitchFireMode", IE_Pressed, this, &AWeapon::SwitchFireMode);
-
-	// TODO: Zoom
 }
 
 void AWeapon::BeforeDrop()
@@ -160,7 +158,7 @@ void AWeapon::HandleFiring()
 
 void AWeapon::ShootProjectile()
 {
-	FVector Direction = FMath::VRandCone(GetOwnerCharacter()->GetBaseAimRotation().Vector(), FMath::DegreesToRadians(SpreadBase + CurrentSpread));
+	FVector Direction = FMath::VRandCone(GetOwnerCharacter()->GetBaseAimRotation().Vector(), FMath::DegreesToRadians(GetSpreadBase() + CurrentSpread));
 	ServerShootProjectile(GetOwnerCharacter()->GetCamera()->GetComponentLocation(), Direction);
 
 	if (!GetWorld()->IsServer())
@@ -181,7 +179,7 @@ void AWeapon::ShootProjectile()
 		PlayerController->SetControlRotation(NewControlRotation);
 	}
 
-	CurrentSpread = FMath::Min(CurrentSpread + SpreadIncrease, SpreadMax);
+	CurrentSpread = FMath::Min(CurrentSpread + GetSpreadIncrease(), GetSpreadMax());
 }
 
 void AWeapon::ServerShootProjectile_Implementation(FVector Origin, FVector_NetQuantizeNormal Direction)
@@ -246,6 +244,42 @@ bool AWeapon::CanFire()
 		return false;
 
 	return LastShotTime + 60.0f / RateOfFire <= GetWorld()->GetTimeSeconds() && !bIsReloading && !GetOwnerCharacter()->IsSprinting();
+}
+
+void AWeapon::StartAiming()
+{
+	// Placeholder
+
+	if (GetOwnerCharacter() == nullptr)
+		return;
+
+	GetOwnerCharacter()->GetCamera()->SetFieldOfView(70.0f);
+
+	GetMesh1P()->AttachToComponent(GetOwnerCharacter()->GetMesh1P(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, "WeaponSocketZoom");
+
+	GetOwnerCharacter()->GetMesh1P()->SetVisibility(false);
+
+	GetWorld()->Exec(GetWorld(), TEXT("SetMouseSensitivity 0.04"));
+
+	bIsAiming = true;
+}
+
+void AWeapon::StopAiming()
+{
+	// Placeholder
+
+	if (GetOwnerCharacter() == nullptr)
+		return;
+
+	GetOwnerCharacter()->GetCamera()->SetFieldOfView(90.0f);
+
+	GetMesh1P()->AttachToComponent(GetOwnerCharacter()->GetMesh1P(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, "WeaponSocket");
+
+	GetOwnerCharacter()->GetMesh1P()->SetVisibility(true);
+
+	GetWorld()->Exec(GetWorld(), TEXT("SetMouseSensitivityToDefault"));
+
+	bIsAiming = false;
 }
 
 void AWeapon::StartReload()
@@ -352,6 +386,42 @@ bool AWeapon::IsValidFireMode(EFireMode FireMode)
 		return true;
 
 	return false;
+}
+
+float AWeapon::GetSpreadBase() const
+{
+	if (SpreadDataTable == nullptr)
+		return 0.0f;
+
+	FWeaponMovementValues* Row = SpreadDataTable->FindRow<FWeaponMovementValues>("Base", "Base");
+	return Row ? Row->GetValue(GetOwnerCharacter(), bIsAiming) : 0.0f;
+}
+
+float AWeapon::GetSpreadMax() const
+{
+	if (SpreadDataTable == nullptr)
+		return 0.0f;
+
+	FWeaponMovementValues* Row = SpreadDataTable->FindRow<FWeaponMovementValues>("Max", "Max");
+	return Row ? Row->GetValue(GetOwnerCharacter(), bIsAiming) : 0.0f;
+}
+
+float AWeapon::GetSpreadIncrease() const
+{
+	if (SpreadDataTable == nullptr)
+		return 0.0f;
+
+	FWeaponMovementValues* Row = SpreadDataTable->FindRow<FWeaponMovementValues>("Increase", "Increase");
+	return Row ? Row->GetValue(GetOwnerCharacter(), bIsAiming) : 0.0f;
+}
+
+float AWeapon::GetSpreadDecrease() const
+{
+	if (SpreadDataTable == nullptr)
+		return 0.0f;
+
+	FWeaponMovementValues* Row = SpreadDataTable->FindRow<FWeaponMovementValues>("Decrease", "Decrease");
+	return Row ? Row->GetValue(GetOwnerCharacter(), bIsAiming) : 0.0f;
 }
 
 void AWeapon::OnRep_BurstCount()
