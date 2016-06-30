@@ -48,6 +48,7 @@ AAirdrop::AAirdrop()
 	ReleasePayloadHeight = 300.0f;
 
 	bReplicates = true;
+	bReplicateMovement = true;
 	bAlwaysRelevant = true;
 
 	PrimaryActorTick.bCanEverTick = true;
@@ -66,7 +67,7 @@ void AAirdrop::BeginPlay()
 	
 	StartLocation = GetActorLocation();
 
-	if (Payload == nullptr)
+	if (HasAuthority() && Payload == nullptr)
 	{
 		FVector TestLandingLocation;
 		if (MovementComponent->ControlPoints.Num() > 0)
@@ -128,6 +129,9 @@ void AAirdrop::Init(FVector LandingLocation, TSubclassOf<ADroppablePhysicsActor>
 
 void AAirdrop::OnLanded(const FHitResult& ImpactResult, float Time)
 {
+	if (!HasAuthority())
+		return;
+
 	if (Payload)
 	{
 		ReleasePayload();
@@ -140,7 +144,7 @@ void AAirdrop::OnLanded(const FHitResult& ImpactResult, float Time)
 
 void AAirdrop::ReleasePayload()
 {
-	if (Payload)
+	if (HasAuthority() && Payload)
 	{
 		Payload->DetachFromActor(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
 
