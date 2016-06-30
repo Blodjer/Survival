@@ -28,31 +28,31 @@ struct SURVIVAL_API FWeaponMovementValues : public FCharacterMovementValues
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data)
-	float StandingIdle_ADS;
+	float StandingAimingIdle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data)
-	float StandingMove_ADS;
+	float StandingAimingMove;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data)
-	float CrouchingIdle_ADS;
+	float CrouchingAimingIdle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data)
-	float CrouchingMove_ADS;
+	float CrouchingAimingMove;
 
-	virtual float GetValue(ACharacter* Character) const override
+	float GetValue(ACharacter* Character, bool bIsAiming) const
 	{
 		if (Character == nullptr)
-			return StandingIdle_ADS;
+			return StandingAimingIdle;
 
 		float value = 0.0f;
 
-		if (false) // bIsADS
+		if (bIsAiming)
 		{
 			bool bIsMoving = !Character->GetVelocity().IsNearlyZero(0.5f);
 			if (Character->bIsCrouched)
-				value = bIsMoving ? CrouchingMove_ADS : CrouchingIdle_ADS;
+				value = bIsMoving ? CrouchingAimingMove : CrouchingAimingIdle;
 			else
-				value = bIsMoving ? StandingMove_ADS : StandingIdle_ADS;
+				value = bIsMoving ? StandingAimingMove : StandingAimingIdle;
 		}
 		else
 		{
@@ -129,6 +129,12 @@ protected:
 
 	UFUNCTION(BlueprintPure, Category = Weapon)
 	virtual bool CanFire();
+
+	UFUNCTION(BlueprintCallable, Category = Weapon)
+	void StartAiming();
+
+	UFUNCTION(BlueprintCallable, Category = Weapon)
+	void StopAiming();
 
 	// [client + server]
 	UFUNCTION(BlueprintCallable, Category = Weapon)
@@ -209,6 +215,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = Weapon)
 	TSubclassOf<UCameraShake> CameraShake;
+
+	UPROPERTY(Transient)
+	bool bIsAiming;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapon, meta = (ClampMin = "0", UIMin = "0"))
 	int32 MaxRoundsPerMagazine;
