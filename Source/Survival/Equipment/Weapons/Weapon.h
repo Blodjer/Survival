@@ -191,7 +191,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Weapon, meta = (ClampMin = "0.0", UIMin = "0.0"))
 	float RecoilFirstShotMultiplier;
 
-	UPROPERTY(EditDefaultsOnly, Category = Weapon, meta = (ClampMin = "0.0", UIMin = "0.0"))
+	UPROPERTY(EditDefaultsOnly, Category = Weapon)
 	UDataTable* SpreadDataTable;
 
 	UFUNCTION(BlueprintPure, Category = Weapon)

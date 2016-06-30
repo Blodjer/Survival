@@ -63,6 +63,9 @@ ASurvivalPlayerCharacter::ASurvivalPlayerCharacter(const FObjectInitializer& Obj
 
 	bIsSprinting = false;
 
+	Stamina = 2.0f;
+	StaminaDecrease = 0.1f;
+
 	InteractionRange = 250.0f;
 	
 	PrimaryActorTick.bCanEverTick = true;
@@ -206,6 +209,15 @@ void ASurvivalPlayerCharacter::Tick(float DeltaTime)
 	if (IsLocallyControlled())
 	{
 		UpdateTargetInteractable();
+	}
+
+	if (bIsSprinting && GetCharacterMovement() && GetVelocity().Size() >= GetCharacterMovement()->MaxWalkSpeed)
+	{
+		Stamina = FMath::Max(0.0f, Stamina - StaminaDecrease * DeltaTime);
+	}
+	else
+	{
+		Stamina = FMath::Min(GetMaxStamina(), Stamina + StaminaIncrease.GetValue(this) * DeltaTime);
 	}
 }
 
