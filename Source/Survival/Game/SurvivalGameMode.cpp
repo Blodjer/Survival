@@ -359,7 +359,7 @@ void ASurvivalGameMode::SendAirdrop(TSubclassOf<AAirdropSupplyBox> Payload, AAir
 	AAirdrop* Airdrop = GetWorld()->SpawnActorDeferred<AAirdrop>(AirdropClass, SpawnTransform, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 	if (Airdrop)
 	{
-		Airdrop->Init(LandingZone->GetActorLocation(), Payload);
+		Airdrop->Init(LandingZone->GetRandomLandingLocation(), Payload);
 		UGameplayStatics::FinishSpawningActor(Airdrop, SpawnTransform);
 	}
 }

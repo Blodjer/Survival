@@ -16,6 +16,15 @@ public:
 
 	virtual void BeginPlay() override;
 
+#if WITH_EDITOR
+	virtual void Tick(float DeltaSeconds) override;
+
+	virtual bool ShouldTickIfViewportsOnly() const override;
+#endif
+
+	UFUNCTION(BlueprintPure, Category = LandingZone)
+	FVector GetRandomLandingLocation() const;
+
 private:
 	USceneComponent* Scene;
 
@@ -24,6 +33,9 @@ private:
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = LandingZone, meta = (AllowPrivateAccess = "true"))
 	TArray<TSubclassOf<AAirdropSupplyBox>> AirDropSupplies;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = LandingZone, meta = (ClampMin = "0.0", UIMin = "0.0", AllowPrivateAccess = "true"))
+	float Radius;
 
 public:
 	FORCEINLINE TArray<TSubclassOf<AAirdropSupplyBox>> GetAirDropSupplies() const { return AirDropSupplies; };
