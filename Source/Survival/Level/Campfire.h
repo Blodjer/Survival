@@ -26,6 +26,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = Campfire)
 	bool IsCaptured();
 
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Campfire)
+	void UpdateCapturingPlayers();
+
 private:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Campfire, meta = (AllowPrivateAccess = "true"))
 	USphereComponent* CaptureSphere;

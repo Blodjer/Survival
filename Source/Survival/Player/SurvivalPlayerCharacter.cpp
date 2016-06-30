@@ -7,6 +7,7 @@
 #include "Survival/Pickups/Pickup.h"
 #include "Pickups/PickupEquipment.h"
 #include "Survival/Equipment/Weapons/Weapon.h"
+#include "Survival/Level/Campfire.h"
 
 ASurvivalPlayerCharacter::ASurvivalPlayerCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<USurvivalCharacterMovement>(ACharacter::CharacterMovementComponentName))
@@ -323,6 +324,11 @@ void ASurvivalPlayerCharacter::InjureLethal()
 		EquippedHandheld->UnEquip();
 		EquippedHandheld = nullptr;
 	}
+
+	if (CapturingCampfire != nullptr)
+	{
+		CapturingCampfire->UpdateCapturingPlayers();
+	}
 }
 
 void ASurvivalPlayerCharacter::Die()
@@ -367,6 +373,11 @@ void ASurvivalPlayerCharacter::Revive(float NewHealth)
 		if (PreviousEquippedHandheld != nullptr)
 		{
 			Equip(PreviousEquippedHandheld);
+		}
+
+		if (CapturingCampfire != nullptr)
+		{
+			CapturingCampfire->UpdateCapturingPlayers();
 		}
 
 		EnableInput(GetPlayerController());

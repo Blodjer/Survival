@@ -64,8 +64,8 @@ void ACampfire::PostInitializeComponents()
 
 void ACampfire::Tick(float DeltaTime)
 {
-	Super::Tick( DeltaTime );
-
+	Super::Tick(DeltaTime);
+	
 	if (DominantTeamIdx != -1)
 	{
 		if (DominantTeamIdx != OwningTeamIdx)
@@ -104,6 +104,28 @@ void ACampfire::SetActive(bool bActive)
 bool ACampfire::IsCaptured()
 {
 	return CaptureValue >= 1.0f;
+}
+
+void ACampfire::UpdateCapturingPlayers()
+{
+	if (!HasAuthority())
+		return;
+
+	CapturingPlayers.Empty();
+
+	TArray<AActor*> OverlappingActors;
+	CaptureSphere->GetOverlappingActors(OverlappingActors, ASurvivalPlayerCharacter::StaticClass());
+
+	for (AActor* Actor : OverlappingActors)
+	{
+		ASurvivalPlayerCharacter* Player = Cast<ASurvivalPlayerCharacter>(Actor);
+		if (Player != nullptr && !Player->IsLethalInjured())
+		{
+			CapturingPlayers.Add(Player);
+		}
+	}
+
+	OnCapturingPlayersChanged();
 }
 
 void ACampfire::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
