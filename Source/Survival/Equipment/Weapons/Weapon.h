@@ -216,7 +216,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Weapon)
 	TSubclassOf<UCameraShake> CameraShake;
 
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, BlueprintReadOnly, Category = Weapon)
 	bool bIsAiming;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapon, meta = (ClampMin = "0", UIMin = "0"))
