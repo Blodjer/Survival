@@ -5,10 +5,10 @@
 
 int32 USurvivalFunctionLibrary::GetGlobalSeed(const UObject* Object)
 {
-	UWorld* World = GEngine->GetWorldFromContextObject(Object);
+	const UWorld* World = GEngine->GetWorldFromContextObject(Object);
 	if (World && World->GetGameState())
 	{
-		ASurvivalGameState* SurvivalGameState = Cast<ASurvivalGameState>(World->GetGameState());
+		const ASurvivalGameState* SurvivalGameState = Cast<ASurvivalGameState>(World->GetGameState());
 		if (SurvivalGameState)
 		{
 			return SurvivalGameState->GetReplicatedSeed();
