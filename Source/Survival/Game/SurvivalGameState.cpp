@@ -14,6 +14,7 @@ void ASurvivalGameState::SetMatchProperties(float LengthOfDay, float StartTimeOf
 	GameMode_LengthOfDay = LengthOfDay;
 	GameMode_StartTimeOfDay = StartTimeOfDay;
 	GameMode_Teams = Teams;
+	Seed = FMath::Rand();
 }
 
 float ASurvivalGameState::GetMatchTime()
@@ -54,14 +55,21 @@ void ASurvivalGameState::SetTimeOfDay(float TimeOfDay)
 	}
 }
 
+int32 ASurvivalGameState::GetReplicatedSeed() const
+{
+	return Seed;
+}
+
 void ASurvivalGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ASurvivalGameState, MatchTimeStartOffset);
 
-	DOREPLIFETIME(ASurvivalGameState, GameMode_LengthOfDay);
-	DOREPLIFETIME(ASurvivalGameState, GameMode_StartTimeOfDay);
+	DOREPLIFETIME_CONDITION(ASurvivalGameState, GameMode_LengthOfDay, COND_InitialOnly);
+	DOREPLIFETIME_CONDITION(ASurvivalGameState, GameMode_StartTimeOfDay, COND_InitialOnly);
 
-	DOREPLIFETIME(ASurvivalGameState, GameMode_Teams);
+	DOREPLIFETIME_CONDITION(ASurvivalGameState, GameMode_Teams, COND_InitialOnly);
+
+	DOREPLIFETIME_CONDITION(ASurvivalGameState, Seed, COND_InitialOnly)
 }

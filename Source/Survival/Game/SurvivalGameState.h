@@ -40,16 +40,22 @@ public:
 
 	void SetTimeOfDay(float TimeOfDay);
 
+	UFUNCTION(BlueprintPure, Category = Math)
+	int32 GetReplicatedSeed() const;
+
 private:
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated, Transient)
 	float MatchTimeStartOffset;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated, Transient)
 	float GameMode_LengthOfDay;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated, Transient)
 	float GameMode_StartTimeOfDay;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated, Transient)
 	TArray<FTeamInfo> GameMode_Teams;
+
+	UPROPERTY(Replicated)
+	int32 Seed;
 };
