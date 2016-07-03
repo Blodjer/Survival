@@ -352,14 +352,16 @@ void ASurvivalGameMode::SendAirdrop(TSubclassOf<AAirdropSupplyBox> Payload, AAir
 {
 	if (Payload == nullptr || LandingZone == nullptr)
 		return;
-
-	const FVector SpawnOffset(0.0f, 4500.0f, 10000.0f);
-	const FTransform SpawnTransform(LandingZone->GetActorLocation() + SpawnOffset);
+	
+	FVector StartLocation, LandingLocation;
+	LandingZone->GetRandomApproachLocation(11000.0f, StartLocation, LandingLocation);
+	
+	const FTransform SpawnTransform(StartLocation);
 
 	AAirdrop* Airdrop = GetWorld()->SpawnActorDeferred<AAirdrop>(AirdropClass, SpawnTransform, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 	if (Airdrop)
 	{
-		Airdrop->Init(LandingZone->GetRandomLandingLocation(), Payload);
+		Airdrop->Init(LandingLocation, Payload);
 		UGameplayStatics::FinishSpawningActor(Airdrop, SpawnTransform);
 	}
 }

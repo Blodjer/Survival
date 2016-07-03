@@ -15,6 +15,7 @@ AAirdropLandingZone::AAirdropLandingZone()
 	Billboard->SetupAttachment(RootComponent);
 
 	Radius = 800.0f;
+	ApproachAngle = 55.0f;
 
 	bNetLoadOnClient = false;
 
@@ -48,8 +49,12 @@ void AAirdropLandingZone::BeginPlay()
 void AAirdropLandingZone::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
+	
 	DrawDebugCircle(GetWorld(), GetActorLocation(), Radius, 64, FColor::Magenta, false, -1, 0, 25, FVector(0,1,0), FVector(1,0,0), false);
+
+	float Angle = FMath::Min(ApproachAngle, 89.0f);
+	float ConeOffset = FMath::Tan(FMath::DegreesToRadians(Angle)) * Radius;
+	DrawDebugCone(GetWorld(), GetActorLocation() - FVector(0, 0, ConeOffset), FVector(0, 0, 1), 3750.0f + ConeOffset + FMath::Sqrt(Radius * Radius + ConeOffset + ConeOffset), FMath::DegreesToRadians(90.0f - Angle), FMath::DegreesToRadians(90.0f - Angle), 12, FColor::Magenta, false, -1, 0, 7);
 }
 
 bool AAirdropLandingZone::ShouldTickIfViewportsOnly() const
@@ -58,7 +63,8 @@ bool AAirdropLandingZone::ShouldTickIfViewportsOnly() const
 }
 #endif
 
-FVector AAirdropLandingZone::GetRandomLandingLocation() const
+void AAirdropLandingZone::GetRandomApproachLocation(float DropHeight, FVector& StartLocation, FVector& LandingLocation) const
 {
-	return GetActorLocation() + FVector(FMath::FRand() * Radius, 0, 0).RotateAngleAxis(FMath::FRand() * 360.0f, FVector::UpVector);
+	LandingLocation = GetActorLocation() + FVector(FMath::FRand() * Radius, 0, 0).RotateAngleAxis(FMath::FRand() * 360.0f, FVector::UpVector);
+	StartLocation = LandingLocation + FRotator(FMath::Clamp(ApproachAngle, 0.0f, 90.0f), FMath::FRand() * 360.0f, 0.0f).RotateVector(FVector(DropHeight, 0, 0));
 }

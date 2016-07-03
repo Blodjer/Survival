@@ -23,7 +23,7 @@ public:
 #endif
 
 	UFUNCTION(BlueprintPure, Category = LandingZone)
-	FVector GetRandomLandingLocation() const;
+	void GetRandomApproachLocation(float DropHeight, FVector& StartLocation, FVector& LandingLocation) const;
 
 private:
 	USceneComponent* Scene;
@@ -34,8 +34,11 @@ private:
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = LandingZone, meta = (AllowPrivateAccess = "true"))
 	TArray<TSubclassOf<AAirdropSupplyBox>> AirDropSupplies;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = LandingZone, meta = (ClampMin = "0.0", UIMin = "0.0", AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = LandingZone, meta = (ClampMin = "20.0", UIMin = "0.0", AllowPrivateAccess = "true"))
 	float Radius;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = LandingZone, meta = (ClampMin = "20.0", UIMin = "20.0", ClampMax = "90.0", UIMax = "90.0", AllowPrivateAccess = "true"))
+	float ApproachAngle;
 
 public:
 	FORCEINLINE TArray<TSubclassOf<AAirdropSupplyBox>> GetAirDropSupplies() const { return AirDropSupplies; };
