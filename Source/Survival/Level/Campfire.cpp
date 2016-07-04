@@ -121,7 +121,7 @@ void ACampfire::UpdateCapturingPlayers()
 		ASurvivalPlayerCharacter* Player = Cast<ASurvivalPlayerCharacter>(Actor);
 		if (Player != nullptr && !Player->IsLethalInjured())
 		{
-			CapturingPlayers.Add(Player);
+			CapturingPlayers.AddUnique(Player);
 		}
 	}
 
@@ -135,14 +135,8 @@ void ACampfire::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 	{
 		SurvivalPlayerCharacter->CapturingCampfire = this;
 
-		if (!HasAuthority())
-			return;
-
-		if (SurvivalPlayerCharacter->PlayerState)
-		{
-			CapturingPlayers.Add(SurvivalPlayerCharacter);
-			OnCapturingPlayersChanged();
-		}
+		CapturingPlayers.AddUnique(SurvivalPlayerCharacter);
+		OnCapturingPlayersChanged();
 	}
 }
 
@@ -152,9 +146,6 @@ void ACampfire::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* O
 	if (SurvivalPlayerCharacter)
 	{
 		SurvivalPlayerCharacter->CapturingCampfire = nullptr;
-
-		if (!HasAuthority())
-			return;
 
 		CapturingPlayers.Remove(SurvivalPlayerCharacter);
 		OnCapturingPlayersChanged();
@@ -167,14 +158,7 @@ void ACampfire::OnCapturingPlayersChanged()
 	for (ASurvivalPlayerCharacter* SurvialPlayerCharacter : CapturingPlayers)
 	{
 		int32 TeamIdx = SurvialPlayerCharacter->GetTeamIdx();
-		if (CapturingTeams.Contains(TeamIdx))
-		{
-			CapturingTeams[TeamIdx]++;
-		}
-		else
-		{
-			CapturingTeams.Add(TeamIdx, 1);
-		}
+		CapturingTeams.FindOrAdd(TeamIdx)++;
 	}
 
 	if (CapturingTeams.Num() > 0)
@@ -185,14 +169,14 @@ void ACampfire::OnCapturingPlayersChanged()
 		int32 DominantTeamIdx = CapturingTeamsKeys[0];
 		bool bDraw = false;
 
-		for (auto& Element : CapturingTeams)
+		for (auto& Team : CapturingTeams)
 		{
-			if (Element.Value > CapturingTeams[DominantTeamIdx])
+			if (Team.Value > CapturingTeams[DominantTeamIdx])
 			{
-				DominantTeamIdx = Element.Key;
+				DominantTeamIdx = Team.Key;
 				bDraw = false;
 			}
-			else if (Element.Key != DominantTeamIdx && Element.Value == CapturingTeams[DominantTeamIdx])
+			else if (Team.Key != DominantTeamIdx && Team.Value == CapturingTeams[DominantTeamIdx])
 			{
 				bDraw = true;
 			}

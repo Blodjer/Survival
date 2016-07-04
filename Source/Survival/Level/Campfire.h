@@ -58,6 +58,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = Campfire, meta = (ClampMin = "0", UIMin = "0", AllowPrivateAccess = "true"))
 	float CaptureDuration;
 
+	// Multiplies to the capture duration for every additional team player
 	UPROPERTY(EditDefaultsOnly, Category = Campfire, meta = (ClampMin = "0", UIMin = "0", ClampMax = "1", UIMax = "1", AllowPrivateAccess = "true"))
 	float CaptureDurationMuliplier;
 
