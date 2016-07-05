@@ -5,6 +5,7 @@
 
 ADroppablePhysicsActor::ADroppablePhysicsActor()
 {
+	bDropWithCCD = false;
 
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -43,6 +44,7 @@ void ADroppablePhysicsActor::StartSimulatePhysics(FVector Velocity)
 	DefaultPhysicProfileName = PhysicsRootComponent->GetCollisionProfileName();
 	
 	SetReplicateMovement(true);
+	PhysicsRootComponent->BodyInstance.bUseCCD = bDropWithCCD;
 	PhysicsRootComponent->SetCollisionProfileName(SimulatingPhysicsProfileName.IsNone() ? DefaultPhysicProfileName : SimulatingPhysicsProfileName);
 	PhysicsRootComponent->SetSimulatePhysics(true);
 	PhysicsRootComponent->SetAllPhysicsLinearVelocity(Velocity);
@@ -57,4 +59,8 @@ void ADroppablePhysicsActor::StopSimulatePhysics()
 	PhysicsRootComponent->SetCollisionProfileName(DefaultPhysicProfileName);
 	PhysicsRootComponent->SetSimulatePhysics(false);
 	PhysicsRootComponent->UnWeldChildren();
+	if (bDropWithCCD)
+	{
+		PhysicsRootComponent->BodyInstance.bUseCCD = false;
+	}
 }

@@ -7,10 +7,12 @@ APickup::APickup()
 {
 	PickupMesh = CreateDefaultSubobject<UStaticMeshComponent>("PickupMesh");
 	PickupMesh->SetCollisionProfileName("Pickup");
+	PickupMesh->bGenerateOverlapEvents = false;
 	RootComponent = PickupMesh;
 
 	SimulatingPhysicsProfileName = "PickupPhysic";
-	
+	bDropWithCCD = true;
+
 	PickupName = "";
 
 	bReplicates = true;

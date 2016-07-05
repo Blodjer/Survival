@@ -27,6 +27,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Physics)
 	FName SimulatingPhysicsProfileName;
 
+	UPROPERTY(EditDefaultsOnly, Category = Physics)
+	bool bDropWithCCD;
+
 private:
 	UPrimitiveComponent* PhysicsRootComponent;
 
