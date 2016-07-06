@@ -75,6 +75,7 @@ void AWeapon::OnCharacterStopUse()
 	{
 		StopFire();
 		StopAiming();
+		StopReload();
 	}
 }
 
@@ -246,20 +247,9 @@ void AWeapon::SimulateFire()
 	OnSimulateFire();
 }
 
-bool AWeapon::CanFire()
-{
-	if (GetWorld() == nullptr || GetOwnerCharacter() == nullptr)
-		return false;
-
-	return LastShotTime + 60.0f / RateOfFire <= GetWorld()->GetTimeSeconds() && !bIsReloading && !GetOwnerCharacter()->IsSprinting();
-}
-
 void AWeapon::StartAiming()
 {
-	if (GetOwnerCharacter() == nullptr)
-		return;
-
-	if (GetOwnerCharacter()->IsSprinting())
+	if (!CanAim())
 		return;
 
 	GetOwnerCharacter()->GetCamera()->SetFieldOfView(90.0f / IronSightZoom);
@@ -294,10 +284,10 @@ void AWeapon::StopAiming()
 
 void AWeapon::StartReload()
 {
-	if (GetOwnerCharacter() == nullptr)
+	if (!CanReload())
 		return;
 
-	if (bIsReloading && (GetOwnerCharacter()->IsLocallyControlled() && !HasAuthority()))
+	if (!GetOwnerCharacter()->IsLocallyControlled() && !HasAuthority())
 		return;
 
 	if (GetOwnerCharacter()->IsLocallyControlled())
@@ -338,6 +328,16 @@ void AWeapon::Reload()
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Magenta, "Reload Complete");
 	}
+}
+
+void AWeapon::StopReload()
+{
+	if (!bIsReloading)
+		return;
+
+	GetWorldTimerManager().ClearTimer(TimerHandle_Reload);
+
+	bIsReloading = false;
 }
 
 void AWeapon::SwitchFireMode()
@@ -398,6 +398,24 @@ bool AWeapon::IsValidFireMode(EFireMode FireMode)
 	return false;
 }
 
+bool AWeapon::CanFire()
+{
+	if (GetWorld() == nullptr || GetOwnerCharacter() == nullptr)
+		return false;
+
+	return LastShotTime + 60.0f / RateOfFire <= GetWorld()->GetTimeSeconds() && !bIsReloading && !GetOwnerCharacter()->IsSprinting();
+}
+
+bool AWeapon::CanAim()
+{
+	return GetOwnerCharacter() && !GetOwnerCharacter()->IsSprinting();
+}
+
+bool AWeapon::CanReload()
+{
+	return GetOwnerCharacter() && !bIsReloading && !GetOwnerCharacter()->IsSprinting();
+}
+
 float AWeapon::GetSpreadBase() const
 {
 	if (SpreadDataTable == nullptr)
@@ -451,6 +469,10 @@ void AWeapon::OnRep_Reload()
 	if (bIsReloading)
 	{
 		StartReload();
+	}
+	else
+	{
+		StopReload();
 	}
 }
 

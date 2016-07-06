@@ -83,6 +83,8 @@ void AHandheld::UnEquip()
 {
 	ClearActionBindings();
 
+	OnCharacterStopUse();
+
 	bIsEquipped = false;
 }
 

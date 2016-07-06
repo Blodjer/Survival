@@ -127,9 +127,6 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = Weapon)
 	void OnSimulateFire();
 
-	UFUNCTION(BlueprintPure, Category = Weapon)
-	virtual bool CanFire();
-
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	void StartAiming();
 
@@ -149,6 +146,10 @@ protected:
 	// [client + server]
 	void Reload();
 
+	// [server]
+	UFUNCTION(BlueprintCallable, Category = Weapon)
+	void StopReload();
+
 	void SwitchFireMode();
 
 	// [server]
@@ -163,6 +164,16 @@ protected:
 	EFireMode GetBestFireMode();
 
 	bool IsValidFireMode(EFireMode FireMode);
+
+protected:
+	UFUNCTION(BlueprintPure, Category = Weapon)
+	virtual bool CanFire();
+
+	UFUNCTION(BlueprintPure, Category = Weapon)
+	virtual bool CanAim();
+
+	UFUNCTION(BlueprintPure, Category = Weapon)
+	virtual bool CanReload();
 
 protected:
 	// The projectile the weapon uses
