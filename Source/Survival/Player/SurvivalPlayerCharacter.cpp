@@ -298,17 +298,7 @@ void ASurvivalPlayerCharacter::Die(const FDamageEvent& DamageEvent, AController*
 	}
 	else
 	{
-		ASurvivalPlayerController* SurvivalPlayerController = GetPlayerController();
-		float DieDelay = SurvivalPlayerController ? SurvivalPlayerController->GetMinDieDelay() : 0.0f;
-		if (DieDelay >= 0.1f)
-		{
-			GetWorldTimerManager().SetTimer(TimerHandle_Die, this, &ASurvivalPlayerCharacter::Die, DieDelay);
-			InjureLethal();
-		}
-		else
-		{
-			Die();
-		}
+		InjureLethal();
 	}
 }
 
@@ -330,10 +320,24 @@ void ASurvivalPlayerCharacter::InjureLethal()
 	{
 		CapturingCampfire->UpdateCapturingPlayers();
 	}
+
+	ASurvivalPlayerController* SurvivalPlayerController = GetPlayerController();
+	float DieDelay = SurvivalPlayerController ? SurvivalPlayerController->GetMinDieDelay() : 0.0f;
+	if (DieDelay >= 0.1f)
+	{
+		GetWorldTimerManager().SetTimer(TimerHandle_Die, this, &ASurvivalPlayerCharacter::Die, DieDelay);
+	}
+	else
+	{
+		Die();
+	}
 }
 
 void ASurvivalPlayerCharacter::Die()
 {
+	if (!HasAuthority())
+		return;
+
 	bIsDead = true;
 
 	SetReplicateMovement(false);
