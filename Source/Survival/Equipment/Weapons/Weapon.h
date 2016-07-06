@@ -225,6 +225,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Weapon)
 	TSubclassOf<UCameraShake> CameraShake;
 
+	UPROPERTY(EditDefaultsOnly, Category = Weapon)
+	USoundBase* ShotSound;
+
 	UPROPERTY(Transient, BlueprintReadOnly, Category = Weapon)
 	bool bIsAiming;
 

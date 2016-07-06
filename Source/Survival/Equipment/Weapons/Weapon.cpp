@@ -238,6 +238,8 @@ void AWeapon::SimulateFire()
 		}
 	}
 
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), ShotSound, GetActorLocation());
+
 	// TODO: Remove
 	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetOwnerCharacter()->GetBaseAimRotation().Vector() * 100000.0f, FColor::White, false, 0.15f);
 
