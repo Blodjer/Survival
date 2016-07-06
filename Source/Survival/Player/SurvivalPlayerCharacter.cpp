@@ -417,7 +417,7 @@ int32 ASurvivalPlayerCharacter::GetTeamIdx()
 	return -1;
 }
 
-AWeapon* ASurvivalPlayerCharacter::GetEquippedHandheld() const
+AWeapon* ASurvivalPlayerCharacter::GetEquippedWeapon() const
 {
 	return EquippedHandheld != nullptr ? Cast<AWeapon>(EquippedHandheld) : nullptr;
 }

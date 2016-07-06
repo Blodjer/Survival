@@ -12,7 +12,7 @@ enum class EHandheldType : uint8
 	PrimaryWeapon,
 	SecondaryWeapon,
 	Gadget,
-	Unknown UMETA(Hidden)
+	Unknown
 };
 
 UCLASS(Abstract, NotBlueprintable)
@@ -118,6 +118,7 @@ public:
 	FORCEINLINE ASurvivalPlayerCharacter* GetOwnerCharacter() const { return OwnerCharacter; }
 
 	// Return the type of the handheld
+	UFUNCTION(BlueprintPure, Category = Handheld)
 	FORCEINLINE EHandheldType GetHandheldType() const { return Type; };
 
 };

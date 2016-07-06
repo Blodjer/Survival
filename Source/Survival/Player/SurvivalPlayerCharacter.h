@@ -152,7 +152,10 @@ public:
 	int32 GetTeamIdx();
 
 	UFUNCTION(BlueprintPure, Category = Equipment)
-	class AWeapon* GetEquippedHandheld() const;
+	FORCEINLINE class AHandheld* GetEquippedHandheld() const { return EquippedHandheld; };
+
+	UFUNCTION(BlueprintPure, Category = Equipment)
+	class AWeapon* GetEquippedWeapon() const;
 
 	// Spawn a specific hendheld. Handled by server
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Equipment)
