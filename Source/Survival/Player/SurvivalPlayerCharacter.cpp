@@ -321,6 +321,7 @@ void ASurvivalPlayerCharacter::InjureLethal()
 	if (EquippedHandheld != nullptr)
 	{
 		PreviousEquippedHandheld = EquippedHandheld;
+		EquippedHandheld->OnCharacterStopUse();
 		EquippedHandheld->UnEquip();
 		EquippedHandheld = nullptr;
 	}
