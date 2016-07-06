@@ -184,6 +184,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Battery)
 	void DrainBatteryPower(float Amount);
 
+	UFUNCTION(BlueprintPure, Category = Character)
+	float GetDeadness() const;
+
 public:
 	UPROPERTY(BlueprintReadOnly, Transient, Category = Campfire)
 	class ACampfire* CapturingCampfire;

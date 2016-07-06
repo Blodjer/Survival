@@ -486,6 +486,13 @@ void ASurvivalPlayerCharacter::DrainBatteryPower(float Amount)
 	CurrentBatteryPower = FMath::Max(0.0f, CurrentBatteryPower - FMath::Abs(Amount));
 }
 
+float ASurvivalPlayerCharacter::GetDeadness() const
+{
+	ASurvivalPlayerController* SurvivalPlayerController = GetPlayerController();
+	float DieDelay = SurvivalPlayerController ? SurvivalPlayerController->GetMinDieDelay() : 0.0f;
+	return GetWorldTimerManager().GetTimerElapsed(TimerHandle_Die) / DieDelay;
+}
+
 void ASurvivalPlayerCharacter::SetRagdollPhysics()
 {
 	if (!GetMesh() || !GetMesh()->GetPhysicsAsset())
