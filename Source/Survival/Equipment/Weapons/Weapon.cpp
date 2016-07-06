@@ -61,10 +61,8 @@ void AWeapon::Tick(float DeltaSeconds)
 
 void AWeapon::UnEquip()
 {
-	StopFire();
-	StopAiming();
-
 	Super::UnEquip();
+
 }
 
 void AWeapon::OnCharacterStopUse()
@@ -268,6 +266,9 @@ void AWeapon::StartAiming()
 
 void AWeapon::StopAiming()
 {
+	if (!bIsAiming)
+		return;
+
 	if (GetOwnerCharacter() == nullptr)
 		return;
 

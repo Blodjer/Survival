@@ -308,7 +308,7 @@ void ASurvivalPlayerCharacter::InjureLethal()
 
 	DisableInput(GetPlayerController());
 
-	if (EquippedHandheld != nullptr)
+	if (HasAuthority() && EquippedHandheld != nullptr)
 	{
 		PreviousEquippedHandheld = EquippedHandheld;
 		EquippedHandheld->UnEquip();
@@ -773,6 +773,8 @@ void ASurvivalPlayerCharacter::SimulateUnEquip(AHandheld* Handheld)
 {
 	if (Handheld != nullptr)
 	{
+		Handheld->UnEquip();
+
 		if (HasAuthority())
 		{
 			FName InventorySocketName = HandheldInventorySlots.Store(Handheld);
@@ -791,12 +793,13 @@ void ASurvivalPlayerCharacter::SimulateUnEquip(AHandheld* Handheld)
 		}
 		else
 		{
-			Handheld->GetMesh3P()->AttachToComponent(Handheld->GetMesh1P(), FAttachmentTransformRules::SnapToTargetIncludingScale);
+			if (!IsLethalInjured())
+			{
+				Handheld->GetMesh3P()->AttachToComponent(Handheld->GetMesh1P(), FAttachmentTransformRules::SnapToTargetIncludingScale);
+			}
 
 			Handheld->GetMesh1P()->SetVisibility(false);
 		}
-
-		Handheld->UnEquip();
 	}
 }
 
