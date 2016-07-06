@@ -206,6 +206,15 @@ protected:
 	UFUNCTION(BlueprintPure, Category = Weapon)
 	float GetSpreadDecrease() const;
 
+	UPROPERTY(EditAnywhere, Category = Weapon, meta = (MakeEditWidget = true))
+	FVector IronSightLocation;
+
+	UPROPERTY(EditDefaultsOnly, Category = Weapon, meta = (ClampMin = "0.0", UIMin = "0.0"))
+	float IronSightCameraDistance;
+
+	UPROPERTY(EditDefaultsOnly, Category = Weapon, meta = (ClampMin = "1.0", UIMin = "1.0"))
+	float IronSightZoom;
+
 	UPROPERTY(EditDefaultsOnly, Category = FireModes)
 	bool bAutomatic;
 	UPROPERTY(EditDefaultsOnly, Category = FireModes)

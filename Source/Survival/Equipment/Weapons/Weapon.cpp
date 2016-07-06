@@ -18,6 +18,10 @@ AWeapon::AWeapon()
 	RecoilRight = 0.35f;
 	RecoilFirstShotMultiplier = 1.4f;
 
+	IronSightLocation = FVector(0.0f, -5.0f, 10.0f);
+	IronSightCameraDistance = 20.0f;
+	IronSightZoom = 1.0f;
+
 	MaxRoundsPerMagazine = 20;
 	CurrentRoundsInMagazine = 0;
 
@@ -58,6 +62,7 @@ void AWeapon::Tick(float DeltaSeconds)
 void AWeapon::UnEquip()
 {
 	StopFire();
+	StopAiming();
 
 	Super::UnEquip();
 }
@@ -69,6 +74,7 @@ void AWeapon::OnCharacterStopUse()
 	if (HasAuthority() || (GetOwnerCharacter() && GetOwnerCharacter()->IsLocallyControlled()))
 	{
 		StopFire();
+		StopAiming();
 	}
 }
 
@@ -248,14 +254,18 @@ bool AWeapon::CanFire()
 
 void AWeapon::StartAiming()
 {
-	// Placeholder
-
 	if (GetOwnerCharacter() == nullptr)
 		return;
 
-	GetOwnerCharacter()->GetCamera()->SetFieldOfView(70.0f);
+	if (GetOwnerCharacter()->IsSprinting())
+		return;
 
-	GetMesh1P()->AttachToComponent(GetOwnerCharacter()->GetMesh1P(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, "WeaponSocketZoom");
+	GetOwnerCharacter()->GetCamera()->SetFieldOfView(90.0f / IronSightZoom);
+
+	GetMesh1P()->AttachToComponent(GetOwnerCharacter()->GetCamera(), FAttachmentTransformRules::KeepWorldTransform);
+
+	FRotator WeaponBaseRotation = FRotator(0.0f, -90.0f, 0.0f);
+	GetMesh1P()->SetRelativeLocationAndRotation(WeaponBaseRotation.RotateVector(IronSightLocation) * FVector(1,-1,-1) + FVector(IronSightCameraDistance, 0.0f, 0.0f), WeaponBaseRotation);
 
 	GetOwnerCharacter()->GetMesh1P()->SetVisibility(false);
 
@@ -266,8 +276,6 @@ void AWeapon::StartAiming()
 
 void AWeapon::StopAiming()
 {
-	// Placeholder
-
 	if (GetOwnerCharacter() == nullptr)
 		return;
 

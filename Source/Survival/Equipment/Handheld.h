@@ -68,11 +68,11 @@ protected:
 
 private:
 	// First person mesh. Seen only by owner.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Handheld, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Handheld, meta = (AllowPrivateAccess = "true"))
 	class USkeletalMeshComponent* Mesh1P;
 
 	// Thrid person mesh. Not visible for owner.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Handheld, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Handheld, meta = (AllowPrivateAccess = "true"))
 	class USkeletalMeshComponent* Mesh3P;
 
 	// The character actor that owns this handheld
