@@ -3,16 +3,9 @@
 #pragma once
 
 #include "WeaponProjectile.h"
+#include "WeaponSight.h"
 #include "Survival/Player/SurvivalCharacterMovement.h"
 #include "Weapon.generated.h"
-
-UENUM()
-enum class EWeaponState : uint8
-{
-	Idle,
-	Firing,
-	Reloading
-};
 
 UENUM(BlueprintType)
 enum class EFireMode : uint8
@@ -175,6 +168,10 @@ protected:
 	UFUNCTION(BlueprintPure, Category = Weapon)
 	virtual bool CanReload();
 
+public:
+	UFUNCTION(BlueprintCallable, Category = Weapon)
+	void AttachSight(TSubclassOf<AWeaponSight> Sight);
+
 protected:
 	// The projectile the weapon uses
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapon)
@@ -217,14 +214,8 @@ protected:
 	UFUNCTION(BlueprintPure, Category = Weapon)
 	float GetSpreadDecrease() const;
 
-	UPROPERTY(EditAnywhere, Category = Weapon, meta = (MakeEditWidget = true))
-	FVector IronSightLocation;
-
-	UPROPERTY(EditDefaultsOnly, Category = Weapon, meta = (ClampMin = "0.0", UIMin = "0.0"))
-	float IronSightCameraDistance;
-
-	UPROPERTY(EditDefaultsOnly, Category = Weapon, meta = (ClampMin = "1.0", UIMin = "1.0"))
-	float IronSightZoom;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
+	FWeaponSightConfig IronSight;
 
 	UPROPERTY(EditDefaultsOnly, Category = FireModes)
 	bool bAutomatic;
@@ -272,6 +263,9 @@ private:
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = Weapon, meta = (AllowPrivateAccess = "true"))
 	float CurrentSpread;
+
+	UPROPERTY(Transient)
+	AWeaponSight* CurrentSight;
 
 private:
 	UFUNCTION()

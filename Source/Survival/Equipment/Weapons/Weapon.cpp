@@ -18,9 +18,7 @@ AWeapon::AWeapon()
 	RecoilRight = 0.35f;
 	RecoilFirstShotMultiplier = 1.4f;
 
-	IronSightLocation = FVector(0.0f, -5.0f, 10.0f);
-	IronSightCameraDistance = 20.0f;
-	IronSightZoom = 1.0f;
+	IronSight = FWeaponSightConfig(FVector(0.0f, -5.0f, 10.0f), 20.0f, 1.2f);
 
 	MaxRoundsPerMagazine = 20;
 	CurrentRoundsInMagazine = 0;
@@ -250,12 +248,14 @@ void AWeapon::StartAiming()
 	if (!CanAim())
 		return;
 
-	GetOwnerCharacter()->GetCamera()->SetFieldOfView(90.0f / IronSightZoom);
+	FWeaponSightConfig SightConfig = CurrentSight ? CurrentSight->GetConfig() : IronSight;
+
+	GetOwnerCharacter()->GetCamera()->SetFieldOfView(90.0f / SightConfig.ZoomFactor);
 
 	GetMesh1P()->AttachToComponent(GetOwnerCharacter()->GetCamera(), FAttachmentTransformRules::KeepWorldTransform);
 
 	FRotator WeaponBaseRotation = FRotator(0.0f, -90.0f, 0.0f);
-	GetMesh1P()->SetRelativeLocationAndRotation(WeaponBaseRotation.RotateVector(IronSightLocation) * FVector(1,-1,-1) + FVector(IronSightCameraDistance, 0.0f, 0.0f), WeaponBaseRotation);
+	GetMesh1P()->SetRelativeLocationAndRotation(WeaponBaseRotation.RotateVector(SightConfig.CenterLocation) * FVector(1,-1,-1) + FVector(SightConfig.CameraDistance, 0.0f, 0.0f), WeaponBaseRotation);
 
 	GetOwnerCharacter()->GetMesh1P()->SetVisibility(false);
 
@@ -415,6 +415,32 @@ bool AWeapon::CanAim()
 bool AWeapon::CanReload()
 {
 	return GetOwnerCharacter() && !bIsReloading && !GetOwnerCharacter()->IsSprinting();
+}
+
+void AWeapon::AttachSight(TSubclassOf<AWeaponSight> Sight)
+{
+	if (CurrentSight)
+	{
+		CurrentSight->Destroy(true);
+		CurrentSight = nullptr;
+	}
+
+	if (Sight == nullptr)
+		return;
+
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParameters.Instigator = GetInstigator();
+	SpawnParameters.Owner = this;
+
+	AWeaponSight* NewSight = GetWorld()->SpawnActor<AWeaponSight>(Sight, SpawnParameters);
+	if (NewSight)
+	{
+		CurrentSight = NewSight;
+
+		NewSight->GetMesh1P()->AttachToComponent(GetMesh1P(), FAttachmentTransformRules::SnapToTargetIncludingScale, "socket_sight");
+		NewSight->GetMesh3P()->AttachToComponent(GetMesh3P(), FAttachmentTransformRules::SnapToTargetIncludingScale, "socket_sight");
+	}
 }
 
 float AWeapon::GetSpreadBase() const
