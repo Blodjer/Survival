@@ -373,7 +373,7 @@ protected:
 	float DeadlyLandingVelocity;
 
 	// Set by character movement to specify that this Character is currently sprinting
-	UPROPERTY(Transient, BlueprintReadOnly, ReplicatedUsing = OnRep_IsSprinting, Category = Character)
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_IsSprinting)
 	bool bIsSprinting;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Character, meta = (ClampMin = "0.0", UIMin = "0.0"))
@@ -442,7 +442,8 @@ public:
 	FORCEINLINE bool IsLethalInjured() const { return bIsLethalInjured; };
 
 	// Is the player currently sprinting
-	FORCEINLINE bool IsSprinting() const { return bIsSprinting; };
+	UFUNCTION(BlueprintPure, Category = Character)
+	FORCEINLINE bool IsSprinting() const { return bIsSprinting && GetVelocity() != FVector::ZeroVector; };
 
 	FORCEINLINE float GetStamina() const { return Stamina; };
 

@@ -196,6 +196,19 @@ void ASurvivalPlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (IsSprinting())
+	{
+		if (bIsCrouched)
+		{
+			StopCrouch();
+		}
+
+		if (EquippedHandheld != nullptr)
+		{
+			EquippedHandheld->OnCharacterStopUse();
+		}
+	}
+
 	if (!IsLocallyControlled())
 	{
 		Flashlight->SetWorldRotation(GetBaseAimRotation());
@@ -212,7 +225,7 @@ void ASurvivalPlayerCharacter::Tick(float DeltaTime)
 		UpdateTargetInteractable();
 	}
 
-	if (bIsSprinting && GetCharacterMovement() && GetVelocity().Size() >= GetCharacterMovement()->MaxWalkSpeed)
+	if (IsSprinting() && GetCharacterMovement() && GetVelocity().Size() >= GetCharacterMovement()->MaxWalkSpeed)
 	{
 		Stamina = FMath::Max(0.0f, Stamina - StaminaDecrease * DeltaTime);
 	}
@@ -575,16 +588,6 @@ void ASurvivalPlayerCharacter::StopSprint()
 
 void ASurvivalPlayerCharacter::SetSprint(bool bShouldSprint)
 {
-	if (bShouldSprint)
-	{
-		StopCrouch();
-
-		if (EquippedHandheld != nullptr)
-		{
-			EquippedHandheld->OnCharacterStopUse();
-		}
-	}
-
 	if (SurvivalCharacterMovement)
 	{
 		SurvivalCharacterMovement->bWantsToSprint = bShouldSprint;
