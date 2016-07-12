@@ -732,10 +732,13 @@ void ASurvivalPlayerCharacter::RemoveHandheldFromInventory(AHandheld* Handheld)
 
 void ASurvivalPlayerCharacter::DestroyInventory()
 {
+	if (!HasAuthority())
+		return;
+
 	for (AHandheld* Handheld : HandheldInventory)
 	{
 		HandheldInventory.Remove(Handheld);
-		Handheld->Destroy(true);
+		Handheld->Destroy();
 	}
 
 	EquippedHandheld = nullptr;
