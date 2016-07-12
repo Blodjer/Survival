@@ -74,6 +74,12 @@ void AWeapon::UnEquip()
 {
 	Super::UnEquip();
 
+	if (HasAuthority() || (GetOwnerCharacter() && GetOwnerCharacter()->IsLocallyControlled()))
+	{
+		StopReload();
+		StopFire();
+		StopAiming();
+	}
 }
 
 void AWeapon::OnCharacterStopUse()
