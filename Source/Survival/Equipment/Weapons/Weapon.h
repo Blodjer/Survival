@@ -68,6 +68,8 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 	virtual void UnEquip() override;
 
 	virtual void OnCharacterStopUse() override;

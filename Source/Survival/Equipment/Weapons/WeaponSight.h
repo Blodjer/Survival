@@ -32,7 +32,7 @@ struct SURVIVAL_API FWeaponSightConfig
 	}
 };
 
-UCLASS(Abstract)
+UCLASS(Abstract, Blueprintable)
 class SURVIVAL_API AWeaponSight : public AWeaponAttachment
 {
 	GENERATED_BODY()

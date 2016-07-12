@@ -235,6 +235,13 @@ void ASurvivalPlayerCharacter::Tick(float DeltaTime)
 	}
 }
 
+void ASurvivalPlayerCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	DestroyInventory();
+
+	Super::EndPlay(EndPlayReason);
+}
+
 void ASurvivalPlayerCharacter::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
@@ -353,8 +360,6 @@ void ASurvivalPlayerCharacter::Die()
 	bIsDead = true;
 
 	SetReplicateMovement(false);
-
-	DestroyInventory();
 
 	if (GetController())
 	{
@@ -729,8 +734,12 @@ void ASurvivalPlayerCharacter::DestroyInventory()
 {
 	for (AHandheld* Handheld : HandheldInventory)
 	{
+		HandheldInventory.Remove(Handheld);
 		Handheld->Destroy(true);
 	}
+
+	EquippedHandheld = nullptr;
+	PreviousEquippedHandheld = nullptr;
 }
 
 void ASurvivalPlayerCharacter::Equip(AHandheld* Handheld)

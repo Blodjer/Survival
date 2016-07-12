@@ -122,6 +122,8 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 public:
 	virtual void Landed(const FHitResult& Hit) override;
 
