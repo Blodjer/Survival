@@ -84,7 +84,6 @@ void AWeapon::OnCharacterStopUse()
 	{
 		StopFire();
 		StopAiming();
-		StopReload();
 	}
 }
 
@@ -427,7 +426,7 @@ bool AWeapon::CanAim()
 
 bool AWeapon::CanReload()
 {
-	return GetOwnerCharacter() && !bIsReloading && !GetOwnerCharacter()->IsSprinting();
+	return GetOwnerCharacter() && !bIsReloading;
 }
 
 void AWeapon::AttachSight(TSubclassOf<AWeaponSight> Sight)
