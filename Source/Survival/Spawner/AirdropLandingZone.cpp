@@ -50,6 +50,9 @@ void AAirdropLandingZone::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	
+	if (!bShowHelper)
+		return;
+
 	DrawDebugCircle(GetWorld(), GetActorLocation(), Radius, 64, FColor::Magenta, false, -1, 0, 25, FVector(0,1,0), FVector(1,0,0), false);
 
 	float Angle = FMath::Min(ApproachAngle, 89.0f);
