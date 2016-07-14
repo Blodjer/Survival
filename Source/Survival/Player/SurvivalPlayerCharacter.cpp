@@ -31,9 +31,11 @@ ASurvivalPlayerCharacter::ASurvivalPlayerCharacter(const FObjectInitializer& Obj
 	Mesh1P->SetOnlyOwnerSee(true);
 	Mesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Mesh1P->CastShadow = false;
+	Mesh1P->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::OnlyTickPoseWhenRendered;
 
 	// Set 3rd person mesh invisible for owner
 	GetMesh()->SetOwnerNoSee(true);
+	GetMesh()->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::AlwaysTickPoseAndRefreshBones;
 
 	//Create SpotLightComponent for the flashlight
 	Flashlight = CreateDefaultSubobject<USpotLightComponent>("Flashlight");
