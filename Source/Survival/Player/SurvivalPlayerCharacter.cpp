@@ -264,10 +264,8 @@ void ASurvivalPlayerCharacter::FellOutOfWorld(const UDamageType& dmgType)
 
 float ASurvivalPlayerCharacter::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	if (Health <= 0.0f)
-	{
+	if (!HasAuthority())
 		return 0.0f;
-	}
 	
 	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
 	{
@@ -293,11 +291,23 @@ float ASurvivalPlayerCharacter::TakeDamage(float Damage, FDamageEvent const& Dam
 
 	const float TakenDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 
-	Health = FMath::Max(0.0f, Health - TakenDamage);
-
-	if (Health <= 0.0f)
+	if (EventInstigator && EventInstigator->GetPawn())
 	{
-		Die(DamageEvent, EventInstigator, false);
+		ASurvivalPlayerCharacter* SurvivalPlayerCharacter = Cast<ASurvivalPlayerCharacter>(EventInstigator->GetPawn());
+		if (SurvivalPlayerCharacter)
+		{
+			SurvivalPlayerCharacter->ConfirmDamage(TakenDamage, DamageEvent);
+		}
+	}
+
+	if (Health > 0.0f)
+	{
+		Health = FMath::Max(0.0f, Health - TakenDamage);
+
+		if (Health <= 0.0f)
+		{
+			Die(DamageEvent, EventInstigator, false);
+		}
 	}
 
 	return TakenDamage;
@@ -383,6 +393,11 @@ void ASurvivalPlayerCharacter::Die()
 	}
 
 	DetachFromControllerPendingDestroy();
+}
+
+void ASurvivalPlayerCharacter::ConfirmDamage_Implementation(float Damage, FDamageEvent const& DamageEvent)
+{
+	OnConfirmDamage.Broadcast(Damage, DamageEvent);
 }
 
 void ASurvivalPlayerCharacter::Revive(float NewHealth)

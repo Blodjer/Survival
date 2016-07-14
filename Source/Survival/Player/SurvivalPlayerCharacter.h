@@ -96,6 +96,8 @@ struct SURVIVAL_API FHandheldInventorySlotManager
 	}
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FConfirmDamageSignature, float, Damage, FDamageEvent const&, DamageEvent);
+
 UCLASS()
 class SURVIVAL_API ASurvivalPlayerCharacter : public ACharacter
 {
@@ -139,6 +141,10 @@ public:
 
 private:
 	void Die();
+
+	UFUNCTION(Client, Reliable, Category = "Game|Damage")
+	void ConfirmDamage(float Damage, FDamageEvent const& DamageEvent);
+	void ConfirmDamage_Implementation(float Damage, FDamageEvent const& DamageEvent);
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Character)
@@ -419,6 +425,10 @@ protected:
 	
 	UPROPERTY(Transient, BlueprintReadOnly, Category = Material)
 	TArray<UMaterialInstanceDynamic*> MeshMIDs;
+
+public:
+	UPROPERTY(BlueprintAssignable, Category = "Game|Damage")
+	FConfirmDamageSignature OnConfirmDamage;
 
 public:
 	// Return the first person mesh
