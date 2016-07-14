@@ -300,7 +300,7 @@ float ASurvivalPlayerCharacter::TakeDamage(float Damage, FDamageEvent const& Dam
 		}
 	}
 
-	if (Health > 0.0f)
+	if (TakenDamage > 0.0f && Health > 0.0f)
 	{
 		Health = FMath::Max(0.0f, Health - TakenDamage);
 
