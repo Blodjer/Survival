@@ -67,7 +67,12 @@ void ASurvivalGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &O
 	DOREPLIFETIME(ASurvivalGameState, MatchTimeStartOffset);
 
 	DOREPLIFETIME_CONDITION(ASurvivalGameState, GameMode_LengthOfDay, COND_InitialOnly);
+
+#if !UE_BUILD_SHIPPING
+	DOREPLIFETIME(ASurvivalGameState, GameMode_StartTimeOfDay);
+#else
 	DOREPLIFETIME_CONDITION(ASurvivalGameState, GameMode_StartTimeOfDay, COND_InitialOnly);
+#endif
 
 	DOREPLIFETIME_CONDITION(ASurvivalGameState, GameMode_Teams, COND_InitialOnly);
 
