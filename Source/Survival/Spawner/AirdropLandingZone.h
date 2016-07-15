@@ -17,9 +17,6 @@ public:
 	virtual void BeginPlay() override;
 
 #if WITH_EDITOR
-	UPROPERTY(Transient, EditAnywhere, Category = Debug)
-	bool bShowHelper;
-
 	virtual void Tick(float DeltaSeconds) override;
 
 	virtual bool ShouldTickIfViewportsOnly() const override;
