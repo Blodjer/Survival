@@ -9,9 +9,11 @@ AWeaponProjectile::AWeaponProjectile()
 {
 	// Create the sphere collision
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>("CollisionComponent");
-	CollisionComponent->InitSphereRadius(2.0f);
+	CollisionComponent->InitSphereRadius(1.0f);
 	CollisionComponent->SetCollisionProfileName("Projectile");
 	CollisionComponent->bTraceComplexOnMove = true;
+	CollisionComponent->AlwaysLoadOnServer = true;
+	CollisionComponent->AlwaysLoadOnClient = true;
 	RootComponent = CollisionComponent;
 
 	ParticleSystem = CreateDefaultSubobject<UParticleSystemComponent>("ParticleSystem");
@@ -24,7 +26,7 @@ AWeaponProjectile::AWeaponProjectile()
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->ProjectileGravityScale = 0.0f;
 
-	Speed = 900.0f;
+	Speed = 750.0f;
 	LifeSpan = 4.0f;
 
 	// Update dependent variables
@@ -32,17 +34,17 @@ AWeaponProjectile::AWeaponProjectile()
 	ProjectileMovement->MaxSpeed = Speed * 100.0f;
 	InitialLifeSpan = LifeSpan;
 
-	bReplicates = true;
-	bReplicateMovement = true;
+	bReplicates = false;
+	bNetTemporary = true;
 
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 }
 
 #if WITH_EDITOR
 void AWeaponProjectile::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
-
+	
 	// Update dependent variables
 	ProjectileMovement->InitialSpeed = Speed * 100.0f;
 	ProjectileMovement->MaxSpeed = Speed * 100.0f;
@@ -73,6 +75,7 @@ void AWeaponProjectile::PostInitializeComponents()
 void AWeaponProjectile::InitProjectile(FVector& Direction)
 {
 	// Set the initial velocity
+	ProjectileMovement->bInitialVelocityInLocalSpace = false;
 	ProjectileMovement->Velocity = Direction * ProjectileMovement->InitialSpeed;
 }
 
@@ -88,6 +91,5 @@ void AWeaponProjectile::OnImpact(const FHitResult& HitResult)
 		HitResult.GetActor()->TakeDamage(Damage, PointDamage, GetInstigatorController(), this);
 	}
 
-	//Destroy(true);
-	SetLifeSpan(0.5f);
+	Destroy();
 }

@@ -112,6 +112,11 @@ protected:
 	void ServerShootProjectile_Implementation(FVector Origin, FVector_NetQuantizeNormal Direction);
 	bool ServerShootProjectile_Validate(FVector Origin, FVector_NetQuantizeNormal Direction) { return true; };
 
+	// [client] Spawn a simulated projectile
+	UFUNCTION(NetMulticast, Reliable)
+	void SimulateShootProjectile(FVector_NetQuantizeNormal Direction);
+	void SimulateShootProjectile_Implementation(FVector_NetQuantizeNormal Direction);
+
 	void StartSimulateFire();
 
 	void StopSimulateFire();
@@ -169,6 +174,9 @@ protected:
 
 	UFUNCTION(BlueprintPure, Category = Weapon)
 	virtual bool CanReload();
+
+	UFUNCTION(BlueprintPure, Category = Weapon)
+	FORCEINLINE FVector GetMuzzleLocation() const;
 
 public:
 	UFUNCTION(BlueprintCallable, Category = Weapon)

@@ -180,7 +180,7 @@ void AWeapon::HandleFiring()
 void AWeapon::ShootProjectile()
 {
 	FVector Direction = FMath::VRandCone(GetOwnerCharacter()->GetBaseAimRotation().Vector(), FMath::DegreesToRadians(GetSpreadBase() + CurrentSpread));
-	ServerShootProjectile(GetOwnerCharacter()->GetCamera()->GetComponentLocation(), Direction);
+	ServerShootProjectile(GetMuzzleLocation(), Direction);
 
 	if (!GetWorld()->IsServer())
 	{
@@ -208,23 +208,39 @@ void AWeapon::ServerShootProjectile_Implementation(FVector Origin, FVector_NetQu
 	if (ProjectileType == nullptr || GetWorld() == nullptr)
 		return;
 
+	FTransform SpawnTransform(Direction.Rotation(), Origin);
+
 	FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
 	SpawnParameters.Instigator = Instigator;
 	SpawnParameters.Owner = this;
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	AWeaponProjectile* NewProjectile = GetWorld()->SpawnActor<AWeaponProjectile>(ProjectileType, Origin, Direction.Rotation(), SpawnParameters);
+	AWeaponProjectile* NewProjectile = GetWorld()->SpawnActor<AWeaponProjectile>(ProjectileType, SpawnTransform, SpawnParameters);
 	if (NewProjectile)
 	{
-		NewProjectile->InitProjectile(Direction);
-
 		BurstCount++;
 		CurrentRoundsInMagazine--;
-
+		
+		SimulateShootProjectile(Direction);
 		SimulateFire();
 	}
 
 	LastShotTime = GetWorld()->GetTimeSeconds();
+}
+
+void AWeapon::SimulateShootProjectile_Implementation(FVector_NetQuantizeNormal Direction)
+{
+	if (HasAuthority() || ProjectileType == nullptr || GetWorld() == nullptr)
+		return;
+
+	FTransform SpawnTransform(Direction.Rotation(), GetMuzzleLocation());
+
+	FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
+	SpawnParameters.Owner = this;
+	SpawnParameters.Instigator = GetInstigator();
+	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	GetWorld()->SpawnActor<AWeaponProjectile>(ProjectileType, SpawnTransform, SpawnParameters);
 }
 
 void AWeapon::StartSimulateFire()
@@ -254,9 +270,6 @@ void AWeapon::SimulateFire()
 	}
 
 	UGameplayStatics::PlaySoundAtLocation(GetWorld(), ShotSound, GetActorLocation());
-
-	// TODO: Remove
-	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetOwnerCharacter()->GetBaseAimRotation().Vector() * 100000.0f, FColor::White, false, 0.15f);
 
 	OnSimulateFire();
 }
@@ -433,6 +446,11 @@ bool AWeapon::CanAim()
 bool AWeapon::CanReload()
 {
 	return GetOwnerCharacter() && !bIsReloading;
+}
+
+FVector AWeapon::GetMuzzleLocation() const
+{
+	return GetOwnerCharacter()->GetCamera()->GetComponentLocation();
 }
 
 void AWeapon::AttachSight(TSubclassOf<AWeaponSight> Sight)
