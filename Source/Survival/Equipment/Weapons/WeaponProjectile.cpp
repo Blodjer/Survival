@@ -81,7 +81,7 @@ void AWeaponProjectile::InitProjectile(FVector& Direction)
 
 void AWeaponProjectile::OnImpact(const FHitResult& HitResult)
 {
-	if (HasAuthority() && HitResult.GetActor() != nullptr)
+	if (HasAuthority() && GetWorld()->IsServer() && HitResult.GetActor() != nullptr)
 	{
 		FPointDamageEvent PointDamage = FPointDamageEvent();
 		PointDamage.Damage = Damage;
