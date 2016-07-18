@@ -12,6 +12,7 @@ AWeaponProjectile::AWeaponProjectile()
 	CollisionComponent->InitSphereRadius(1.0f);
 	CollisionComponent->SetCollisionProfileName("Projectile");
 	CollisionComponent->bTraceComplexOnMove = true;
+	CollisionComponent->bReturnMaterialOnMove = true;
 	CollisionComponent->AlwaysLoadOnServer = true;
 	CollisionComponent->AlwaysLoadOnClient = true;
 	RootComponent = CollisionComponent;
