@@ -288,7 +288,7 @@ void AWeapon::StartAiming()
 	FRotator WeaponBaseRotation = FRotator(0.0f, -90.0f, 0.0f);
 	GetMesh1P()->SetRelativeLocationAndRotation(WeaponBaseRotation.RotateVector(SightConfig.CenterLocation) * FVector(1,-1,-1) + FVector(SightConfig.CameraDistance, 0.0f, 0.0f), WeaponBaseRotation);
 
-	GetOwnerCharacter()->GetMesh1P()->SetVisibility(false);
+	GetOwnerCharacter()->GetMesh1P()->SetVisibility(false, true);
 
 	GetWorld()->Exec(GetWorld(), TEXT("SetMouseSensitivity 0.04"));
 
@@ -307,7 +307,7 @@ void AWeapon::StopAiming()
 
 	GetMesh1P()->AttachToComponent(GetOwnerCharacter()->GetMesh1P(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, "WeaponSocket");
 
-	GetOwnerCharacter()->GetMesh1P()->SetVisibility(true);
+	GetOwnerCharacter()->GetMesh1P()->SetVisibility(true, true);
 
 	GetWorld()->Exec(GetWorld(), TEXT("SetMouseSensitivityToDefault"));
 
