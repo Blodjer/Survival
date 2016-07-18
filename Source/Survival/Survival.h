@@ -7,7 +7,7 @@
 #include "UnrealNetwork.h"
 #include "Online.h"
 
-#include "SurvivalStructs.h"
+#include "SurvivalTypes.h"
 
 #include "Survival/Components/Interactable.h"
 

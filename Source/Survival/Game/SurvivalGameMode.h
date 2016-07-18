@@ -3,7 +3,7 @@
 #pragma once
 
 #include "GameFramework/GameMode.h"
-#include "../SurvivalStructs.h"
+#include "../SurvivalTypes.h"
 #include "SurvivalGameMode.generated.h"
 
 USTRUCT(BlueprintType)

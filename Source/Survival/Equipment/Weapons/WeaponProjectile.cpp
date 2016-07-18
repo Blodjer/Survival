@@ -91,5 +91,51 @@ void AWeaponProjectile::OnImpact(const FHitResult& HitResult)
 		HitResult.GetActor()->TakeDamage(Damage, PointDamage, GetInstigatorController(), this);
 	}
 
+	UPhysicalMaterial* HitPhysicalMaterial = HitResult.PhysMaterial.Get();
+	EPhysicalSurface HitSurfaceType = UPhysicalMaterial::DetermineSurfaceType(HitPhysicalMaterial);
+
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), GetImpactVFX(HitSurfaceType), HitResult.ImpactPoint, HitResult.ImpactNormal.Rotation(), true);
+	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), GetImpactSFX(HitSurfaceType), HitResult.ImpactPoint, HitResult.ImpactNormal.Rotation());
+
 	Destroy();
+}
+
+UParticleSystem* AWeaponProjectile::GetImpactVFX(TEnumAsByte<EPhysicalSurface> SurfaceType) const
+{
+	UParticleSystem* ParticleSystem = nullptr;
+
+	switch (SurfaceType)
+	{
+		case SURFACE_Default:	ParticleSystem = ImpactVFX.Default; break;
+		case SURFACE_Wood:		ParticleSystem = ImpactVFX.Wood; break;
+		case SURFACE_Stone:		ParticleSystem = ImpactVFX.Stone; break;
+		case SURFACE_Dirt:		ParticleSystem = ImpactVFX.Dirt; break;
+		case SURFACE_Grass:		ParticleSystem = ImpactVFX.Grass; break;
+		case SURFACE_Water:		ParticleSystem = ImpactVFX.Water; break;
+		case SURFACE_Flesh:		ParticleSystem = ImpactVFX.Flesh; break;
+		case SURFACE_Metal:		ParticleSystem = ImpactVFX.Metal; break;
+		default:				ParticleSystem = ImpactVFX.Default; break;
+	}
+
+	return ParticleSystem;
+}
+
+USoundBase* AWeaponProjectile::GetImpactSFX(TEnumAsByte<EPhysicalSurface> SurfaceType) const
+{
+	USoundBase* Sound = nullptr;
+
+	switch (SurfaceType)
+	{
+		case SURFACE_Default:	Sound = ImpactSFX.Default; break;
+		case SURFACE_Wood:		Sound = ImpactSFX.Wood; break;
+		case SURFACE_Stone:		Sound = ImpactSFX.Stone; break;
+		case SURFACE_Dirt:		Sound = ImpactSFX.Dirt; break;
+		case SURFACE_Grass:		Sound = ImpactSFX.Grass; break;
+		case SURFACE_Water:		Sound = ImpactSFX.Water; break;
+		case SURFACE_Flesh:		Sound = ImpactSFX.Flesh; break;
+		case SURFACE_Metal:		Sound = ImpactSFX.Metal; break;
+		default:				Sound = ImpactSFX.Default; break;
+	}
+
+	return Sound;
 }

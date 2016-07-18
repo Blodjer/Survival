@@ -3,7 +3,24 @@
 #pragma once
 
 #include "Engine.h"
-#include "SurvivalStructs.generated.h"
+#include "SurvivalTypes.generated.h"
+
+/*
+	DEFINES
+*/
+
+#define SURFACE_Default		SurfaceType_Default
+#define SURFACE_Wood		SurfaceType1
+#define SURFACE_Stone		SurfaceType2
+#define SURFACE_Dirt		SurfaceType3
+#define SURFACE_Grass		SurfaceType4
+#define SURFACE_Water		SurfaceType5
+#define SURFACE_Flesh		SurfaceType6
+#define SURFACE_Metal		SurfaceType7
+
+/*
+	STRUCTS
+*/
 
 USTRUCT(BlueprintType)
 struct SURVIVAL_API FTeamInfo
@@ -165,4 +182,64 @@ struct SURVIVAL_API FFloatSpan
 	{
 		return FMath::RandRange(Min, Max);
 	}
+};
+
+USTRUCT(BlueprintType)
+struct SURVIVAL_API FPhysicalVFX
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, Category = Visual)
+	UParticleSystem* Default;
+
+	UPROPERTY(EditDefaultsOnly, Category = Visual)
+	UParticleSystem* Wood;
+
+	UPROPERTY(EditDefaultsOnly, Category = Visual)
+	UParticleSystem* Stone;
+
+	UPROPERTY(EditDefaultsOnly, Category = Visual)
+	UParticleSystem* Dirt;
+
+	UPROPERTY(EditDefaultsOnly, Category = Visual)
+	UParticleSystem* Grass;
+
+	UPROPERTY(EditDefaultsOnly, Category = Visual)
+	UParticleSystem* Water;
+
+	UPROPERTY(EditDefaultsOnly, Category = Visual)
+	UParticleSystem* Flesh;
+
+	UPROPERTY(EditDefaultsOnly, Category = Visual)
+	UParticleSystem* Metal;
+};
+
+USTRUCT(BlueprintType)
+struct SURVIVAL_API FPhysicalSFX
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+	USoundBase* Default;
+
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+	USoundBase* Wood;
+
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+	USoundBase* Stone;
+
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+	USoundBase* Dirt;
+
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+	USoundBase* Grass;
+
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+	USoundBase* Water;
+
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+	USoundBase* Flesh;
+
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+	USoundBase* Metal;
 };

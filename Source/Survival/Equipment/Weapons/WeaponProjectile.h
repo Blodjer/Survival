@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "../../SurvivalTypes.h"
 #include "GameFramework/Actor.h"
 #include "WeaponProjectile.generated.h"
 
@@ -38,6 +39,19 @@ protected:
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = Projectile)
 	float Damage;
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Impact)
+	FPhysicalVFX ImpactVFX;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Impact)
+	FPhysicalSFX ImpactSFX;
+
+	UFUNCTION()
+	UParticleSystem* GetImpactVFX(TEnumAsByte<EPhysicalSurface> SurfaceType) const;
+
+	UFUNCTION()
+	USoundBase* GetImpactSFX(TEnumAsByte<EPhysicalSurface> SurfaceType) const;
 
 private:
 	// Projectile movement
