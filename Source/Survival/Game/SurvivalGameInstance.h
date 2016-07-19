@@ -7,6 +7,7 @@
 #include "FindSessionsCallbackProxy.h"
 #include "SurvivalGameInstance.generated.h"
 
+#define GAME_SEARCH_KEAYWORD FString("FireScouts")
 
 UCLASS(config=Engine)
 class SURVIVAL_API USurvivalGameInstance : public UGameInstance

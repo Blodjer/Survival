@@ -47,6 +47,7 @@ bool USurvivalGameInstance::CreateSession(bool bIsLAN, bool bIsPresence, FString
 			SessionSettings->bAllowJoinViaPresenceFriendsOnly = false;
 
 			// Fill advanced Session Settings
+			SessionSettings->Set(SEARCH_KEYWORDS, GAME_SEARCH_KEAYWORD, EOnlineDataAdvertisementType::ViaOnlineService);
 			SessionSettings->Set(SETTING_MAPNAME, MapName, EOnlineDataAdvertisementType::ViaOnlineService);
 
 			// Set the CreateSession delegate handle
@@ -137,12 +138,12 @@ bool USurvivalGameInstance::FindSessions(bool bIsLAN, bool bIsPresence, FString 
 			SessionSearch->MaxSearchResults = MaxSearchResults;
 			SessionSearch->PingBucketSize = PingBucketSize;
 
+			SessionSearch->QuerySettings.Set(SEARCH_KEYWORDS, GAME_SEARCH_KEAYWORD, EOnlineComparisonOp::Equals);
+			SessionSearch->QuerySettings.Set(SETTING_MAPNAME, MapName, EOnlineComparisonOp::Equals);
 			if (bIsPresence)
 			{
 				SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, bIsPresence, EOnlineComparisonOp::Equals);
 			}
-
-			SessionSearch->QuerySettings.Set(SETTING_MAPNAME, MapName, EOnlineComparisonOp::Equals);
 
 			// Set the FindSessions delegate handle
 			OnFindSessionsCompleteDelegateHandle = Sessions->AddOnFindSessionsCompleteDelegate_Handle(OnFindSessionsCompleteDelegate);
