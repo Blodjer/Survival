@@ -754,9 +754,9 @@ void ASurvivalPlayerCharacter::DestroyInventory()
 
 	for (AHandheld* Handheld : HandheldInventory)
 	{
-		HandheldInventory.Remove(Handheld);
 		Handheld->Destroy();
 	}
+	HandheldInventory.Empty();
 
 	EquippedHandheld = nullptr;
 	PreviousEquippedHandheld = nullptr;
