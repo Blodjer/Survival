@@ -7,6 +7,7 @@
 APickupSpawner::APickupSpawner()
 {
 	PickupSpawnerComponent = CreateDefaultSubobject<UPickupSpawnerComponent>("PickupSpawner");
+	PickupSpawnerComponent->SetMobility(EComponentMobility::Static);
 	RootComponent = PickupSpawnerComponent;
 
 	bNetLoadOnClient = false;

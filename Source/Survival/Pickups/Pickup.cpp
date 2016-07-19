@@ -17,7 +17,7 @@ APickup::APickup()
 
 	bReplicates = true;
 
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 }
 
 void APickup::Interact_Implementation(ASurvivalPlayerCharacter* PlayerCharacter)
