@@ -230,7 +230,7 @@ void AWeapon::ServerShootProjectile_Implementation(FVector Origin, FVector_NetQu
 
 void AWeapon::SimulateShootProjectile_Implementation(FVector_NetQuantizeNormal Direction)
 {
-	if (HasAuthority() || ProjectileType == nullptr || GetWorld() == nullptr)
+	if (HasAuthority() || GetOwnerCharacter() == nullptr || ProjectileType == nullptr || GetWorld() == nullptr)
 		return;
 
 	FTransform SpawnTransform(Direction.Rotation(), GetMuzzleLocation());
@@ -450,7 +450,7 @@ bool AWeapon::CanReload()
 
 FVector AWeapon::GetMuzzleLocation() const
 {
-	return GetOwnerCharacter()->GetCamera()->GetComponentLocation();
+	return GetOwnerCharacter() ? GetOwnerCharacter()->GetCamera()->GetComponentLocation() : FVector::ZeroVector;
 }
 
 void AWeapon::AttachSight(TSubclassOf<AWeaponSight> Sight)
