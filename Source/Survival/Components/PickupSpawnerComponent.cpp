@@ -49,7 +49,10 @@ void UPickupSpawnerComponent::TickComponent(float DeltaTime, ELevelTick TickType
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	UpdateVisualizeBox();
+	if (TickType == ELevelTick::LEVELTICK_ViewportsOnly)
+	{
+		UpdateVisualizeBox();
+	}
 }
 
 void UPickupSpawnerComponent::UpdateVisualizeSprite()
@@ -71,7 +74,7 @@ void UPickupSpawnerComponent::UpdateVisualizeBox()
 		return;
 
 	FVector MaxExtend = FVector::ZeroVector;
-	for (FPickupSpawnerItem Item : SpawnList)
+	for (FPickupSpawnerItem& Item : SpawnList)
 	{
 		if (Item.Pickup && Item.Pickup.GetDefaultObject()->GetPickupMesh())
 		{
