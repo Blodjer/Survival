@@ -70,23 +70,26 @@ void UPickupSpawnerComponent::UpdateVisualizeSprite()
 
 void UPickupSpawnerComponent::UpdateVisualizeBox()
 {
-	if (GetWorld() && GetWorld()->bBegunPlay)
+	if (GetWorld() == nullptr || GetWorld()->bBegunPlay || GetWorld()->ViewLocationsRenderedLastFrame.Num() == 0)
 		return;
-
-	FVector MaxExtend = FVector::ZeroVector;
-	for (FPickupSpawnerItem& Item : SpawnList)
+	
+	if (FVector::DistSquared(GetComponentLocation(), GetWorld()->ViewLocationsRenderedLastFrame[0]) < 8500000)
 	{
-		if (Item.Pickup && Item.Pickup.GetDefaultObject()->GetPickupMesh())
+		FVector MaxExtend = FVector::ZeroVector;
+		for (FPickupSpawnerItem& Item : SpawnList)
 		{
-			FVector Extend = Item.Pickup.GetDefaultObject()->GetPickupMesh()->CalcBounds(FTransform(GetComponentLocation())).BoxExtent;
-			MaxExtend.X = FMath::Max(MaxExtend.X, Extend.X);
-			MaxExtend.Y = FMath::Max(MaxExtend.Y, Extend.Y);
-			MaxExtend.Z = FMath::Max(MaxExtend.Z, Extend.Z);
+			if (Item.Pickup && Item.Pickup.GetDefaultObject()->GetPickupMesh())
+			{
+				FVector Extend = Item.Pickup.GetDefaultObject()->GetPickupMesh()->CalcBounds(FTransform(GetComponentLocation())).BoxExtent;
+				MaxExtend.X = FMath::Max(MaxExtend.X, Extend.X);
+				MaxExtend.Y = FMath::Max(MaxExtend.Y, Extend.Y);
+				MaxExtend.Z = FMath::Max(MaxExtend.Z, Extend.Z);
+			}
 		}
-	}
 
-	FVector Location = GetComponentLocation() + GetComponentRotation().RotateVector(FVector(0, 0, MaxExtend.Z));
-	DrawDebugSolidBox(GetWorld(), Location, MaxExtend, GetComponentRotation().Quaternion(), FColor(255, 0, 255, 10), false);
+		FVector Location = GetComponentLocation() + GetComponentRotation().RotateVector(FVector(0, 0, MaxExtend.Z));
+		DrawDebugSolidBox(GetWorld(), Location, MaxExtend, GetComponentRotation().Quaternion(), FColor(255, 0, 255, 10), false);
+	}
 }
 #endif
 
