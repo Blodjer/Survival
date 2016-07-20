@@ -136,9 +136,13 @@ void UPickupSpawnerComponent::Spawn()
 		APickup* Pickup = GetWorld()->SpawnActor<APickup>(SpawnPickupClass, GetComponentLocation(), GetComponentRotation(), SpawnParameters);
 		if (Pickup)
 		{
-			if (GetAttachParent() != nullptr && GetAttachParent()->GetAttachmentRootActor()->bNetLoadOnClient)
+			if (GetOwner()->bNetLoadOnClient && GetAttachParent())
 			{
-				Pickup->AttachToComponent(GetAttachParent(), FAttachmentTransformRules(EAttachmentRule::KeepRelative, true));
+				Pickup->AttachToComponent(this, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true));
+			}
+			else if (GetOwner()->GetRootComponent()->GetAttachParent() && GetOwner()->GetRootComponent()->GetAttachParent()->GetOwner()->bNetLoadOnClient)
+			{
+				Pickup->AttachToComponent(GetOwner()->GetRootComponent()->GetAttachParent(), FAttachmentTransformRules(EAttachmentRule::KeepWorld, true));
 			}
 		}
 	}
