@@ -257,6 +257,8 @@ private:
 	void ServerSetSprint_Implementation(bool bShouldSprint);
 	bool ServerSetSprint_Validate(bool bShouldSprint) { return true; };
 
+	virtual void Jump() override;
+
 	// Toggle crouching
 	UFUNCTION(BlueprintCallable, Category = Crouch)
 	void ToggleCrouch();

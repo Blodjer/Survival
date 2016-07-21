@@ -634,6 +634,13 @@ void ASurvivalPlayerCharacter::ServerSetSprint_Implementation(bool bShouldSprint
 	}
 }
 
+void ASurvivalPlayerCharacter::Jump()
+{
+	StopCrouch();
+
+	Super::Jump();
+}
+
 void ASurvivalPlayerCharacter::ToggleCrouch()
 {
 	if (bIsCrouched)
