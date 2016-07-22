@@ -147,6 +147,10 @@ void ASurvivalPlayerCharacter::SetupPlayerInputComponent(class UInputComponent* 
 	InputComponent->BindAction("NextHandheld", IE_Pressed, this, &ASurvivalPlayerCharacter::NextHandheld);
 	InputComponent->BindAction("PreviousHandheld", IE_Pressed, this, &ASurvivalPlayerCharacter::PreviousHandheld);
 
+	InputComponent->BindAction("EquipSlot_1", IE_Pressed, this, &ASurvivalPlayerCharacter::EquipSlot<0>);
+	InputComponent->BindAction("EquipSlot_2", IE_Pressed, this, &ASurvivalPlayerCharacter::EquipSlot<1>);
+	InputComponent->BindAction("EquipSlot_3", IE_Pressed, this, &ASurvivalPlayerCharacter::EquipSlot<2>);
+
 	InputComponent->BindAction("DropHandheld", IE_Pressed, this, &ASurvivalPlayerCharacter::DropHandheld);
 
 	InputComponent->BindAction("Flashlight", IE_Pressed, this, &ASurvivalPlayerCharacter::ToggleFlashlight);
@@ -859,6 +863,17 @@ void ASurvivalPlayerCharacter::PreviousHandheld()
 		const int32 HandheldIdx = HandheldInventory.IndexOfByKey(EquippedHandheld);
 		AHandheld* NextHandheld = HandheldInventory[(HandheldIdx - 1 + HandheldInventory.Num()) % HandheldInventory.Num()];
 		Equip(NextHandheld);
+	}
+}
+
+void ASurvivalPlayerCharacter::EquipSlot(int32 SlotIndex)
+{
+	if (HandheldInventorySlots.Slots.Num() > SlotIndex)
+	{
+		if (HandheldInventorySlots.Slots[SlotIndex].AssignedHandheld != nullptr)
+		{
+			Equip(HandheldInventorySlots.Slots[SlotIndex].AssignedHandheld);
+		}
 	}
 }
 

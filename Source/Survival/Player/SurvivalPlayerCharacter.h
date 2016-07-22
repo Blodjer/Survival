@@ -303,6 +303,14 @@ private:
 
 	void PreviousHandheld();
 
+	void EquipSlot(int32 SlotIndex);
+
+	template<int32 SlotIndex>
+	void EquipSlot()
+	{
+		EquipSlot(SlotIndex);
+	}
+
 	void UpdateTeamColors();
 
 	UFUNCTION(BlueprintCallable, Category = Interactable)
