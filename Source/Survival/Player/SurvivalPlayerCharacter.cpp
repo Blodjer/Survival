@@ -686,7 +686,7 @@ void ASurvivalPlayerCharacter::ToggleFlashlight()
 
 void ASurvivalPlayerCharacter::SetFlashlightOn(bool bOn)
 {
-	Flashlight->SetVisibility(bOn);
+	Flashlight->SetVisibility(bOn, true);
 	bIsFlashlightOn = bOn;
 
 	if (!HasAuthority())

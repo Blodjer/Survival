@@ -56,7 +56,7 @@ void UFlashingPointLightComponent::StopOff()
 
 void UFlashingPointLightComponent::ToggleLight()
 {
-	ToggleVisibility();
+	ToggleVisibility(true);
 
 	if (FlashingPattern.Num() > 0)
 	{
