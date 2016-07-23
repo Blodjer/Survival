@@ -111,15 +111,16 @@ void AHandheld::Drop(bool bIsWaste)
 		if (HasAuthority() && GetWorld())
 		{
 			FTransform PickupTransform(GetActorRotation(), GetActorLocation());
-			APickup* Pickup = GetWorld()->SpawnActorDeferred<APickup>(PickupClass, PickupTransform, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn);
+			APickup* Pickup = GetWorld()->SpawnActorDeferred<APickup>(PickupClass, PickupTransform, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 			if (Pickup)
 			{
-				FVector PickupVelocity = FVector::ZeroVector;
+				FVector DropVelocity = FVector::ZeroVector;
 				if (GetOwnerCharacter())
 				{
-					PickupVelocity = GetOwnerCharacter()->GetVelocity() + GetOwnerCharacter()->GetControlRotation().Vector() * 180.0f;
+					DropVelocity = GetOwnerCharacter()->GetVelocity() + GetOwnerCharacter()->GetControlRotation().Vector() * 200.0f;
+					DropVelocity += FVector(0, 0, 80.0f);
 				}
-				Pickup->StartSimulatePhysics(PickupVelocity);
+				Pickup->StartSimulatePhysics(DropVelocity);
 				UGameplayStatics::FinishSpawningActor(Pickup, PickupTransform);
 			}
 		}
