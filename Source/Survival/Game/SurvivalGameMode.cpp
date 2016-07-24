@@ -17,6 +17,8 @@ ASurvivalGameMode::ASurvivalGameMode()
 	MinRespawnDelay = 10.0f;
 	MinDieDelay = 10.0f;
 
+	bDelayedStart = true;
+
 	DefaultPlayerName = FText::FromString("Survivor");
 
 	InactivePlayerStateLifeSpan = 150.0f;
@@ -68,6 +70,11 @@ void ASurvivalGameMode::PostLogin(APlayerController* NewPlayer)
 		{
 			SurvivalPlayerState->AssignToTeam(ChooseTeam(SurvivalPlayerState));
 		}
+	}
+
+	if (GetMatchState() == MatchState::WaitingToStart)
+	{
+		RestartPlayer(NewPlayer);
 	}
 
 	Super::PostLogin(NewPlayer);
@@ -228,6 +235,19 @@ void ASurvivalGameMode::Tick(float DeltaTime)
 			}
 		}
 	}
+}
+
+bool ASurvivalGameMode::ReadyToStartMatch_Implementation()
+{
+	if (GetMatchState() != MatchState::WaitingToStart)
+		return false;
+
+	if (GetNumPlayers() >= MaxPlayers)
+	{
+		return true;
+	}
+
+	return Super::ReadyToStartMatch_Implementation();
 }
 
 void ASurvivalGameMode::HandleMatchHasStarted()
