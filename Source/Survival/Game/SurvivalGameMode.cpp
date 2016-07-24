@@ -17,6 +17,10 @@ ASurvivalGameMode::ASurvivalGameMode()
 	MinRespawnDelay = 10.0f;
 	MinDieDelay = 10.0f;
 
+	DefaultPlayerName = FText::FromString("Survivor");
+
+	InactivePlayerStateLifeSpan = 150.0f;
+
 	Teams.Add(FTeamInfo("Alpha", FColor::Blue));
 	Teams.Add(FTeamInfo("Bravo", FColor::Red));
 
@@ -37,6 +41,13 @@ void ASurvivalGameMode::PostInitializeComponents()
 	DetermineActiveCampfireCluster();
 }
 
+void ASurvivalGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
+{
+	Super::InitGame(MapName, Options, ErrorMessage);
+
+	MaxPlayers = UGameplayStatics::GetIntOption(Options, FString("MaxPlayers"), -1);
+}
+
 void ASurvivalGameMode::InitGameState()
 {
 	Super::InitGameState();
@@ -55,11 +66,77 @@ void ASurvivalGameMode::PostLogin(APlayerController* NewPlayer)
 		ASurvivalPlayerState* SurvivalPlayerState = Cast<ASurvivalPlayerState>(NewPlayer->PlayerState);
 		if (SurvivalPlayerState)
 		{
-			SurvivalPlayerState->AssignToTeam(GetNumPlayers() % Teams.Num());
+			SurvivalPlayerState->AssignToTeam(ChooseTeam(SurvivalPlayerState));
 		}
 	}
 
 	Super::PostLogin(NewPlayer);
+}
+
+int32 ASurvivalGameMode::ChooseTeam(APlayerState* PlayerState)
+{
+	TArray<int32> PlayersInTeam;
+	PlayersInTeam.AddZeroed(Teams.Num());
+
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		ASurvivalPlayerController* SurvivalPlayerController = Cast<ASurvivalPlayerController>(Iterator->Get());
+		if (SurvivalPlayerController)
+		{
+			if (SurvivalPlayerController->PlayerState == PlayerState)
+				continue;
+
+			ASurvivalPlayerState* SurvivalPlayerState = Cast<ASurvivalPlayerState>(SurvivalPlayerController->PlayerState);
+			if (SurvivalPlayerState)
+			{
+				PlayersInTeam[SurvivalPlayerState->GetTeamIdx()]++;
+			}
+		}
+	}
+
+	int32 TeamIdx = 0;
+	for (int32 i = 0; i < PlayersInTeam.Num(); i++)
+	{
+		if (PlayersInTeam[i] < PlayersInTeam[TeamIdx])
+		{
+			TeamIdx = i;
+		}
+	}
+
+	return TeamIdx;
+}
+
+int32 ASurvivalGameMode::ChooseTeam(APlayerState* PlayerState, int32 PreferedTeam)
+{
+	if (PreferedTeam >= 0 && PreferedTeam < Teams.Num() && MaxPlayers > 0)
+	{
+		TArray<int32> PlayersInTeam;
+		PlayersInTeam.AddZeroed(Teams.Num());
+
+		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+		{
+			ASurvivalPlayerController* SurvivalPlayerController = Cast<ASurvivalPlayerController>(Iterator->Get());
+			if (SurvivalPlayerController)
+			{
+				if (SurvivalPlayerController->PlayerState == PlayerState)
+					continue;
+
+				ASurvivalPlayerState* SurvivalPlayerState = Cast<ASurvivalPlayerState>(SurvivalPlayerController->PlayerState);
+				if (SurvivalPlayerState)
+				{
+					PlayersInTeam[SurvivalPlayerState->GetTeamIdx()]++;
+				}
+			}
+		}
+
+		int32 MaxPlayersPerTeam = MaxPlayers / Teams.Num();
+		if (PlayersInTeam[PreferedTeam] < MaxPlayersPerTeam)
+		{
+			return PreferedTeam;
+		}
+	}
+
+	return ChooseTeam(PlayerState);
 }
 
 AActor* ASurvivalGameMode::ChoosePlayerStart_Implementation(AController* Player)
@@ -134,26 +211,29 @@ void ASurvivalGameMode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	int32 WinnerTeamIdx;
-	if (IsMatchInProgress() && DetermineMatchWinner(WinnerTeamIdx))
+	if (IsMatchInProgress())
 	{
-		EndMatch();
-
-		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+		int32 WinnerTeamIdx;
+		if (DetermineMatchWinner(WinnerTeamIdx))
 		{
-			ASurvivalPlayerController* SurvivalPlayerController = Cast<ASurvivalPlayerController>(Iterator->Get());
-			if (SurvivalPlayerController)
+			EndMatch();
+
+			for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 			{
-				SurvivalPlayerController->MatchHasEnded(WinnerTeamIdx);
+				ASurvivalPlayerController* SurvivalPlayerController = Cast<ASurvivalPlayerController>(Iterator->Get());
+				if (SurvivalPlayerController)
+				{
+					SurvivalPlayerController->MatchHasEnded(WinnerTeamIdx);
+				}
 			}
 		}
 	}
 }
 
-void ASurvivalGameMode::StartMatch()
+void ASurvivalGameMode::HandleMatchHasStarted()
 {
-	Super::StartMatch();
-
+	Super::HandleMatchHasStarted();
+	
 	GetWorldTimerManager().SetTimer(TimerHandle_SendAirdrop, this, &ASurvivalGameMode::DetermineNextAirdrop, AirdropInterval.Random(), false);
 }
 

@@ -44,9 +44,15 @@ public:
 
 	virtual void PostInitializeComponents() override;
 
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+
 	virtual void InitGameState() override;
 
 	virtual void PostLogin(APlayerController* NewPlayer) override;
+
+	int32 ChooseTeam(APlayerState* PlayerState);
+	
+	int32 ChooseTeam(APlayerState* PlayerState, int32 PreferedTeam);
 
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
@@ -54,7 +60,7 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void StartMatch() override;
+	virtual void HandleMatchHasStarted() override;
 
 public:
 	void Killed(const UDamageType* DamageType, AController* Killer, AController* KilledPlayer);
@@ -108,6 +114,9 @@ protected:
 	TArray<class AAirdropLandingZone*> AirdropLandingZones;
 
 private:
+	UPROPERTY(BlueprintReadOnly, Category = GameMode, meta = (AllowPrivateAccess = "true"))
+	int32 MaxPlayers;
+	
 	UPROPERTY(BlueprintReadOnly, Category = GameMode, meta = (AllowPrivateAccess = "true"))
 	int32 ActiveCampfireCluster;
 

@@ -3,10 +3,29 @@
 #include "Survival.h"
 #include "SurvivalPlayerState.h"
 #include "Survival/Game/SurvivalGameState.h"
+#include "Survival/Game/SurvivalGameMode.h"
 
 ASurvivalPlayerState::ASurvivalPlayerState()
 {
 	TeamIdx = 0;
+}
+
+void ASurvivalPlayerState::CopyProperties(APlayerState* NewPlayerState)
+{
+	Super::CopyProperties(NewPlayerState);
+
+	ASurvivalPlayerState* NewSurvivalPlayerState = Cast<ASurvivalPlayerState>(NewPlayerState);
+	if (NewSurvivalPlayerState)
+	{
+		if (GetWorld() && GetWorld()->GetAuthGameMode())
+		{
+			ASurvivalGameMode* SurvivalGameMode = Cast<ASurvivalGameMode>(GetWorld()->GetAuthGameMode());
+			if (SurvivalGameMode)
+			{
+				NewSurvivalPlayerState->AssignToTeam(SurvivalGameMode->ChooseTeam(this, TeamIdx));
+			}
+		}
+	}
 }
 
 void ASurvivalPlayerState::AssignToTeam(int32 Number)

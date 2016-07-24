@@ -12,6 +12,8 @@ class SURVIVAL_API ASurvivalPlayerState : public APlayerState
 	
 public:
 	ASurvivalPlayerState();
+
+	virtual void CopyProperties(APlayerState* NewPlayerState) override;
 	
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Team)
 	void AssignToTeam(int32 Number);
