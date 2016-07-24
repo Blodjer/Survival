@@ -2,6 +2,7 @@
 
 #include "Survival.h"
 #include "SurvivalGameState.h"
+#include "Survival/Level/SurvivalLevelScriptActor.h"
 
 
 ASurvivalGameState::ASurvivalGameState()
@@ -17,6 +18,15 @@ void ASurvivalGameState::HandleMatchHasStarted()
 	{
 		UpdateServerTimeSeconds();
 		MatchTimeStartOffset = GetServerWorldTimeSeconds();
+	}
+
+	if (GetLevel()->LevelScriptActor)
+	{
+		ASurvivalLevelScriptActor* SurvivalLevelScriptActor = Cast<ASurvivalLevelScriptActor>(GetLevel()->LevelScriptActor);
+		if (SurvivalLevelScriptActor)
+		{
+			SurvivalLevelScriptActor->HandleMatchHasStarted();
+		}
 	}
 }
 
