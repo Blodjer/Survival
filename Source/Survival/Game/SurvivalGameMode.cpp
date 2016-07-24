@@ -11,8 +11,7 @@
 
 ASurvivalGameMode::ASurvivalGameMode()
 {
-	LengthOfDay = 60.0f;
-	StartTimeOfDay = 8.5f;
+	StartMatchDelay = 30.0f;
 
 	MinRespawnDelay = 10.0f;
 	MinDieDelay = 10.0f;
@@ -22,6 +21,9 @@ ASurvivalGameMode::ASurvivalGameMode()
 	DefaultPlayerName = FText::FromString("Survivor");
 
 	InactivePlayerStateLifeSpan = 150.0f;
+
+	LengthOfDay = 60.0f;
+	StartTimeOfDay = 8.5f;
 
 	Teams.Add(FTeamInfo("Alpha", FColor::Blue));
 	Teams.Add(FTeamInfo("Bravo", FColor::Red));
@@ -72,9 +74,14 @@ void ASurvivalGameMode::PostLogin(APlayerController* NewPlayer)
 		}
 	}
 
-	if (GetMatchState() == MatchState::WaitingToStart)
+	if (!HasMatchStarted())
 	{
 		RestartPlayer(NewPlayer);
+
+		if (NumPlayers >= MaxPlayers && !GetWorldTimerManager().IsTimerActive(TimerHandle_MatchStartCountdown))
+		{
+			GetWorldTimerManager().SetTimer(TimerHandle_MatchStartCountdown, StartMatchDelay, false);
+		}
 	}
 
 	Super::PostLogin(NewPlayer);
@@ -242,7 +249,7 @@ bool ASurvivalGameMode::ReadyToStartMatch_Implementation()
 	if (GetMatchState() != MatchState::WaitingToStart)
 		return false;
 
-	if (GetNumPlayers() >= MaxPlayers)
+	if (NumPlayers >= MaxPlayers && GetWorldTimerManager().GetTimerRemaining(TimerHandle_MatchStartCountdown) <= 0.0f)
 	{
 		return true;
 	}

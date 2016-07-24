@@ -86,6 +86,10 @@ protected:
 	void SendAirdrop(TSubclassOf<class AAirdropSupplyBox> Payload, class AAirdropLandingZone* LandingZone);
 
 protected:
+	// Countdown length to delay the match start after enough players joined the game
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0.0", UIMin = "0.0"), Category = GameMode)
+	float StartMatchDelay;
+
 	// The length of one day in seconds
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0.0", UIMin = "0.0"), Category = TimeOfDay)
 	float LengthOfDay;
@@ -124,6 +128,8 @@ private:
 
 	TMap<TSubclassOf<AAirdropSupplyBox>, int32> SuppliesProbabilityModifier;
 
+	FTimerHandle TimerHandle_MatchStartCountdown;
+	
 	FTimerHandle TimerHandle_SendAirdrop;
 	
 };
