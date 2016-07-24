@@ -14,6 +14,8 @@ class SURVIVAL_API ASurvivalGameState : public AGameState
 public:
 	ASurvivalGameState();
 
+	virtual void HandleMatchHasStarted() override;
+
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = "GameState")
 	void SetMatchProperties(float LengthOfDay, float StartTimeOfDay, TArray<FTeamInfo> Teams);
 	

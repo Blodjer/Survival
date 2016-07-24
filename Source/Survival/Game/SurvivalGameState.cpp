@@ -9,6 +9,17 @@ ASurvivalGameState::ASurvivalGameState()
 	MatchTimeStartOffset = 0.0f;
 }
 
+void ASurvivalGameState::HandleMatchHasStarted()
+{
+	Super::HandleMatchHasStarted();
+
+	if (HasAuthority())
+	{
+		UpdateServerTimeSeconds();
+		MatchTimeStartOffset = GetServerWorldTimeSeconds();
+	}
+}
+
 void ASurvivalGameState::SetMatchProperties(float LengthOfDay, float StartTimeOfDay, TArray<FTeamInfo> Teams)
 {
 	GameMode_LengthOfDay = LengthOfDay;
@@ -19,7 +30,7 @@ void ASurvivalGameState::SetMatchProperties(float LengthOfDay, float StartTimeOf
 
 float ASurvivalGameState::GetMatchTime()
 {
-	return GetServerWorldTimeSeconds() - MatchTimeStartOffset;
+	return HasMatchStarted() ? GetServerWorldTimeSeconds() - MatchTimeStartOffset : 0.0f;
 }
 
 float ASurvivalGameState::GetTimeOfDay()
