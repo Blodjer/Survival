@@ -28,6 +28,11 @@ float ASurvivalPlayerController::GetMinDieDelay()
 	return ((GameState != NULL) && (GameState->GameModeClass != NULL)) ? GetDefault<ASurvivalGameMode>(GameState->GameModeClass)->MinDieDelay : 0.0f;
 }
 
+void ASurvivalPlayerController::MatchStartCountdown_Implementation(float RemainingTime)
+{
+	OnMatchStartCountdown(RemainingTime);
+}
+
 void ASurvivalPlayerController::MatchHasEnded_Implementation(int32 WinnerTeamIdx)
 {
 	OnMatchHasEnded(WinnerTeamIdx);

@@ -21,13 +21,20 @@ public:
 	float GetMinDieDelay();
 
 	UFUNCTION(Client, Reliable)
+	void MatchStartCountdown(float RemainingTime);
+	void MatchStartCountdown_Implementation(float RemainingTime);
+
+	UFUNCTION(Client, Reliable)
 	void MatchHasEnded(int32 WinnerTeamIdx);
 	void MatchHasEnded_Implementation(int32 WinnerTeamIdx);
 
+protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = Match)
 	void OnMatchHasEnded(int32 WinnerTeamIdx);
 
-protected:
+	UFUNCTION(BlueprintImplementableEvent, Category = Match)
+	void OnMatchStartCountdown(float RemainingTime);
+
 	virtual void BeginInactiveState() override;
 
 	virtual void EndInactiveState() override;

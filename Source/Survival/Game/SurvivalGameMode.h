@@ -60,7 +60,11 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void CountdownToStart();
+
 	virtual bool ReadyToStartMatch_Implementation() override;
+
+	virtual void StartMatch() override;
 
 	virtual void HandleMatchHasStarted() override;
 
@@ -131,5 +135,8 @@ private:
 	FTimerHandle TimerHandle_MatchStartCountdown;
 	
 	FTimerHandle TimerHandle_SendAirdrop;
-	
+
+	UPROPERTY(Transient)
+	bool bPassedDelay;
+
 };

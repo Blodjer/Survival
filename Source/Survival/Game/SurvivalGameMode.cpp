@@ -74,17 +74,25 @@ void ASurvivalGameMode::PostLogin(APlayerController* NewPlayer)
 		}
 	}
 
+	Super::PostLogin(NewPlayer);
+
 	if (!HasMatchStarted())
 	{
 		RestartPlayer(NewPlayer);
 
-		if (NumPlayers >= MaxPlayers && !GetWorldTimerManager().IsTimerActive(TimerHandle_MatchStartCountdown))
+		if (GetWorldTimerManager().IsTimerActive(TimerHandle_MatchStartCountdown))
 		{
-			GetWorldTimerManager().SetTimer(TimerHandle_MatchStartCountdown, StartMatchDelay, false);
+			ASurvivalPlayerController* SurvivalPlayerController = Cast<ASurvivalPlayerController>(NewPlayer);
+			if (SurvivalPlayerController)
+			{
+				SurvivalPlayerController->MatchStartCountdown(GetWorldTimerManager().GetTimerRemaining(TimerHandle_MatchStartCountdown));
+			}
+		}
+		else if (NumPlayers >= MaxPlayers)
+		{
+			CountdownToStart();
 		}
 	}
-
-	Super::PostLogin(NewPlayer);
 }
 
 int32 ASurvivalGameMode::ChooseTeam(APlayerState* PlayerState)
@@ -244,17 +252,41 @@ void ASurvivalGameMode::Tick(float DeltaTime)
 	}
 }
 
+void ASurvivalGameMode::CountdownToStart()
+{
+	if (!bDelayedStart || HasMatchStarted() || GetWorldTimerManager().IsTimerActive(TimerHandle_MatchStartCountdown))
+		return;
+
+	GetWorldTimerManager().SetTimer(TimerHandle_MatchStartCountdown, this, &ASurvivalGameMode::StartMatch, StartMatchDelay, false);
+
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		ASurvivalPlayerController* SurvivalPlayerController = Cast<ASurvivalPlayerController>(Iterator->Get());
+		if (SurvivalPlayerController)
+		{
+			SurvivalPlayerController->MatchStartCountdown(StartMatchDelay);
+		}
+	}
+}
+
 bool ASurvivalGameMode::ReadyToStartMatch_Implementation()
 {
-	if (GetMatchState() != MatchState::WaitingToStart)
-		return false;
-
-	if (NumPlayers >= MaxPlayers && GetWorldTimerManager().GetTimerRemaining(TimerHandle_MatchStartCountdown) <= 0.0f)
+	if (bDelayedStart)
 	{
-		return true;
+		if (bPassedDelay &&  NumPlayers >= MaxPlayers)
+		{
+			return true;
+		}
 	}
 
 	return Super::ReadyToStartMatch_Implementation();
+}
+
+void ASurvivalGameMode::StartMatch()
+{
+	bPassedDelay = true;
+
+	Super::StartMatch();
 }
 
 void ASurvivalGameMode::HandleMatchHasStarted()
