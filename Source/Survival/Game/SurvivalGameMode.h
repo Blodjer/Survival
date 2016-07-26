@@ -60,6 +60,8 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void HandleMatchIsWaitingToStart() override;
+
 	virtual void CountdownToStart();
 
 	virtual bool ReadyToStartMatch_Implementation() override;

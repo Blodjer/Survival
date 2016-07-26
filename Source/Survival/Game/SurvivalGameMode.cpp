@@ -252,6 +252,16 @@ void ASurvivalGameMode::Tick(float DeltaTime)
 	}
 }
 
+void ASurvivalGameMode::HandleMatchIsWaitingToStart()
+{
+	Super::HandleMatchIsWaitingToStart();
+
+	if (bDelayedStart)
+	{
+		GEngine->BlockTillLevelStreamingCompleted(GetWorld());
+	}
+}
+
 void ASurvivalGameMode::CountdownToStart()
 {
 	if (!bDelayedStart || HasMatchStarted() || GetWorldTimerManager().IsTimerActive(TimerHandle_MatchStartCountdown))
