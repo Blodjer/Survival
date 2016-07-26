@@ -14,7 +14,14 @@ void ASurvivalPlayerController::UnFreeze()
 {
 	Super::UnFreeze();
 
-	ServerRestartPlayer();
+	if (GetWorld() && GetWorld()->GetAuthGameMode() && !GetWorld()->GetAuthGameMode()->HasMatchStarted())
+	{
+		GetWorld()->GetAuthGameMode()->RestartPlayer(this);
+	}
+	else
+	{
+		ServerRestartPlayer();
+	}
 }
 
 float ASurvivalPlayerController::GetRemainingRespawnTime()
