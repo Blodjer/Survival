@@ -240,6 +240,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Weapon)
 	USoundBase* ShotSound;
 
+	UPROPERTY(EditDefaultsOnly, Category = Weapon)
+	USoundBase* TriggerSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = Weapon)
+	USoundBase* FiremodeSound;
+
+protected:
 	UPROPERTY(Transient, BlueprintReadOnly, Category = Weapon)
 	bool bIsAiming;
 

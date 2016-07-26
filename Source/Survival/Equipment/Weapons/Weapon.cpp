@@ -118,6 +118,11 @@ void AWeapon::BeforeDrop()
 
 void AWeapon::StartFire()
 {
+	if (CurrentRoundsInMagazine <= 0)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), TriggerSound, GetActorLocation());
+	}
+
 	if (!CanFire())
 		return;
 
@@ -391,6 +396,9 @@ void AWeapon::SwitchFireMode()
 		if (IsValidFireMode(NextFireMode))
 		{
 			FireMode = NextFireMode;
+
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), FiremodeSound, GetActorLocation());
+
 			break;
 		}
 	}
