@@ -35,6 +35,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = LensFlare, meta = (AllowPrivateAccess = "true"))
 	bool bScreenSizeScaled;
 
+	UPROPERTY(EditAnywhere, Category = LensFlare, meta = (AllowPrivateAccess = "true"))
+	float DepthOffset;
+
 	UPROPERTY(Transient)
 	UMaterialInstanceDynamic* LensFlareMID;
 };
