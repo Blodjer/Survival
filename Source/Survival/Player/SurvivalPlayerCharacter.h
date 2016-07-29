@@ -331,6 +331,9 @@ private:
 	void ServerDropHandheld_Implementation();
 	bool ServerDropHandheld_Validate() { return true; };
 
+	UFUNCTION(BlueprintCallable, Category = Character)
+	void UpdateSurface();
+
 private:
 	// First person mesh. Seen only by owner.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character, meta = (AllowPrivateAccess = "true"))
@@ -358,13 +361,18 @@ private:
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_IsDead)
 	bool bIsDead;
 
-	FTimerHandle TimerHandle_Die;
-
 	UPROPERTY(Transient)
 	class AHandheld* PreviousEquippedHandheld;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = Interactable, meta = (AllowPrivateAccess = "true"))
 	class AActor* TargetingInteractableActor;
+
+	EPhysicalSurface CurrentSurface;
+
+private:
+	FTimerHandle TimerHandle_Die;
+
+	FTimerHandle TimerHandle_UpdateSurface;
 
 protected:
 	// Base controller turn rate, in deg/sec
@@ -432,6 +440,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Interactable)
 	float InteractionRange;
+
+	UPROPERTY(EditDefaultsOnly, Category = Character)
+	float UpdateSurfaceRate;
 	
 	UPROPERTY(Transient, BlueprintReadOnly, Category = Material)
 	TArray<UMaterialInstanceDynamic*> MeshMIDs;
@@ -475,6 +486,9 @@ public:
 	// The health value the player starts with
 	UFUNCTION(BlueprintPure, Category = Character)
 	FORCEINLINE float GetMaxFlashlightIntensity() const { return GetClass()->GetDefaultObject<ASurvivalPlayerCharacter>()->Flashlight->Intensity; };
+
+	UFUNCTION(BlueprintPure, Category = Character)
+	FORCEINLINE EPhysicalSurface GetCurrentSurface() const;
 	
 private:
 	UFUNCTION()

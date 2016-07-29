@@ -70,6 +70,8 @@ ASurvivalPlayerCharacter::ASurvivalPlayerCharacter(const FObjectInitializer& Obj
 	StaminaDecrease = 0.1f;
 
 	InteractionRange = 250.0f;
+
+	UpdateSurfaceRate = 0.2f;
 	
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -196,6 +198,7 @@ void ASurvivalPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GetWorldTimerManager().SetTimer(TimerHandle_UpdateSurface, this, &ASurvivalPlayerCharacter::UpdateSurface, UpdateSurfaceRate, true);
 }
 
 void ASurvivalPlayerCharacter::Tick(float DeltaTime)
@@ -984,6 +987,32 @@ void ASurvivalPlayerCharacter::ServerDropHandheld_Implementation()
 	{
 		EquippedHandheld->Drop();
 	}
+}
+
+void ASurvivalPlayerCharacter::UpdateSurface()
+{
+	FHitResult HitResult;
+
+	FVector TraceStart = GetActorLocation();
+	FVector TraceEnd = GetActorLocation() - FVector(0, 0, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() - 60.0f);
+
+	FCollisionQueryParams CollisionQueryParams;
+	CollisionQueryParams.AddIgnoredActor(this);
+	CollisionQueryParams.bReturnPhysicalMaterial = true;
+
+	if (GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, CollisionQueryParams))
+	{
+		CurrentSurface = UPhysicalMaterial::DetermineSurfaceType(HitResult.PhysMaterial.Get());;
+	}
+	else
+	{
+		CurrentSurface = SURFACE_Default;
+	}
+}
+
+EPhysicalSurface ASurvivalPlayerCharacter::GetCurrentSurface() const
+{
+	return CurrentSurface;
 }
 
 void ASurvivalPlayerCharacter::OnRep_IsSprinting()
