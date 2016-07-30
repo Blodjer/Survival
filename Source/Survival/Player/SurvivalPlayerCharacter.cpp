@@ -1010,11 +1010,6 @@ void ASurvivalPlayerCharacter::UpdateSurface()
 	}
 }
 
-EPhysicalSurface ASurvivalPlayerCharacter::GetCurrentSurface() const
-{
-	return CurrentSurface;
-}
-
 void ASurvivalPlayerCharacter::OnRep_IsSprinting()
 {
 	if (bIsSprinting)

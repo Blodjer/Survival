@@ -488,7 +488,7 @@ public:
 	FORCEINLINE float GetMaxFlashlightIntensity() const { return GetClass()->GetDefaultObject<ASurvivalPlayerCharacter>()->Flashlight->Intensity; };
 
 	UFUNCTION(BlueprintPure, Category = Character)
-	FORCEINLINE EPhysicalSurface GetCurrentSurface() const;
+	FORCEINLINE EPhysicalSurface GetCurrentSurface() const { return CurrentSurface; };
 	
 private:
 	UFUNCTION()
