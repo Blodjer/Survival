@@ -118,6 +118,9 @@ void AWeapon::BeforeDrop()
 
 void AWeapon::StartFire()
 {
+	if (!IsGameInputAllowed())
+		return;
+
 	if (CurrentRoundsInMagazine <= 0)
 	{
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), TriggerSound, GetActorLocation());
@@ -382,7 +385,7 @@ void AWeapon::SwitchFireMode()
 	if (bAutomatic + bBurst + bSemiAutomatic <= 1)
 		return;
 
-	if (GetOwnerCharacter() == nullptr)
+	if (!IsGameInputAllowed())
 		return;
 
 	if (!HasAuthority() && GetOwnerCharacter()->IsLocallyControlled())
@@ -440,7 +443,7 @@ bool AWeapon::IsValidFireMode(EFireMode FireMode)
 
 bool AWeapon::CanFire()
 {
-	if (GetWorld() == nullptr || GetOwnerCharacter() == nullptr)
+	if (!IsGameInputAllowed() || GetWorld() == nullptr)
 		return false;
 
 	return LastShotTime + 60.0f / RateOfFire <= GetWorld()->GetTimeSeconds() && !bIsReloading && !GetOwnerCharacter()->IsSprinting();
@@ -448,12 +451,12 @@ bool AWeapon::CanFire()
 
 bool AWeapon::CanAim()
 {
-	return GetOwnerCharacter() && !GetOwnerCharacter()->IsSprinting();
+	return IsGameInputAllowed() && !GetOwnerCharacter()->IsSprinting();
 }
 
 bool AWeapon::CanReload()
 {
-	return GetOwnerCharacter() && !bIsReloading;
+	return IsGameInputAllowed() && !bIsReloading;
 }
 
 FVector AWeapon::GetMuzzleLocation() const

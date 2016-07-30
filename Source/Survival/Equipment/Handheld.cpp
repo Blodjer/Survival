@@ -155,6 +155,11 @@ void AHandheld::Drop(bool bIsWaste)
 	}
 }
 
+bool AHandheld::IsGameInputAllowed() const
+{
+	return GetOwnerCharacter() ? GetOwnerCharacter()->IsGameInputAllowed() : false;
+}
+
 void AHandheld::ClearActionBindings()
 {
 	if (InputActionBindings.Num() == 0 || OwnerInputComponent == nullptr)

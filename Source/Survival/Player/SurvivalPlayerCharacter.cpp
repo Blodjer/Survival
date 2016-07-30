@@ -539,6 +539,20 @@ float ASurvivalPlayerCharacter::GetDeadness() const
 	return GetWorldTimerManager().GetTimerElapsed(TimerHandle_Die) / DieDelay;
 }
 
+bool ASurvivalPlayerCharacter::IsGameInputAllowed() const
+{
+	ASurvivalPlayerController* SurvivalPlayerController = GetPlayerController();
+	return SurvivalPlayerController ? SurvivalPlayerController->IsGameInputAllowed() : false;
+}
+
+void ASurvivalPlayerCharacter::OnPause()
+{
+	if (GetEquippedHandheld())
+	{
+		GetEquippedHandheld()->OnCharacterStopUse();
+	}
+}
+
 void ASurvivalPlayerCharacter::SetRagdollPhysics()
 {
 	if (!GetMesh() || !GetMesh()->GetPhysicsAsset())
@@ -607,6 +621,9 @@ void ASurvivalPlayerCharacter::LookUpAtRate(float Value)
 
 void ASurvivalPlayerCharacter::StartSprint()
 {
+	if (IsMoveInputIgnored())
+		return;
+	
 	SetSprint(true);
 }
 
@@ -643,6 +660,9 @@ void ASurvivalPlayerCharacter::ServerSetSprint_Implementation(bool bShouldSprint
 
 void ASurvivalPlayerCharacter::Jump()
 {
+	if (IsMoveInputIgnored())
+		return;
+
 	StopCrouch();
 
 	Super::Jump();
@@ -662,6 +682,9 @@ void ASurvivalPlayerCharacter::ToggleCrouch()
 
 void ASurvivalPlayerCharacter::StartCrouch()
 {
+	if (IsMoveInputIgnored())
+		return;
+
 	if (bIsSprinting)
 	{
 		StopSprint();
@@ -672,11 +695,17 @@ void ASurvivalPlayerCharacter::StartCrouch()
 
 void ASurvivalPlayerCharacter::StopCrouch()
 {
+	if (IsMoveInputIgnored())
+		return;
+
 	UnCrouch();
 }
 
 void ASurvivalPlayerCharacter::ToggleFlashlight()
 {
+	if (!IsGameInputAllowed())
+		return;
+
 	if (bIsFlashlightOn)
 	{
 		SetFlashlightOn(false);

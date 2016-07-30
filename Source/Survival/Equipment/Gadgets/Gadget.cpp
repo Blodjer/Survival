@@ -17,6 +17,9 @@ void AGadget::SetupInputActions()
 
 void AGadget::Use()
 {
+	if (!IsGameInputAllowed())
+		return;
+
 	ServerUse();
 }
 

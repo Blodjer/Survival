@@ -62,6 +62,9 @@ protected:
 
 	virtual void BeforeDrop() {};
 
+	UFUNCTION(BlueprintPure, Category = Handheld)
+	bool IsGameInputAllowed() const;
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = Handheld)
 	EHandheldType Type;

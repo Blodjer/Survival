@@ -198,6 +198,11 @@ public:
 	UFUNCTION(BlueprintPure, Category = Character)
 	float GetDeadness() const;
 
+	UFUNCTION(BlueprintPure, Category = Character)
+	bool IsGameInputAllowed() const;
+
+	void OnPause();
+
 public:
 	UPROPERTY(BlueprintReadOnly, Transient, Category = Campfire)
 	class ACampfire* CapturingCampfire;

@@ -13,6 +13,11 @@ class SURVIVAL_API ASurvivalPlayerController : public APlayerController
 public:
 	ASurvivalPlayerController();
 
+	virtual void SetupInputComponent() override;
+
+	UFUNCTION(BlueprintPure, Category = Pause)
+	virtual bool IsGameInputAllowed() const;
+
 	virtual void UnFreeze() override;
 
 	UFUNCTION(BlueprintPure, Category = Spawn)
@@ -27,6 +32,12 @@ public:
 	UFUNCTION(Client, Reliable)
 	void MatchHasEnded(int32 WinnerTeamIdx);
 	void MatchHasEnded_Implementation(int32 WinnerTeamIdx);
+
+	UFUNCTION(BlueprintCallable, Category = Pause)
+	virtual void StartPause();
+
+	UFUNCTION(BlueprintCallable, Category = Pause)
+	virtual void EndPause();
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = Match)
@@ -44,5 +55,18 @@ protected:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Character)
 	void OnRespawn();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Pause)
+	void OnPauseStart();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Pause)
+	void OnPauseEnd();
+
+private:
+	void TogglePause();
+
+private:
+	UPROPERTY(BlueprintReadOnly, Category = Pause, meta = (AllowPrivateAccess = "true"))
+	bool bIsPause;
 
 };
