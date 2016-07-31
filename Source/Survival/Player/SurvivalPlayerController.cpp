@@ -80,6 +80,11 @@ void ASurvivalPlayerController::MatchStartCountdown_Implementation(float Remaini
 	OnMatchStartCountdown(RemainingTime);
 }
 
+void ASurvivalPlayerController::MatchHasStarted_Implementation()
+{
+	OnMatchHasStarted();
+}
+
 void ASurvivalPlayerController::MatchHasEnded_Implementation(int32 WinnerTeamIdx)
 {
 	OnMatchHasEnded(WinnerTeamIdx);

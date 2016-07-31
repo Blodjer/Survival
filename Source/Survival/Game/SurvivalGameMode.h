@@ -70,6 +70,8 @@ public:
 
 	virtual void HandleMatchHasStarted() override;
 
+	virtual void HandleMatchHasEnded() override;
+
 public:
 	void Killed(const UDamageType* DamageType, AController* Killer, AController* KilledPlayer);
 

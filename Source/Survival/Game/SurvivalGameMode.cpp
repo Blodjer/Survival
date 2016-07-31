@@ -303,7 +303,22 @@ void ASurvivalGameMode::HandleMatchHasStarted()
 {
 	Super::HandleMatchHasStarted();
 	
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		ASurvivalPlayerController* SurvivalPlayerController = Cast<ASurvivalPlayerController>(Iterator->Get());
+		if (SurvivalPlayerController)
+		{
+			SurvivalPlayerController->MatchHasStarted();
+		}
+	}
+
 	GetWorldTimerManager().SetTimer(TimerHandle_SendAirdrop, this, &ASurvivalGameMode::DetermineNextAirdrop, AirdropInterval.Random(), false);
+}
+
+void ASurvivalGameMode::HandleMatchHasEnded()
+{
+	Super::HandleMatchHasEnded();
+
 }
 
 void ASurvivalGameMode::Killed(const UDamageType* DamageType, AController* Killer, AController* KilledPlayer)

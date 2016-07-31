@@ -34,6 +34,10 @@ public:
 	void MatchStartCountdown_Implementation(float RemainingTime);
 
 	UFUNCTION(Client, Reliable)
+	void MatchHasStarted();
+	void MatchHasStarted_Implementation();
+
+	UFUNCTION(Client, Reliable)
 	void MatchHasEnded(int32 WinnerTeamIdx);
 	void MatchHasEnded_Implementation(int32 WinnerTeamIdx);
 
@@ -45,10 +49,13 @@ public:
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = Match)
-	void OnMatchHasEnded(int32 WinnerTeamIdx);
+	void OnMatchStartCountdown(float RemainingTime);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Match)
-	void OnMatchStartCountdown(float RemainingTime);
+	void OnMatchHasStarted();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Match)
+	void OnMatchHasEnded(int32 WinnerTeamIdx);
 
 	virtual void BeginInactiveState() override;
 

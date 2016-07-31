@@ -8,12 +8,21 @@
 void USurvivalCheatManager::SetTimeOfDay(float TimeOfDay)
 {
 	ASurvivalPlayerController* PlayerController = GetOuterASurvivalPlayerController();
-	if (PlayerController->GetWorld())
+	if (PlayerController && PlayerController->GetWorld())
 	{
 		ASurvivalGameState* SurvivalGameState = Cast<ASurvivalGameState>(PlayerController->GetWorld()->GetGameState());
 		if (SurvivalGameState)
 		{
 			SurvivalGameState->SetTimeOfDay(TimeOfDay);
 		}
+	}
+}
+
+void USurvivalCheatManager::StartMatch()
+{
+	ASurvivalPlayerController* PlayerController = GetOuterASurvivalPlayerController();
+	if (PlayerController && PlayerController->GetWorld())
+	{
+		PlayerController->GetWorld()->GetAuthGameMode()->StartMatch();
 	}
 }
