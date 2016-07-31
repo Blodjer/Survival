@@ -4,12 +4,28 @@
 #include "SurvivalPlayerController.h"
 #include "Helper/SurvivalCheatManager.h"
 #include "Game/SurvivalGameMode.h"
+#include "SurvivalLocalPlayer.h"
+#include "Persistent/SurvivalUserSettings.h"
 
 ASurvivalPlayerController::ASurvivalPlayerController()
 {
 	bIsPause = false;
 
 	CheatClass = USurvivalCheatManager::StaticClass();
+}
+
+void ASurvivalPlayerController::InitInputSystem()
+{
+	Super::InitInputSystem();
+	
+	if (GetLocalPlayer())
+	{
+		USurvivalLocalPlayer* SurvivalLocalPlayer = Cast<USurvivalLocalPlayer>(GetLocalPlayer());
+		if (SurvivalLocalPlayer)
+		{
+			SurvivalLocalPlayer->GetSurvivalUserSettings()->ApplyInputSettings();
+		}
+	}
 }
 
 void ASurvivalPlayerController::SetupInputComponent()

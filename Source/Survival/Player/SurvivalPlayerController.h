@@ -13,6 +13,8 @@ class SURVIVAL_API ASurvivalPlayerController : public APlayerController
 public:
 	ASurvivalPlayerController();
 
+	virtual void InitInputSystem() override;
+
 	virtual void SetupInputComponent() override;
 
 	UFUNCTION(BlueprintPure, Category = Pause)
