@@ -16,6 +16,8 @@ ASurvivalPlayerController::ASurvivalPlayerController()
 
 void ASurvivalPlayerController::BeginPlay()
 {
+	Super::BeginPlay();
+
 	if (!bInPauseMenu)
 	{
 		FInputModeGameOnly InputMode;
