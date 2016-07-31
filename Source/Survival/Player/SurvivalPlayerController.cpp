@@ -14,6 +14,16 @@ ASurvivalPlayerController::ASurvivalPlayerController()
 	CheatClass = USurvivalCheatManager::StaticClass();
 }
 
+void ASurvivalPlayerController::BeginPlay()
+{
+	if (!bIsPause)
+	{
+		FInputModeGameOnly InputMode;
+		InputMode.SetConsumeCaptureMouseDown(true);
+		SetInputMode(InputMode);
+	}
+}
+
 void ASurvivalPlayerController::InitInputSystem()
 {
 	Super::InitInputSystem();
