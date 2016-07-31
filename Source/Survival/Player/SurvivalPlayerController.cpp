@@ -9,14 +9,14 @@
 
 ASurvivalPlayerController::ASurvivalPlayerController()
 {
-	bIsPause = false;
+	bInPauseMenu = false;
 
 	CheatClass = USurvivalCheatManager::StaticClass();
 }
 
 void ASurvivalPlayerController::BeginPlay()
 {
-	if (!bIsPause)
+	if (!bInPauseMenu)
 	{
 		FInputModeGameOnly InputMode;
 		InputMode.SetConsumeCaptureMouseDown(true);
@@ -42,12 +42,12 @@ void ASurvivalPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	InputComponent->BindAction("Pause", EInputEvent::IE_Pressed, this, &ASurvivalPlayerController::TogglePause);
+	InputComponent->BindAction("Pause", EInputEvent::IE_Pressed, this, &ASurvivalPlayerController::TogglePauseMenu);
 }
 
 bool ASurvivalPlayerController::IsGameInputAllowed() const
 {
-	return !bIsPause && !bCinematicMode;
+	return !bInPauseMenu && !bCinematicMode;
 }
 
 void ASurvivalPlayerController::UnFreeze()
@@ -85,9 +85,9 @@ void ASurvivalPlayerController::MatchHasEnded_Implementation(int32 WinnerTeamIdx
 	OnMatchHasEnded(WinnerTeamIdx);
 }
 
-void ASurvivalPlayerController::StartPause()
+void ASurvivalPlayerController::OpenPauseMenu()
 {
-	if (bIsPause)
+	if (bInPauseMenu)
 		return;
 
 	bShowMouseCursor = true;
@@ -99,7 +99,7 @@ void ASurvivalPlayerController::StartPause()
 
 	SetCinematicMode(true, true, true);
 
-	bIsPause = true;
+	bInPauseMenu = true;
 
 	if (GetPawn())
 	{
@@ -110,12 +110,12 @@ void ASurvivalPlayerController::StartPause()
 		}
 	}
 
-	OnPauseStart();
+	OnOpenPauseMenu();
 }
 
-void ASurvivalPlayerController::EndPause()
+void ASurvivalPlayerController::ClosePauseMenu()
 {
-	if (!bIsPause)
+	if (!bInPauseMenu)
 		return;
 
 	bShowMouseCursor = false;
@@ -126,9 +126,9 @@ void ASurvivalPlayerController::EndPause()
 
 	SetCinematicMode(false, true, true);
 
-	bIsPause = false;
+	bInPauseMenu = false;
 
-	OnPauseEnd();
+	OnClosePauseMenu();
 }
 
 void ASurvivalPlayerController::BeginInactiveState()
@@ -145,14 +145,14 @@ void ASurvivalPlayerController::EndInactiveState()
 	OnRespawn();
 }
 
-void ASurvivalPlayerController::TogglePause()
+void ASurvivalPlayerController::TogglePauseMenu()
 {
-	if (bIsPause)
+	if (bInPauseMenu)
 	{
-		EndPause();
+		ClosePauseMenu();
 	}
 	else
 	{
-		StartPause();
+		OpenPauseMenu();
 	}
 }

@@ -38,10 +38,10 @@ public:
 	void MatchHasEnded_Implementation(int32 WinnerTeamIdx);
 
 	UFUNCTION(BlueprintCallable, Category = Pause)
-	virtual void StartPause();
+	virtual void OpenPauseMenu();
 
 	UFUNCTION(BlueprintCallable, Category = Pause)
-	virtual void EndPause();
+	virtual void ClosePauseMenu();
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = Match)
@@ -61,16 +61,16 @@ protected:
 	void OnRespawn();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Pause)
-	void OnPauseStart();
+	void OnOpenPauseMenu();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Pause)
-	void OnPauseEnd();
+	void OnClosePauseMenu();
 
 private:
-	void TogglePause();
+	void TogglePauseMenu();
 
 private:
 	UPROPERTY(BlueprintReadOnly, Category = Pause, meta = (AllowPrivateAccess = "true"))
-	bool bIsPause;
+	bool bInPauseMenu;
 
 };
