@@ -118,6 +118,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Airdrop)
 	FFloatSpan AirdropInterval;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Airdrop)
+	int32 CampAirdropInterval;
+
 	UPROPERTY(BlueprintReadOnly, Category = GameMode)
 	TArray<class ACampfire*> Campfires;
 
@@ -128,13 +131,16 @@ protected:
 	TArray<class AAirdropLandingZone*> AirdropLandingZones;
 
 private:
-	UPROPERTY(BlueprintReadOnly, Category = GameMode, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Transient, BlueprintReadOnly, Category = GameMode, meta = (AllowPrivateAccess = "true"))
 	int32 MaxPlayers;
 	
-	UPROPERTY(BlueprintReadOnly, Category = GameMode, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Transient, BlueprintReadOnly, Category = GameMode, meta = (AllowPrivateAccess = "true"))
 	int32 ActiveCampfireCluster;
 
 	TMap<TSubclassOf<AAirdropSupplyBox>, int32> SuppliesProbabilityModifier;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = Airdrop, meta = (AllowPrivateAccess = "true"))
+	int32 DroppedScheduledAirdrops;
 
 	FTimerHandle TimerHandle_MatchStartCountdown;
 	

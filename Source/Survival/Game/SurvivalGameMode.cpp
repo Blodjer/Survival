@@ -29,8 +29,11 @@ ASurvivalGameMode::ASurvivalGameMode()
 	Teams.Add(FTeamInfo("Bravo", FColor::Red));
 
 	AirdropInterval = FFloatSpan(60.0f, 120.0f);
+	CampAirdropInterval = 5;
 
 	ActiveCampfireCluster = -1;
+
+	DroppedScheduledAirdrops = 0;
 }
 
 void ASurvivalGameMode::PostInitializeComponents()
@@ -456,58 +459,92 @@ void ASurvivalGameMode::DetermineNextAirdrop()
 		return;
 	}
 
-	TSubclassOf<AAirdropSupplyBox> SupplyClass = nullptr;
-	AAirdropLandingZone* LandingZoneActor = nullptr;
-
-	float TimeInMinutes = GetGameState<ASurvivalGameState>() ? GetGameState<ASurvivalGameState>()->GetMatchTime() / 60.0f : 0.0f;
-
-	float TotalProbability = 0.0f;
-	TArray<float> Probabilities;
-	for (FAirdropSupply Supply : AirdropSupplies)
+	if (CampAirdropInterval > 1 && DroppedScheduledAirdrops > CampAirdropInterval && DroppedScheduledAirdrops % CampAirdropInterval == 0)
 	{
-		float Probability = Supply.GetProbability(TimeInMinutes);
-		if (SuppliesProbabilityModifier.Contains(Supply.SupplyClass))
+		TArray<AAirdropLandingZone*> CampLandingZones;
+		TArray<TSubclassOf<AAirdropSupplyBox>> PossibleSupplyBoxes;
+		for (AAirdropLandingZone* LandingZone : AirdropLandingZones)
 		{
-			Probability += Probability * 0.4f * SuppliesProbabilityModifier[Supply.SupplyClass];
+			if (LandingZone->IsCampLandingZone() && LandingZone->GetAirDropSupplies().Num() > 0)
+			{
+				CampLandingZones.Add(LandingZone);
+
+				for (TSubclassOf<AAirdropSupplyBox> SupplyBoxClass : LandingZone->GetAirDropSupplies())
+				{
+					PossibleSupplyBoxes.AddUnique(SupplyBoxClass);
+				}
+			}
 		}
 
-		TotalProbability += Probability;
-		Probabilities.Add(Probability);
-	}
-
-	float SupplyProbabilityIndex = FMath::RandRange(0.0f, TotalProbability);
-
-	float CurrentProbabilityIndex = 0.0f;
-	for (int32 i = 0; i < Probabilities.Num(); i++)
-	{
-		CurrentProbabilityIndex += Probabilities[i];
-		if (CurrentProbabilityIndex >= SupplyProbabilityIndex && SupplyClass == nullptr)
+		if (PossibleSupplyBoxes.Num() > 0)
 		{
-			SupplyClass = AirdropSupplies[i].SupplyClass;
-			SuppliesProbabilityModifier.FindOrAdd(SupplyClass) = 1;
-		}
-		else
-		{
-			int& p = SuppliesProbabilityModifier.FindOrAdd(AirdropSupplies[i].SupplyClass);
-			p = FMath::Max(1, p) + 1;
+			TSubclassOf<AAirdropSupplyBox> SelectedSupplyBox = PossibleSupplyBoxes[FMath::RandRange(0, PossibleSupplyBoxes.Num() - 1)];
+			for (AAirdropLandingZone* LandingZone : CampLandingZones)
+			{
+				if (LandingZone->GetAirDropSupplies().Contains(SelectedSupplyBox))
+				{
+					SendAirdrop(SelectedSupplyBox, LandingZone);
+				}
+			}
 		}
 	}
-
-	TArray<AAirdropLandingZone*> QualifiedLandingZones;
-	for (AAirdropLandingZone* LandingZone : AirdropLandingZones)
+	else
 	{
-		if (LandingZone->GetAirDropSupplies().Contains(SupplyClass))
+		TSubclassOf<AAirdropSupplyBox> SupplyClass = nullptr;
+		AAirdropLandingZone* LandingZoneActor = nullptr;
+
+		float TimeInMinutes = GetGameState<ASurvivalGameState>() ? GetGameState<ASurvivalGameState>()->GetMatchTime() / 60.0f : 0.0f;
+
+		float TotalProbability = 0.0f;
+		TArray<float> Probabilities;
+		for (FAirdropSupply Supply : AirdropSupplies)
 		{
-			QualifiedLandingZones.Add(LandingZone);
+			float Probability = Supply.GetProbability(TimeInMinutes);
+			if (SuppliesProbabilityModifier.Contains(Supply.SupplyClass))
+			{
+				Probability += Probability * 0.4f * SuppliesProbabilityModifier[Supply.SupplyClass];
+			}
+
+			TotalProbability += Probability;
+			Probabilities.Add(Probability);
 		}
+
+		float SupplyProbabilityIndex = FMath::RandRange(0.0f, TotalProbability);
+
+		float CurrentProbabilityIndex = 0.0f;
+		for (int32 i = 0; i < Probabilities.Num(); i++)
+		{
+			CurrentProbabilityIndex += Probabilities[i];
+			if (CurrentProbabilityIndex >= SupplyProbabilityIndex && SupplyClass == nullptr)
+			{
+				SupplyClass = AirdropSupplies[i].SupplyClass;
+				SuppliesProbabilityModifier.FindOrAdd(SupplyClass) = 1;
+			}
+			else
+			{
+				int& p = SuppliesProbabilityModifier.FindOrAdd(AirdropSupplies[i].SupplyClass);
+				p = FMath::Max(1, p) + 1;
+			}
+		}
+
+		TArray<AAirdropLandingZone*> QualifiedLandingZones;
+		for (AAirdropLandingZone* LandingZone : AirdropLandingZones)
+		{
+			if (LandingZone->GetAirDropSupplies().Contains(SupplyClass) && !LandingZone->IsCampLandingZone())
+			{
+				QualifiedLandingZones.Add(LandingZone);
+			}
+		}
+
+		if (QualifiedLandingZones.Num() > 0)
+		{
+			LandingZoneActor = QualifiedLandingZones[FMath::RandRange(0, QualifiedLandingZones.Num() - 1)];
+		}
+
+		SendAirdrop(SupplyClass, LandingZoneActor);
 	}
 
-	if (QualifiedLandingZones.Num() > 0)
-	{
-		LandingZoneActor = QualifiedLandingZones[FMath::RandRange(0, QualifiedLandingZones.Num() - 1)];
-	}
-
-	SendAirdrop(SupplyClass, LandingZoneActor);
+	DroppedScheduledAirdrops++;
 
 	GetWorldTimerManager().SetTimer(TimerHandle_SendAirdrop, this, &ASurvivalGameMode::DetermineNextAirdrop, AirdropInterval.Random(), false);
 }

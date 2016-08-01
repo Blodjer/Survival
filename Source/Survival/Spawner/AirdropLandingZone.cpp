@@ -17,6 +17,8 @@ AAirdropLandingZone::AAirdropLandingZone()
 	Radius = 800.0f;
 	ApproachAngle = 55.0f;
 
+	bIsCampLandingZone = false;
+
 	bNetLoadOnClient = false;
 
 #if WITH_EDITOR

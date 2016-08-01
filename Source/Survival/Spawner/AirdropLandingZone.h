@@ -40,7 +40,12 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = LandingZone, meta = (ClampMin = "20.0", UIMin = "20.0", ClampMax = "90.0", UIMax = "90.0", AllowPrivateAccess = "true"))
 	float ApproachAngle;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = LandingZone, meta = (AllowPrivateAccess = "true"))
+	bool bIsCampLandingZone;
+
 public:
 	FORCEINLINE TArray<TSubclassOf<AAirdropSupplyBox>> GetAirDropSupplies() const { return AirDropSupplies; };
+
+	FORCEINLINE bool IsCampLandingZone() const { return bIsCampLandingZone; };
 
 };
