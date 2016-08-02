@@ -313,7 +313,10 @@ private:
 	template<int32 SlotIndex>
 	void EquipSlot()
 	{
-		EquipSlot(SlotIndex);
+		if (IsGameInputAllowed())
+		{
+			EquipSlot(SlotIndex);
+		}
 	}
 
 	void UpdateTeamColors();

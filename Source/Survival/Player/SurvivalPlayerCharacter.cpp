@@ -880,6 +880,9 @@ void ASurvivalPlayerCharacter::SimulateUnEquip(AHandheld* Handheld)
 
 void ASurvivalPlayerCharacter::NextHandheld()
 {
+	if (!IsGameInputAllowed())
+		return;
+
 	if (HandheldInventory.Num() > 1 || (EquippedHandheld == nullptr && HandheldInventory.Num() > 0))
 	{
 		const int32 HandheldIdx = HandheldInventory.IndexOfByKey(EquippedHandheld);
@@ -890,6 +893,9 @@ void ASurvivalPlayerCharacter::NextHandheld()
 
 void ASurvivalPlayerCharacter::PreviousHandheld()
 {
+	if (!IsGameInputAllowed())
+		return;
+
 	if (HandheldInventory.Num() > 1 || (EquippedHandheld == nullptr && HandheldInventory.Num() > 0))
 	{
 		const int32 HandheldIdx = HandheldInventory.IndexOfByKey(EquippedHandheld);
@@ -1007,7 +1013,10 @@ void ASurvivalPlayerCharacter::ServerInteract_Implementation(AActor* Interactabl
 
 void ASurvivalPlayerCharacter::DropHandheld()
 {
-	ServerDropHandheld();
+	if (IsGameInputAllowed())
+	{
+		ServerDropHandheld();
+	}
 }
 
 void ASurvivalPlayerCharacter::ServerDropHandheld_Implementation()
