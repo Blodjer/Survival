@@ -124,6 +124,7 @@ void AWeapon::StartFire()
 	if (CurrentRoundsInMagazine <= 0)
 	{
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), TriggerSound, GetActorLocation());
+		return;
 	}
 
 	if (!CanFire())
@@ -400,7 +401,10 @@ void AWeapon::SwitchFireMode()
 		{
 			FireMode = NextFireMode;
 
-			UGameplayStatics::PlaySoundAtLocation(GetWorld(), FiremodeSound, GetActorLocation());
+			if (GetOwnerCharacter()->IsLocallyControlled())
+			{
+				UGameplayStatics::PlaySoundAtLocation(GetWorld(), FiremodeSound, GetActorLocation());
+			}
 
 			break;
 		}
