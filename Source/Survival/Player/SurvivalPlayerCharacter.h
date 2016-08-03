@@ -179,7 +179,7 @@ public:
 	int32 RequestAmmo(TSubclassOf<class AWeaponProjectile> Type, int32 Amount);
 
 	UFUNCTION(BlueprintCallable, Category = Ammunition)
-	int32 GetAmmoAmmountOfType(TSubclassOf<class AWeaponProjectile> Type) const;
+	int32 GetAmmoAmountOfType(TSubclassOf<class AWeaponProjectile> Type) const;
 
 	UFUNCTION(BlueprintPure, Category = Interactable)
 	const TScriptInterface<IInteractable> GetTargetingInteractableInterface() const;

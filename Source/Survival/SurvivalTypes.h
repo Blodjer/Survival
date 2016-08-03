@@ -122,7 +122,7 @@ public:
 		return 0;
 	}
 
-	int32 const GetAmmoAmmountOfType(TSubclassOf<class AWeaponProjectile> Type) const
+	int32 const GetAmmoAmountOfType(TSubclassOf<class AWeaponProjectile> Type) const
 	{
 		int32 i = IndexOf(Type);
 		if (i != INDEX_NONE)

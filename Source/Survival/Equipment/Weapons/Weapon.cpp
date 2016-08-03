@@ -70,6 +70,16 @@ void AWeapon::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
+void AWeapon::Equip()
+{
+	Super::Equip();
+
+	if (GetCurrentRoundsInMagazine() <= 0)
+	{
+		StartReload();
+	}
+}
+
 void AWeapon::UnEquip()
 {
 	Super::UnEquip();
@@ -450,17 +460,17 @@ bool AWeapon::CanFire()
 	if (!IsGameInputAllowed() || GetWorld() == nullptr)
 		return false;
 
-	return LastShotTime + 60.0f / RateOfFire <= GetWorld()->GetTimeSeconds() && !bIsReloading && !GetOwnerCharacter()->IsSprinting();
+	return IsEquipped() && LastShotTime + 60.0f / RateOfFire <= GetWorld()->GetTimeSeconds() && !bIsReloading && !GetOwnerCharacter()->IsSprinting();
 }
 
 bool AWeapon::CanAim()
 {
-	return IsGameInputAllowed() && !GetOwnerCharacter()->IsSprinting();
+	return IsEquipped() && IsGameInputAllowed() && !GetOwnerCharacter()->IsSprinting();
 }
 
 bool AWeapon::CanReload()
 {
-	return IsGameInputAllowed() && !bIsReloading;
+	return IsEquipped() && !bIsReloading && CurrentRoundsInMagazine < MaxRoundsPerMagazine + 1 && GetOwnerCharacter()->GetAmmoAmountOfType(ProjectileType) > 0 && IsGameInputAllowed();
 }
 
 FVector AWeapon::GetMuzzleLocation() const

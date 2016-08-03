@@ -70,6 +70,8 @@ public:
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+	virtual void Equip() override;
+
 	virtual void UnEquip() override;
 
 	virtual void OnCharacterStopUse() override;

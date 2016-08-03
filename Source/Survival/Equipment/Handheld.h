@@ -37,10 +37,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Handheld)
 	virtual void UnEquip();
-
-	// Is the weapon currently equipped
-	UFUNCTION(BlueprintPure, Category = Handheld)
-	bool IsEquipped() const;
 	
 	void Drop(bool bIsWaste = false);
 
@@ -119,6 +115,10 @@ public:
 
 	// Return the character actor that owns this handheld
 	FORCEINLINE ASurvivalPlayerCharacter* GetOwnerCharacter() const { return OwnerCharacter; }
+
+	// Is the weapon currently equipped
+	UFUNCTION(BlueprintPure, Category = Handheld)
+	FORCEINLINE bool IsEquipped() const { return bIsEquipped; };
 
 	// Return the type of the handheld
 	UFUNCTION(BlueprintPure, Category = Handheld)

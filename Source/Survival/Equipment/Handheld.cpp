@@ -88,11 +88,6 @@ void AHandheld::UnEquip()
 	bIsEquipped = false;
 }
 
-bool AHandheld::IsEquipped() const
-{
-	return bIsEquipped;
-}
-
 void AHandheld::Drop(bool bIsWaste)
 {
 	if (GetOwnerCharacter() == nullptr)

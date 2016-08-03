@@ -88,20 +88,20 @@ void ASurvivalPlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+	if (HasAuthority())
+	{
+		for (FAmmo& Ammo : StartAmmunition)
+		{
+			AmmunitionInventory.AddAmmo(Ammo.Type, Ammo.Amount);
+		}
+	}
+
 	// Spawn the first handheld from the loadout list
 	if (HasAuthority() && StartEquipment.Num() > 0)
 	{
 		for (TSubclassOf<AHandheld> HandheldClass : StartEquipment)
 		{
 			AddHandheldToInventory(HandheldClass);
-		}
-	}
-
-	if (HasAuthority())
-	{
-		for (FAmmo& Ammo : StartAmmunition)
-		{
-			AmmunitionInventory.AddAmmo(Ammo.Type, Ammo.Amount);
 		}
 	}
 
@@ -478,9 +478,9 @@ int32 ASurvivalPlayerCharacter::RequestAmmo(TSubclassOf<AWeaponProjectile> Type,
 	return AmmunitionInventory.RequestAmmo(Type, Amount);
 }
 
-int32 ASurvivalPlayerCharacter::GetAmmoAmmountOfType(TSubclassOf<AWeaponProjectile> Type) const
+int32 ASurvivalPlayerCharacter::GetAmmoAmountOfType(TSubclassOf<AWeaponProjectile> Type) const
 {
-	return AmmunitionInventory.GetAmmoAmmountOfType(Type);
+	return AmmunitionInventory.GetAmmoAmountOfType(Type);
 }
 
 const TScriptInterface<IInteractable> ASurvivalPlayerCharacter::GetInteractableInterface(AActor* Actor) const
@@ -542,7 +542,7 @@ float ASurvivalPlayerCharacter::GetDeadness() const
 bool ASurvivalPlayerCharacter::IsGameInputAllowed() const
 {
 	ASurvivalPlayerController* SurvivalPlayerController = GetPlayerController();
-	return SurvivalPlayerController ? SurvivalPlayerController->IsGameInputAllowed() : false;
+	return SurvivalPlayerController ? SurvivalPlayerController->IsGameInputAllowed() : true;
 }
 
 void ASurvivalPlayerCharacter::OnOpenPauseMenu()
