@@ -50,7 +50,7 @@ ASurvivalPlayerCharacter::ASurvivalPlayerCharacter(const FObjectInitializer& Obj
 	Flashlight->bUseRayTracedDistanceFieldShadows = true;
 
 	bIsFlashlightOn = false;
-	Flashlight->SetVisibility(bIsFlashlightOn);
+	Flashlight->SetVisibility(bIsFlashlightOn, true);
 	FlashlightBatteryPowerDrain = 0.016f;
 
 	SurvivalCharacterMovement = Cast<USurvivalCharacterMovement>(Super::GetCharacterMovement());
@@ -764,12 +764,12 @@ void ASurvivalPlayerCharacter::AddHandheldToInventory(TSubclassOf<AHandheld> Han
 				NewHandheld->GetMesh1P()->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, InventorySocketName);
 				NewHandheld->GetMesh3P()->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, InventorySocketName);
 
-				NewHandheld->GetMesh1P()->SetVisibility(false);
+				NewHandheld->GetMesh1P()->SetVisibility(false, true);
 			}
 			else
 			{
-				NewHandheld->GetMesh1P()->SetVisibility(false);
-				NewHandheld->GetMesh3P()->SetVisibility(false);
+				NewHandheld->GetMesh1P()->SetVisibility(false, true);
+				NewHandheld->GetMesh3P()->SetVisibility(false, true);
 			}
 		}
 	}
@@ -834,8 +834,8 @@ void ASurvivalPlayerCharacter::SimulateEquip(AHandheld* Handheld)
 		Handheld->GetMesh1P()->AttachToComponent(GetMesh1P(), FAttachmentTransformRules::SnapToTargetIncludingScale, GetHandheldAttachPoint());
 		Handheld->GetMesh3P()->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, GetHandheldAttachPoint());
 
-		Handheld->GetMesh1P()->SetVisibility(true);
-		Handheld->GetMesh3P()->SetVisibility(true);
+		Handheld->GetMesh1P()->SetVisibility(true, true);
+		Handheld->GetMesh3P()->SetVisibility(true, true);
 
 		Handheld->SetOwnerCharacter(this);
 		Handheld->Equip();
@@ -858,12 +858,12 @@ void ASurvivalPlayerCharacter::SimulateUnEquip(AHandheld* Handheld)
 				Handheld->GetMesh1P()->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, InventorySocketName);
 				Handheld->GetMesh3P()->AttachToComponent(Handheld->GetMesh1P(), FAttachmentTransformRules::SnapToTargetIncludingScale, InventorySocketName);
 
-				Handheld->GetMesh1P()->SetVisibility(false);
+				Handheld->GetMesh1P()->SetVisibility(false, true);
 			}
 			else
 			{
-				Handheld->GetMesh1P()->SetVisibility(false);
-				Handheld->GetMesh3P()->SetVisibility(false);
+				Handheld->GetMesh1P()->SetVisibility(false, true);
+				Handheld->GetMesh3P()->SetVisibility(false, true);
 			}
 		}
 		else
@@ -873,7 +873,7 @@ void ASurvivalPlayerCharacter::SimulateUnEquip(AHandheld* Handheld)
 				Handheld->GetMesh3P()->AttachToComponent(Handheld->GetMesh1P(), FAttachmentTransformRules::SnapToTargetIncludingScale);
 			}
 
-			Handheld->GetMesh1P()->SetVisibility(false);
+			Handheld->GetMesh1P()->SetVisibility(false, true);
 		}
 	}
 }
