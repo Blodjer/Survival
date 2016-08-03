@@ -129,6 +129,8 @@ void AWeapon::BeforeDrop()
 		return;
 
 	GetOwnerCharacter()->AddAmmo(ProjectileType, GetCurrentRoundsInMagazine());	
+
+	OnCharacterStopUse();
 }
 
 void AWeapon::StartFire()
