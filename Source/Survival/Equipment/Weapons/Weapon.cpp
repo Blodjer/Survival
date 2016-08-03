@@ -44,6 +44,11 @@ void AWeapon::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+	if (DefaultSight != nullptr)
+	{
+		AttachSight(DefaultSight);
+	}
+
 	FireMode = GetBestFireMode();
 }
 
@@ -499,8 +504,8 @@ void AWeapon::AttachSight(TSubclassOf<AWeaponSight> Sight)
 	{
 		CurrentSight = NewSight;
 
-		NewSight->GetMesh1P()->AttachToComponent(GetMesh1P(), FAttachmentTransformRules::SnapToTargetIncludingScale, "socket_sight");
-		NewSight->GetMesh3P()->AttachToComponent(GetMesh3P(), FAttachmentTransformRules::SnapToTargetIncludingScale, "socket_sight");
+		NewSight->GetMesh1P()->AttachToComponent(GetMesh1P(), FAttachmentTransformRules::SnapToTargetIncludingScale);
+		NewSight->GetMesh3P()->AttachToComponent(GetMesh3P(), FAttachmentTransformRules::SnapToTargetIncludingScale);
 	}
 }
 

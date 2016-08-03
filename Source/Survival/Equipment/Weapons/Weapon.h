@@ -229,6 +229,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
 	FWeaponSightConfig IronSight;
 
+	UPROPERTY(EditDefaultsOnly, Category = Weapon)
+	TSubclassOf<class AWeaponSight> DefaultSight;
+
 	UPROPERTY(EditDefaultsOnly, Category = FireModes)
 	bool bAutomatic;
 	UPROPERTY(EditDefaultsOnly, Category = FireModes)
