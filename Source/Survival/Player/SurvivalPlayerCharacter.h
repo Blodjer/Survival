@@ -201,7 +201,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = Character)
 	bool IsGameInputAllowed() const;
 
-	void OnPause();
+	void OnOpenPauseMenu();
 
 public:
 	UPROPERTY(BlueprintReadOnly, Transient, Category = Campfire)

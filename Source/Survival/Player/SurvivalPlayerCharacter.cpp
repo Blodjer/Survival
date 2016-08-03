@@ -545,7 +545,7 @@ bool ASurvivalPlayerCharacter::IsGameInputAllowed() const
 	return SurvivalPlayerController ? SurvivalPlayerController->IsGameInputAllowed() : false;
 }
 
-void ASurvivalPlayerCharacter::OnPause()
+void ASurvivalPlayerCharacter::OnOpenPauseMenu()
 {
 	if (GetEquippedHandheld())
 	{

@@ -113,7 +113,7 @@ void ASurvivalPlayerController::OpenPauseMenu()
 		ASurvivalPlayerCharacter* SurvivalPlayerCharacter = Cast<ASurvivalPlayerCharacter>(GetPawn());
 		if (SurvivalPlayerCharacter)
 		{
-			SurvivalPlayerCharacter->OnPause();
+			SurvivalPlayerCharacter->OnOpenPauseMenu();
 		}
 	}
 
