@@ -15,6 +15,9 @@ ACampfire::ACampfire()
 	SmokeParticleSystem = CreateDefaultSubobject<UParticleSystemComponent>("Smoke");
 	SmokeParticleSystem->SetupAttachment(RootComponent);
 
+	Audio = CreateDefaultSubobject<UAudioComponent>("Audio");
+	Audio->SetupAttachment(RootComponent);
+
 	OwningTeamIdx = -1;
 	DominantTeamIdx = -1;
 
@@ -97,6 +100,15 @@ void ACampfire::SetActive(bool bActive)
 	SetActorHiddenInGame(!bActive);
 	SetActorEnableCollision(bActive);
 	SetActorTickEnabled(bActive);
+
+	if (bActive)
+	{
+		Audio->Activate(true);
+	}
+	else
+	{
+		Audio->Deactivate();
+	}
 
 	bIsActive = bActive;
 }

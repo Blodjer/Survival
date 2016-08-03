@@ -36,6 +36,9 @@ private:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Smoke, meta = (AllowPrivateAccess = "true"))
 	UParticleSystemComponent* SmokeParticleSystem;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Smoke, meta = (AllowPrivateAccess = "true"))
+	UAudioComponent* Audio;
+
 	UPROPERTY(BlueprintReadOnly, Category = Campfire, meta = (AllowPrivateAccess = "true"))
 	TArray<ASurvivalPlayerCharacter*> CapturingPlayers;
 
