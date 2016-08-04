@@ -47,6 +47,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Pause)
 	virtual void ClosePauseMenu();
 
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	virtual void SetIgnoreGameInput(bool bNewGameInput);
+
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	virtual void ResetIgnoreGameInput();
+
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	virtual bool IsGameInputIgnored() const;
+
 protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = Match)
 	void OnMatchStartCountdown(float RemainingTime);
@@ -75,6 +84,9 @@ protected:
 
 private:
 	void TogglePauseMenu();
+
+protected:
+	uint8 IgnoreGameInput;
 
 private:
 	UPROPERTY(BlueprintReadOnly, Category = Pause, meta = (AllowPrivateAccess = "true"))

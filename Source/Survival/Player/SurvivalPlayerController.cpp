@@ -9,6 +9,8 @@
 
 ASurvivalPlayerController::ASurvivalPlayerController()
 {
+	IgnoreGameInput = 0;
+
 	bInPauseMenu = false;
 
 	CheatClass = USurvivalCheatManager::StaticClass();
@@ -49,7 +51,7 @@ void ASurvivalPlayerController::SetupInputComponent()
 
 bool ASurvivalPlayerController::IsGameInputAllowed() const
 {
-	return !bInPauseMenu && !bCinematicMode;
+	return !bInPauseMenu && !bCinematicMode && !IsGameInputIgnored();
 }
 
 void ASurvivalPlayerController::UnFreeze()
@@ -151,6 +153,21 @@ void ASurvivalPlayerController::ClosePauseMenu()
 	bInPauseMenu = false;
 
 	OnClosePauseMenu();
+}
+
+void ASurvivalPlayerController::SetIgnoreGameInput(bool bNewGameInput)
+{
+	IgnoreGameInput = FMath::Max(IgnoreGameInput + (bNewGameInput ? +1 : -1), 0);
+}
+
+void ASurvivalPlayerController::ResetIgnoreGameInput()
+{
+	IgnoreGameInput = 0;
+}
+
+bool ASurvivalPlayerController::IsGameInputIgnored() const
+{
+	return (IgnoreGameInput > 0);
 }
 
 void ASurvivalPlayerController::BeginInactiveState()
