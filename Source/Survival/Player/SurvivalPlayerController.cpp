@@ -92,12 +92,19 @@ void ASurvivalPlayerController::MatchHasStarted_Implementation()
 
 void ASurvivalPlayerController::MatchHasEnded_Implementation(int32 WinnerTeamIdx)
 {
-	StopMovement();
 	FlushPressedKeys();
+	StopMovement();
+
+	if (GetPawn() && GetPawn()->GetMovementComponent())
+	{
+		GetPawn()->GetMovementComponent()->StopMovementImmediately();
+	}
 
 	OnMatchHasEnded(WinnerTeamIdx);
 
 	UnPossess();
+
+	GetWorldTimerManager().ClearTimer(TimerHandle_UnFreeze);
 }
 
 void ASurvivalPlayerController::OpenPauseMenu()
