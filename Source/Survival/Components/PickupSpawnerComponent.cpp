@@ -5,6 +5,9 @@
 
 UPickupSpawnerComponent::UPickupSpawnerComponent()
 {
+	RespawnTime = FFloatSpan(0.0f, 0.0f);
+	SpawnedPickup = nullptr;
+
 	bWantsBeginPlay = true;
 	bAutoActivate = true;
 	bUseAttachParentBound = true;
@@ -133,17 +136,36 @@ void UPickupSpawnerComponent::Spawn()
 		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		SpawnParameters.Owner = GetAttachmentRootActor();
 
-		APickup* Pickup = GetWorld()->SpawnActor<APickup>(SpawnPickupClass, GetComponentLocation(), GetComponentRotation(), SpawnParameters);
-		if (Pickup)
+		SpawnedPickup = GetWorld()->SpawnActor<APickup>(SpawnPickupClass, GetComponentLocation(), GetComponentRotation(), SpawnParameters);
+		if (SpawnedPickup)
 		{
 			if (GetOwner()->bNetLoadOnClient && GetAttachParent())
 			{
-				Pickup->AttachToComponent(this, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true));
+				SpawnedPickup->AttachToComponent(this, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true));
 			}
 			else if (GetOwner()->GetRootComponent()->GetAttachParent() && GetOwner()->GetRootComponent()->GetAttachParent()->GetOwner()->bNetLoadOnClient)
 			{
-				Pickup->AttachToComponent(GetOwner()->GetRootComponent()->GetAttachParent(), FAttachmentTransformRules(EAttachmentRule::KeepWorld, true));
+				SpawnedPickup->AttachToComponent(GetOwner()->GetRootComponent()->GetAttachParent(), FAttachmentTransformRules(EAttachmentRule::KeepWorld, true));
 			}
 		}
+	}
+
+	TryRespawn();
+}
+
+void UPickupSpawnerComponent::TryRespawn()
+{
+	if (!IsRespawnable())
+		return;
+	
+	if ((SpawnedPickup == nullptr || !IsValid(SpawnedPickup)) && GetWorld()->GetAuthGameMode()->IsMatchInProgress())
+	{
+		Spawn();
+
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Magenta, "podjg");
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Respawn, this, &UPickupSpawnerComponent::TryRespawn, RespawnTime.Random());
 	}
 }

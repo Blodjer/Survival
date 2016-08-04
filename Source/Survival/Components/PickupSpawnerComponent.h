@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Components/ActorComponent.h"
+#include "../SurvivalTypes.h"
 #include "PickupSpawnerComponent.generated.h"
 
 USTRUCT(BlueprintType)
@@ -54,11 +55,23 @@ private:
 	void UpdateVisualizeBox();
 #endif
 
+protected:
+	FORCEINLINE bool IsRespawnable() const { return RespawnTime.Min > 1.0f && RespawnTime.Max > 1.0f;  }
+
 private:
 	void Spawn();
+
+	void TryRespawn();
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spawner, meta = (AllowPrivateAccess = "true"))
 	TArray<FPickupSpawnerItem> SpawnList;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spawner, meta = (AllowPrivateAccess = "true"))
+	FFloatSpan RespawnTime;
+
+	FTimerHandle TimerHandle_Respawn;
+
+	class APickup* SpawnedPickup;
 
 };
