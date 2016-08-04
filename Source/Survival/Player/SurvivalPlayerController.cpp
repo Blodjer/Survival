@@ -56,11 +56,14 @@ void ASurvivalPlayerController::UnFreeze()
 {
 	Super::UnFreeze();
 
-	if (GetWorld() && GetWorld()->GetAuthGameMode() && !GetWorld()->GetAuthGameMode()->HasMatchStarted())
+	if (GetWorld() == nullptr || GetWorld()->GetAuthGameMode() == nullptr)
+		return;
+
+	if (GetWorld()->GetAuthGameMode()->GetMatchState() == MatchState::WaitingToStart)
 	{
 		GetWorld()->GetAuthGameMode()->RestartPlayer(this);
 	}
-	else
+	else if (GetWorld()->GetAuthGameMode()->IsMatchInProgress())
 	{
 		ServerRestartPlayer();
 	}
@@ -89,7 +92,12 @@ void ASurvivalPlayerController::MatchHasStarted_Implementation()
 
 void ASurvivalPlayerController::MatchHasEnded_Implementation(int32 WinnerTeamIdx)
 {
+	StopMovement();
+	FlushPressedKeys();
+
 	OnMatchHasEnded(WinnerTeamIdx);
+
+	UnPossess();
 }
 
 void ASurvivalPlayerController::OpenPauseMenu()
@@ -141,7 +149,7 @@ void ASurvivalPlayerController::ClosePauseMenu()
 void ASurvivalPlayerController::BeginInactiveState()
 {
 	Super::BeginInactiveState();
-
+	
 	OnDeath();
 }
 
