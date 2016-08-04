@@ -14,6 +14,9 @@ class SURVIVAL_API USurvivalCheatManager : public UCheatManager
 	void SetTimeOfDay(float TimeOfDay);
 
 	UFUNCTION(Exec)
+	void StartMatchCountdown();
+
+	UFUNCTION(Exec)
 	void StartMatch();
 	
 };

@@ -4,6 +4,7 @@
 #include "SurvivalCheatManager.h"
 #include "Player/SurvivalPlayerController.h"
 #include "Game/SurvivalGameState.h"
+#include "Game/SurvivalGameMode.h"
 
 void USurvivalCheatManager::SetTimeOfDay(float TimeOfDay)
 {
@@ -14,6 +15,19 @@ void USurvivalCheatManager::SetTimeOfDay(float TimeOfDay)
 		if (SurvivalGameState)
 		{
 			SurvivalGameState->SetTimeOfDay(TimeOfDay);
+		}
+	}
+}
+
+void USurvivalCheatManager::StartMatchCountdown()
+{
+	ASurvivalPlayerController* PlayerController = GetOuterASurvivalPlayerController();
+	if (PlayerController && PlayerController->GetWorld())
+	{
+		ASurvivalGameMode* SurvivalGameMode = Cast<ASurvivalGameMode>(PlayerController->GetWorld()->GetAuthGameMode());
+		if (SurvivalGameMode)
+		{
+			SurvivalGameMode->StartMatchCountdown();
 		}
 	}
 }

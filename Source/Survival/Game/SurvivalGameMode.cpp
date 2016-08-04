@@ -88,12 +88,12 @@ void ASurvivalGameMode::PostLogin(APlayerController* NewPlayer)
 			ASurvivalPlayerController* SurvivalPlayerController = Cast<ASurvivalPlayerController>(NewPlayer);
 			if (SurvivalPlayerController)
 			{
-				SurvivalPlayerController->MatchStartCountdown(GetWorldTimerManager().GetTimerRemaining(TimerHandle_MatchStartCountdown));
+				SurvivalPlayerController->MatchHasStartedCountdown(GetWorldTimerManager().GetTimerRemaining(TimerHandle_MatchStartCountdown));
 			}
 		}
 		else if (NumPlayers >= MaxPlayers)
 		{
-			CountdownToStart();
+			StartMatchCountdown();
 		}
 	}
 }
@@ -265,7 +265,7 @@ void ASurvivalGameMode::HandleMatchIsWaitingToStart()
 	}
 }
 
-void ASurvivalGameMode::CountdownToStart()
+void ASurvivalGameMode::StartMatchCountdown()
 {
 	if (!bDelayedStart || HasMatchStarted() || GetWorldTimerManager().IsTimerActive(TimerHandle_MatchStartCountdown))
 		return;
@@ -277,7 +277,7 @@ void ASurvivalGameMode::CountdownToStart()
 		ASurvivalPlayerController* SurvivalPlayerController = Cast<ASurvivalPlayerController>(Iterator->Get());
 		if (SurvivalPlayerController)
 		{
-			SurvivalPlayerController->MatchStartCountdown(StartMatchDelay);
+			SurvivalPlayerController->MatchHasStartedCountdown(StartMatchDelay);
 		}
 	}
 }

@@ -62,7 +62,7 @@ public:
 
 	virtual void HandleMatchIsWaitingToStart() override;
 
-	virtual void CountdownToStart();
+	virtual void StartMatchCountdown();
 
 	virtual bool ReadyToStartMatch_Implementation() override;
 

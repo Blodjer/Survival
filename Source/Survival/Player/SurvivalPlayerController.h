@@ -30,8 +30,8 @@ public:
 	float GetMinDieDelay();
 
 	UFUNCTION(Client, Reliable)
-	void MatchStartCountdown(float RemainingTime);
-	void MatchStartCountdown_Implementation(float RemainingTime);
+	void MatchHasStartedCountdown(float RemainingTime);
+	void MatchHasStartedCountdown_Implementation(float RemainingTime);
 
 	UFUNCTION(Client, Reliable)
 	void MatchHasStarted();
@@ -58,7 +58,7 @@ public:
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = Match)
-	void OnMatchStartCountdown(float RemainingTime);
+	void OnMatchHasStartedCountdown(float RemainingTime);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Match)
 	void OnMatchHasStarted();
