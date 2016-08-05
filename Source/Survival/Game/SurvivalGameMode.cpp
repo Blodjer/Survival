@@ -91,6 +91,14 @@ void ASurvivalGameMode::PostLogin(APlayerController* NewPlayer)
 				SurvivalPlayerController->MatchHasStartedCountdown(GetWorldTimerManager().GetTimerRemaining(TimerHandle_MatchStartCountdown));
 			}
 		}
+		else if (NumPlayers < MaxPlayers)
+		{
+			ASurvivalPlayerController* SurvivalPlayerController = Cast<ASurvivalPlayerController>(NewPlayer);
+			if (SurvivalPlayerController)
+			{
+				SurvivalPlayerController->MatchIsWaitingForPlayers();
+			}
+		}
 		else if (NumPlayers >= MaxPlayers)
 		{
 			StartMatchCountdown();

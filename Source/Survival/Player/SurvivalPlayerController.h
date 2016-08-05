@@ -19,15 +19,16 @@ public:
 
 	virtual void SetupInputComponent() override;
 
-	UFUNCTION(BlueprintPure, Category = Pause)
-	virtual bool IsGameInputAllowed() const;
-
 	virtual void UnFreeze() override;
 
 	UFUNCTION(BlueprintPure, Category = Spawn)
 	float GetRemainingRespawnTime();
 
 	float GetMinDieDelay();
+
+	UFUNCTION(Client, Reliable)
+	void MatchIsWaitingForPlayers();
+	void MatchIsWaitingForPlayers_Implementation();
 
 	UFUNCTION(Client, Reliable)
 	void MatchHasStartedCountdown(float RemainingTime);
@@ -47,6 +48,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Pause)
 	virtual void ClosePauseMenu();
 
+	UFUNCTION(BlueprintPure, Category = Pause)
+	virtual bool IsGameInputAllowed() const;
+
 	UFUNCTION(BlueprintCallable, Category = "Input")
 	virtual void SetIgnoreGameInput(bool bNewGameInput);
 
@@ -56,7 +60,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Input")
 	virtual bool IsGameInputIgnored() const;
 
+	virtual void ResetIgnoreInputFlags() override;
+
 protected:
+	UFUNCTION(BlueprintImplementableEvent, Category = Match)
+	void OnMatchIsWaitingForPlayers();
+
 	UFUNCTION(BlueprintImplementableEvent, Category = Match)
 	void OnMatchHasStartedCountdown(float RemainingTime);
 
