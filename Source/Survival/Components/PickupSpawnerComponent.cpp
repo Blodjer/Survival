@@ -98,7 +98,7 @@ void UPickupSpawnerComponent::UpdateVisualizeBox()
 
 void UPickupSpawnerComponent::Spawn()
 {
-	if (!GetWorld()->IsServer())
+	if (!GetWorld()->IsServer() && GetOwnerRole() >= ROLE_Authority)
 		return;
 
 	if (SpawnList.Num() <= 0)
@@ -150,7 +150,7 @@ void UPickupSpawnerComponent::Spawn()
 		}
 	}
 
-	TryRespawn();
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_Respawn, this, &UPickupSpawnerComponent::TryRespawn, RespawnTime.Random());
 }
 
 void UPickupSpawnerComponent::TryRespawn()
@@ -158,11 +158,9 @@ void UPickupSpawnerComponent::TryRespawn()
 	if (!IsRespawnable())
 		return;
 	
-	if ((SpawnedPickup == nullptr || !IsValid(SpawnedPickup)) && GetWorld()->GetAuthGameMode()->IsMatchInProgress())
+	if ((!IsValid(SpawnedPickup) || SpawnedPickup == nullptr) && GetWorld()->GetAuthGameMode()->IsMatchInProgress())
 	{
 		Spawn();
-
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Magenta, "podjg");
 	}
 	else
 	{

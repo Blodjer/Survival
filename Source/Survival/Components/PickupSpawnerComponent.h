@@ -72,6 +72,7 @@ private:
 
 	FTimerHandle TimerHandle_Respawn;
 
-	class APickup* SpawnedPickup;
+	UPROPERTY(Transient)
+	APickup* SpawnedPickup;
 
 };
