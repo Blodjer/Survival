@@ -378,7 +378,8 @@ private:
 	UPROPERTY(Transient, BlueprintReadOnly, Category = Interactable, meta = (AllowPrivateAccess = "true"))
 	class AActor* TargetingInteractableActor;
 
-	EPhysicalSurface CurrentSurface;
+	UPROPERTY(Transient)
+	TEnumAsByte<EPhysicalSurface> CurrentSurface;
 
 private:
 	FTimerHandle TimerHandle_Die;

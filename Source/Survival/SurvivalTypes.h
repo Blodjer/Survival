@@ -17,6 +17,7 @@
 #define SURFACE_Water		SurfaceType5
 #define SURFACE_Flesh		SurfaceType6
 #define SURFACE_Metal		SurfaceType7
+#define SURFACE_Floor		SurfaceType8
 
 /*
 	STRUCTS

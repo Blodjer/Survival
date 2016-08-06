@@ -1036,8 +1036,8 @@ void ASurvivalPlayerCharacter::UpdateSurface()
 {
 	FHitResult HitResult;
 
-	FVector TraceStart = GetActorLocation();
-	FVector TraceEnd = GetActorLocation() - FVector(0, 0, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() - 60.0f);
+	FVector TraceStart = GetActorLocation() + FVector(0, 0, 20.0f);
+	FVector TraceEnd = GetActorLocation() - FVector(0, 0, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + 40.0f);
 
 	FCollisionQueryParams CollisionQueryParams;
 	CollisionQueryParams.AddIgnoredActor(this);
@@ -1045,7 +1045,7 @@ void ASurvivalPlayerCharacter::UpdateSurface()
 
 	if (GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, CollisionQueryParams))
 	{
-		CurrentSurface = UPhysicalMaterial::DetermineSurfaceType(HitResult.PhysMaterial.Get());;
+		CurrentSurface = UPhysicalMaterial::DetermineSurfaceType(HitResult.PhysMaterial.Get());
 	}
 	else
 	{
