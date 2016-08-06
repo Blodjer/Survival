@@ -12,6 +12,9 @@ class SURVIVAL_API APickupEquipment : public APickup
 	GENERATED_BODY()
 
 public:
+	virtual void PostInitializeComponents() override;
+
+public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Pickup)
 	TSubclassOf<AHandheld> HandheldClass;
 

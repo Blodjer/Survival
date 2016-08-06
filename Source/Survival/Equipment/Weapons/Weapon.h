@@ -304,4 +304,6 @@ public:
 
 	FORCEINLINE int32 GetCurrentRoundsInMagazine() const { return CurrentRoundsInMagazine; };
 
+	FORCEINLINE TSubclassOf<class AWeaponSight> GetDefaultSight() const { return DefaultSight; };
+
 };
