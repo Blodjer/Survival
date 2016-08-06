@@ -98,7 +98,7 @@ void UPickupSpawnerComponent::UpdateVisualizeBox()
 
 void UPickupSpawnerComponent::Spawn()
 {
-	if (!GetWorld()->IsServer() && GetOwnerRole() >= ROLE_Authority)
+	if (!GetWorld()->IsServer())
 		return;
 
 	if (SpawnList.Num() <= 0)
@@ -149,8 +149,11 @@ void UPickupSpawnerComponent::Spawn()
 			}
 		}
 	}
-
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle_Respawn, this, &UPickupSpawnerComponent::TryRespawn, RespawnTime.Random());
+	
+	if (IsRespawnable())
+	{
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Respawn, this, &UPickupSpawnerComponent::TryRespawn, RespawnTime.Random());
+	}
 }
 
 void UPickupSpawnerComponent::TryRespawn()
