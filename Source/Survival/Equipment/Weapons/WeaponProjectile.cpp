@@ -35,6 +35,8 @@ AWeaponProjectile::AWeaponProjectile()
 	ProjectileMovement->MaxSpeed = Speed * 100.0f;
 	InitialLifeSpan = LifeSpan;
 
+	ProjectileName = "Unkown";
+
 	bReplicates = false;
 	bNetTemporary = true;
 

@@ -173,13 +173,16 @@ public:
 	void RemoveHandheldFromInventory(class AHandheld* Handheld);
 
 	UFUNCTION(BlueprintCallable, Category = Ammunition)
-	void AddAmmo(TSubclassOf<class AWeaponProjectile> Type, int32 Amount);
+	int32 AddAmmo(TSubclassOf<class AWeaponProjectile> Type, int32 Amount, bool bOverfill = false);
 
 	UFUNCTION(BlueprintCallable, Category = Ammunition)
 	int32 RequestAmmo(TSubclassOf<class AWeaponProjectile> Type, int32 Amount);
 
 	UFUNCTION(BlueprintCallable, Category = Ammunition)
 	int32 GetAmmoAmountOfType(TSubclassOf<class AWeaponProjectile> Type) const;
+
+	UFUNCTION(BlueprintCallable, Category = Ammunition)
+	int32 GetRemainingAmmoAmountOfType(TSubclassOf<class AWeaponProjectile> Type) const;
 
 	UFUNCTION(BlueprintPure, Category = Interactable)
 	const TScriptInterface<IInteractable> GetTargetingInteractableInterface() const;
@@ -213,7 +216,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = Equipment)
 	FHandheldInventorySlotManager HandheldInventorySlots;
 
-	UPROPERTY(BlueprintReadOnly, Replicated, Transient, Category = Ammunition)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Transient, Category = Equipment)
 	FAmmunitionInventory AmmunitionInventory;
 
 	UPROPERTY(BlueprintReadOnly, Replicated, Transient, Category = Battery)

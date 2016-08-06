@@ -468,9 +468,9 @@ AWeapon* ASurvivalPlayerCharacter::GetEquippedWeapon() const
 	return EquippedHandheld != nullptr ? Cast<AWeapon>(EquippedHandheld) : nullptr;
 }
 
-void ASurvivalPlayerCharacter::AddAmmo(TSubclassOf<AWeaponProjectile> Type, int32 Amount)
+int32 ASurvivalPlayerCharacter::AddAmmo(TSubclassOf<AWeaponProjectile> Type, int32 Amount, bool bOverfill)
 {
-	AmmunitionInventory.AddAmmo(Type, Amount);
+	return AmmunitionInventory.AddAmmo(Type, Amount, bOverfill);
 }
 
 int32 ASurvivalPlayerCharacter::RequestAmmo(TSubclassOf<AWeaponProjectile> Type, int32 Amount)
@@ -481,6 +481,11 @@ int32 ASurvivalPlayerCharacter::RequestAmmo(TSubclassOf<AWeaponProjectile> Type,
 int32 ASurvivalPlayerCharacter::GetAmmoAmountOfType(TSubclassOf<AWeaponProjectile> Type) const
 {
 	return AmmunitionInventory.GetAmmoAmountOfType(Type);
+}
+
+int32 ASurvivalPlayerCharacter::GetRemainingAmmoAmountOfType(TSubclassOf<AWeaponProjectile> Type) const
+{
+	return AmmunitionInventory.GetRemainingAmmoAmountOfType(Type);
 }
 
 const TScriptInterface<IInteractable> ASurvivalPlayerCharacter::GetInteractableInterface(AActor* Actor) const

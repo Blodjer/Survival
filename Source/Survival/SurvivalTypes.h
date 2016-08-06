@@ -51,10 +51,10 @@ struct SURVIVAL_API FAmmo
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Ammo)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ammo)
 	TSubclassOf<class AWeaponProjectile> Type;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Ammo, meta = (ClampMin = "0.0", UIMin = "0.0"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ammo, meta = (ClampMin = "0.0", UIMin = "0.0"))
 	int32 Amount;
 
 	FAmmo()
@@ -81,6 +81,9 @@ private:
 	UPROPERTY()
 	TArray<int32> AmmunitionCounts;
 
+	UPROPERTY(EditAnywhere, NotReplicated, Category = Ammunition, meta = (AllowPrivateAccess = "true"))
+	TArray<FAmmo> MaxAmmunition;
+
 public:
 	int32& operator [](TSubclassOf<class AWeaponProjectile> Type)
 	{
@@ -92,10 +95,16 @@ public:
 		return AmmunitionTypes.IndexOfByKey(Type);
 	}
 
-	void AddAmmo(TSubclassOf<class AWeaponProjectile> Type, int32 Amount)
+	int32 AddAmmo(TSubclassOf<class AWeaponProjectile> Type, int32 Amount, bool bOverfill = false)
 	{
+		if (!bOverfill)
+		{
+			const FAmmo* MaxAmmo = MaxAmmunition.FindByPredicate([Type](FAmmo& Ammo) { return Ammo.Type == Type; });
+			Amount = MaxAmmo ? FMath::Min(FMath::Max(MaxAmmo->Amount - GetAmmoAmountOfType(Type), 0), Amount) : Amount;
+		}
+
 		if (Amount <= 0)
-			return;
+			return Amount;
 
 		int32 i = IndexOf(Type);
 		if (i != INDEX_NONE)
@@ -107,6 +116,8 @@ public:
 			AmmunitionTypes.Add(Type);
 			AmmunitionCounts.Add(Amount);
 		}
+
+		return Amount;
 	}
 
 	int32 RequestAmmo(TSubclassOf<class AWeaponProjectile> Type, int32 Amount)
@@ -131,6 +142,12 @@ public:
 		}
 
 		return 0;
+	}
+
+	int32 const GetRemainingAmmoAmountOfType(TSubclassOf<class AWeaponProjectile> Type) const
+	{
+		const FAmmo* MaxAmmo = MaxAmmunition.FindByPredicate([Type](FAmmo& Ammo) { return Ammo.Type == Type; });
+		return MaxAmmo ? FMath::Max(MaxAmmo->Amount - GetAmmoAmountOfType(Type), 0) : INT32_MAX;
 	}
 
 	TArray<TSubclassOf<class AWeaponProjectile>> const GetAmmunitionTypes() const

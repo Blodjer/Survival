@@ -33,13 +33,13 @@ bool APickup::IsInteractable_Implementation(ASurvivalPlayerCharacter* PlayerChar
 void APickup::Pickup(ASurvivalPlayerCharacter* PlayerCharacter)
 {
 	OnPickup(PlayerCharacter);
-
-	Destroy();
 }
 
 void APickup::OnPickup_Implementation(ASurvivalPlayerCharacter* PlayerCharacter)
 {
 	// Pickup Logic
+	
+	Destroy();
 }
 
 void APickup::SimulatePickup_Implementation()

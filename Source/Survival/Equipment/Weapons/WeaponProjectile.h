@@ -40,6 +40,9 @@ protected:
 	UPROPERTY(Transient, BlueprintReadOnly, Category = Projectile)
 	float Damage;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Projectile)
+	FName ProjectileName;
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Impact)
 	FPhysicalVFX ImpactVFX;
@@ -64,5 +67,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Projectile, meta = (AllowPrivateAccess = "true"))
 	class UParticleSystemComponent* ParticleSystem;
+
+public:
+	FORCEINLINE FName GetProjectileName() const { return ProjectileName; };
 
 };
