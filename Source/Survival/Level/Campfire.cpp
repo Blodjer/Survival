@@ -18,6 +18,13 @@ ACampfire::ACampfire()
 	Audio = CreateDefaultSubobject<UAudioComponent>("Audio");
 	Audio->SetupAttachment(RootComponent);
 
+	DamageArea = CreateDefaultSubobject<UCapsuleComponent>("DamageArea");
+	DamageArea->InitCapsuleSize(80.0f, 200.0f);
+	DamageArea->OnComponentBeginOverlap.AddDynamic(this, &ACampfire::OnBeginDamage);
+	DamageArea->OnComponentEndOverlap.AddDynamic(this, &ACampfire::OnEndDamage);
+	DamageArea->SetCollisionProfileName("OverlapAllDynamic");
+	DamageArea->SetupAttachment(RootComponent);
+
 	OwningTeamIdx = -1;
 	DominantTeamIdx = -1;
 
@@ -32,6 +39,8 @@ ACampfire::ACampfire()
 	CurrentCaptureDurationMultiplier = 1.0f;
 
 	SmokeBaseColor = FLinearColor(0.15f, 0.15f, 0.15f);
+
+	FireDamage = 10.0f;
 
 	bReplicates = true;
 	bAlwaysRelevant = true;
@@ -93,6 +102,11 @@ void ACampfire::Tick(float DeltaTime)
 
 	FLinearColor SmokeColor = FMath::Lerp(SmokeBaseColor, OwnerBaseColor, FMath::Pow(CaptureValue, 4));
 	SmokeParticleSystem->SetColorParameter("SmokeColor", SmokeColor);
+
+	for (APawn* Pawn : DamagingPawns)
+	{
+		Pawn->TakeDamage(20.0f * DeltaTime, FDamageEvent(), nullptr, this);
+	}
 }
 
 void ACampfire::SetActive(bool bActive)
@@ -211,6 +225,24 @@ void ACampfire::OnCapturingPlayersChanged()
 	{
 		this->DominantTeamIdx = -1;
 		this->CurrentCaptureDurationMultiplier = 1.0f;
+	}
+}
+
+void ACampfire::OnBeginDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor)
+	{
+		APawn* Pawn = Cast<APawn>(OtherActor);
+		DamagingPawns.Add(Pawn);
+	}
+}
+
+void ACampfire::OnEndDamage(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor)
+	{
+		APawn* Pawn = Cast<APawn>(OtherActor);
+		DamagingPawns.Remove(Pawn);
 	}
 }
 

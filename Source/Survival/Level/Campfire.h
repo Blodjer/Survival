@@ -39,6 +39,9 @@ private:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Smoke, meta = (AllowPrivateAccess = "true"))
 	UAudioComponent* Audio;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Campfire, meta = (AllowPrivateAccess = "true"))
+	UCapsuleComponent* DamageArea;
+
 	UPROPERTY(BlueprintReadOnly, Category = Campfire, meta = (AllowPrivateAccess = "true"))
 	TArray<ASurvivalPlayerCharacter*> CapturingPlayers;
 
@@ -71,8 +74,14 @@ private:
 	UPROPERTY(BlueprintReadOnly, Transient, Category = Campfire, meta = (AllowPrivateAccess = "true"))
 	float CurrentCaptureDurationMultiplier;
 
-	UPROPERTY(EditDefaultsOnly, Category = Campfire)
+	UPROPERTY(EditDefaultsOnly, Category = Campfire, meta = (AllowPrivateAccess = "true"))
 	FLinearColor SmokeBaseColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = Campfire)
+	float FireDamage;
+
+	UPROPERTY(Transient)
+	TArray<APawn*> DamagingPawns;
 
 private:
 	UFUNCTION()
@@ -82,6 +91,12 @@ private:
 	void OnEndOverlap(class UPrimitiveComponent* OverlappedComponent, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	void OnCapturingPlayersChanged();
+
+	UFUNCTION()
+	void OnBeginDamage(class UPrimitiveComponent* OverlappedComponent, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnEndDamage(class UPrimitiveComponent* OverlappedComponent, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 private:
 	UFUNCTION()
