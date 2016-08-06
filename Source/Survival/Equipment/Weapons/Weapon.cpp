@@ -128,7 +128,7 @@ void AWeapon::BeforeDrop()
 	if (GetOwnerCharacter() == nullptr && ProjectileType != nullptr)
 		return;
 
-	GetOwnerCharacter()->AddAmmo(ProjectileType, GetCurrentRoundsInMagazine());	
+	GetOwnerCharacter()->AddAmmo(ProjectileType, FMath::Min(GetCurrentRoundsInMagazine(), MaxRoundsPerMagazine), true);
 
 	OnCharacterStopUse();
 }
