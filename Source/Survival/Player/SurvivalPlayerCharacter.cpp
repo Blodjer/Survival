@@ -864,6 +864,7 @@ void ASurvivalPlayerCharacter::SimulateUnEquip(AHandheld* Handheld)
 				Handheld->GetMesh3P()->AttachToComponent(Handheld->GetMesh1P(), FAttachmentTransformRules::SnapToTargetIncludingScale, InventorySocketName);
 
 				Handheld->GetMesh1P()->SetVisibility(false, true);
+				Handheld->GetMesh3P()->SetVisibility(true, true);
 			}
 			else
 			{
@@ -879,6 +880,7 @@ void ASurvivalPlayerCharacter::SimulateUnEquip(AHandheld* Handheld)
 			}
 
 			Handheld->GetMesh1P()->SetVisibility(false, true);
+			Handheld->GetMesh3P()->SetVisibility(true, true);
 		}
 	}
 }
@@ -1068,6 +1070,28 @@ void ASurvivalPlayerCharacter::OnRep_IsSprinting()
 void ASurvivalPlayerCharacter::OnRep_IsFlashlightOn()
 {
 	SetFlashlightOn(bIsFlashlightOn);
+}
+
+void ASurvivalPlayerCharacter::OnRep_HandheldInventory(TArray<AHandheld*> HandheldInventoryBefore)
+{
+	TArray<AHandheld*> NewHandhelds;
+
+	for (AHandheld* Handheld : HandheldInventory)
+	{
+		if (!HandheldInventoryBefore.Contains(Handheld))
+		{
+			NewHandhelds.Add(Handheld);
+		}
+	}
+
+	for (AHandheld* Handheld : NewHandhelds)
+	{
+		if (!Handheld->IsEquipped())
+		{
+			Handheld->GetMesh1P()->SetVisibility(false, true);
+			Handheld->GetMesh3P()->SetVisibility(true, true);
+		}
+	}
 }
 
 void ASurvivalPlayerCharacter::OnRep_EquippedHandheld(AHandheld* LastEquippedHandheld)

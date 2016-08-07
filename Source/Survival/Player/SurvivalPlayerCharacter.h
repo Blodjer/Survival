@@ -210,7 +210,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Transient, Category = Campfire)
 	class ACampfire* CapturingCampfire;
 
-	UPROPERTY(BlueprintReadOnly, Replicated, Transient, Category = Equipment)
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_HandheldInventory, Transient, Category = Equipment)
 	TArray<class AHandheld*> HandheldInventory;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = Equipment)
@@ -509,6 +509,9 @@ private:
 	UFUNCTION()
 	void OnRep_IsFlashlightOn();
 	
+	UFUNCTION()
+	void OnRep_HandheldInventory(TArray<AHandheld*> HandheldInventoryBefore);
+
 	UFUNCTION()
 	void OnRep_EquippedHandheld(AHandheld* LastEquippedHandheld);
 
