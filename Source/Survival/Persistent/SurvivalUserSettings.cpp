@@ -29,6 +29,8 @@ void USurvivalUserSettings::SetToDefaults()
 	MouseSensitivityX = 0.5f;
 	MouseSensitivityY = 0.5f;
 	bInvertMouseY = false;
+
+	MasterVolume = 1.0f;
 }
 
 void USurvivalUserSettings::ApplyInputSettings()
@@ -56,6 +58,11 @@ void USurvivalUserSettings::ApplyInputSettings()
 			 }
 		 }
 	}
+
+	if (MasterSoundClass)
+	{
+		MasterSoundClass->Properties.Volume = MasterVolume;
+	}
 }
 
 void USurvivalUserSettings::SetMouseSensitivityX(float Value)
@@ -71,4 +78,12 @@ void USurvivalUserSettings::SetMouseSensitivityY(float Value)
 void USurvivalUserSettings::SetInvertMouseY(bool bInvert)
 {
 	bInvertMouseY = bInvert;
+}
+
+void USurvivalUserSettings::SetMasterVolume(float Volume, USoundClass* SoundClass)
+{
+	SoundClass->Properties.Volume = Volume;
+
+	MasterSoundClass = SoundClass;
+	MasterVolume = Volume;
 }
