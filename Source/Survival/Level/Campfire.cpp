@@ -105,7 +105,10 @@ void ACampfire::Tick(float DeltaTime)
 
 	for (APawn* Pawn : DamagingPawns)
 	{
-		Pawn->TakeDamage(FireDamage * DeltaTime, FDamageEvent(), nullptr, this);
+		if (Pawn)
+		{
+			Pawn->TakeDamage(FireDamage * DeltaTime, FDamageEvent(), nullptr, this);
+		}
 	}
 }
 
@@ -233,7 +236,10 @@ void ACampfire::OnBeginDamage(UPrimitiveComponent* OverlappedComponent, AActor* 
 	if (OtherActor)
 	{
 		APawn* Pawn = Cast<APawn>(OtherActor);
-		DamagingPawns.Add(Pawn);
+		if (Pawn)
+		{
+			DamagingPawns.Add(Pawn);
+		}
 	}
 }
 
