@@ -413,7 +413,7 @@ bool ASurvivalGameMode::DetermineMatchWinner(int32& WinnerTeamIdx)
 	}
 
 	// Killed all other teams
-	if (Teams.Num() >= 2)
+	/*if (Teams.Num() >= 2)
 	{
 		TMap<int32, uint32> AlivePlayersInTeam;
 		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
@@ -454,7 +454,7 @@ bool ASurvivalGameMode::DetermineMatchWinner(int32& WinnerTeamIdx)
 				return true;
 			}
 		}
-	}
+	}*/
 
 	return false;
 }
