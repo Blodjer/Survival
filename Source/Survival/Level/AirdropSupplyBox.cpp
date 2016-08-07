@@ -13,8 +13,8 @@ AAirdropSupplyBox::AAirdropSupplyBox()
 	LightSignal->SetFlashingPattern(0.7f);
 	LightSignal->SetupAttachment(RootComponent);
 
-	GetCaseMesh()->SetMassOverrideInKg(NAME_None, 150.0f, true);
-	GetCaseMesh()->SetCenterOfMass(FVector(0, 0, -30.0f));
+	//GetCaseMesh()->SetMassOverrideInKg(NAME_None, 150.0f, true);
+	//GetCaseMesh()->SetCenterOfMass(FVector(0, 0, -30.0f));
 
 	bDropWithCCD = true;
 
