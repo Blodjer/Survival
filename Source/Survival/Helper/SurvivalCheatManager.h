@@ -18,5 +18,8 @@ class SURVIVAL_API USurvivalCheatManager : public UCheatManager
 
 	UFUNCTION(Exec)
 	void StartMatch();
+
+	UFUNCTION(Exec)
+	void EndMatch();
 	
 };

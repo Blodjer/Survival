@@ -40,3 +40,12 @@ void USurvivalCheatManager::StartMatch()
 		PlayerController->GetWorld()->GetAuthGameMode()->StartMatch();
 	}
 }
+
+void USurvivalCheatManager::EndMatch()
+{
+	ASurvivalPlayerController* PlayerController = GetOuterASurvivalPlayerController();
+	if (PlayerController && PlayerController->GetWorld())
+	{
+		PlayerController->GetWorld()->GetAuthGameMode()->EndMatch();
+	}
+}

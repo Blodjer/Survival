@@ -142,6 +142,9 @@ private:
 	UPROPERTY(Transient, BlueprintReadOnly, Category = Airdrop, meta = (AllowPrivateAccess = "true"))
 	int32 DroppedScheduledAirdrops;
 
+	UPROPERTY(Transient)
+	int32 WinnerTeamIdx;
+
 	FTimerHandle TimerHandle_MatchStartCountdown;
 	
 	FTimerHandle TimerHandle_SendAirdrop;

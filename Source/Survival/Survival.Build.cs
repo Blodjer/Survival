@@ -8,7 +8,7 @@ public class Survival : ModuleRules
 	{
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
 
-        PrivateDependencyModuleNames.AddRange(new string[] { "CableComponent" });
+        PrivateDependencyModuleNames.AddRange(new string[] { "CableComponent", "LevelSequence" });
 
         // Uncomment if you are using Slate UI
         // PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });

@@ -17,4 +17,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = PreMatch, meta = (AllowPrivateAccess = "true"))
 	TArray<ABlockingVolume*> PreMatchBlockingVolumes;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = PostMatch, meta = (AllowPrivateAccess = "true"))
+	class ALevelSequenceActor* MatchEndSequence;
+
+public:
+	FORCEINLINE class ALevelSequenceActor* GetMatchEndSequence() const { return MatchEndSequence; };
+
 };

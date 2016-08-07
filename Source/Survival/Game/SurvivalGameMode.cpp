@@ -28,6 +28,8 @@ ASurvivalGameMode::ASurvivalGameMode()
 	Teams.Add(FTeamInfo("Alpha", FColor::Blue));
 	Teams.Add(FTeamInfo("Bravo", FColor::Red));
 
+	WinnerTeamIdx = -1;
+
 	AirdropInterval = FFloatSpan(60.0f, 120.0f);
 	CampAirdropInterval = 5;
 
@@ -249,16 +251,8 @@ void ASurvivalGameMode::Tick(float DeltaTime)
 		int32 WinnerTeamIdx;
 		if (DetermineMatchWinner(WinnerTeamIdx))
 		{
+			this->WinnerTeamIdx = WinnerTeamIdx;
 			EndMatch();
-
-			for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
-			{
-				ASurvivalPlayerController* SurvivalPlayerController = Cast<ASurvivalPlayerController>(Iterator->Get());
-				if (SurvivalPlayerController)
-				{
-					SurvivalPlayerController->MatchHasEnded(WinnerTeamIdx);
-				}
-			}
 		}
 	}
 }
@@ -307,6 +301,8 @@ void ASurvivalGameMode::StartMatch()
 {
 	bPassedDelay = true;
 
+	WinnerTeamIdx = -1;
+
 	Super::StartMatch();
 }
 
@@ -330,6 +326,14 @@ void ASurvivalGameMode::HandleMatchHasEnded()
 {
 	Super::HandleMatchHasEnded();
 
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		ASurvivalPlayerController* SurvivalPlayerController = Cast<ASurvivalPlayerController>(Iterator->Get());
+		if (SurvivalPlayerController)
+		{
+			SurvivalPlayerController->MatchHasEnded(WinnerTeamIdx);
+		}
+	}
 }
 
 void ASurvivalGameMode::Killed(const UDamageType* DamageType, AController* Killer, AController* KilledPlayer)

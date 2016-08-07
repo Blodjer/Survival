@@ -75,6 +75,8 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = Match)
 	void OnMatchHasEnded(int32 WinnerTeamIdx);
 
+	void OnFadedMatchEnd();
+
 	virtual void BeginInactiveState() override;
 
 	virtual void EndInactiveState() override;
@@ -103,5 +105,7 @@ private:
 
 	UPROPERTY(Transient)
 	bool bIsWaitingForPlayers;
+
+	FTimerHandle TimeHandle_MatchEndFade;
 
 };

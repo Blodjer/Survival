@@ -6,6 +6,8 @@
 #include "Game/SurvivalGameMode.h"
 #include "SurvivalLocalPlayer.h"
 #include "Persistent/SurvivalUserSettings.h"
+#include "Survival/Level/SurvivalLevelScriptActor.h"
+#include "../Source/Runtime/LevelSequence/Public/LevelSequenceActor.h"
 
 ASurvivalPlayerController::ASurvivalPlayerController()
 {
@@ -28,6 +30,8 @@ void ASurvivalPlayerController::BeginPlay()
 		InputMode.SetConsumeCaptureMouseDown(true);
 		SetInputMode(InputMode);
 	}
+
+	PlayerCameraManager->StartCameraFade(1.0f, 0.0f, 2.5f, FLinearColor::Black, true);
 }
 
 void ASurvivalPlayerController::InitInputSystem()
@@ -112,6 +116,17 @@ void ASurvivalPlayerController::MatchHasStarted_Implementation()
 
 void ASurvivalPlayerController::MatchHasEnded_Implementation(int32 WinnerTeamIdx)
 {
+	OnMatchHasEnded(WinnerTeamIdx);
+
+	GetWorldTimerManager().ClearTimer(TimerHandle_UnFreeze);
+
+	PlayerCameraManager->StartCameraFade(0.0f, 1.0f, 1.0f, FLinearColor::Black, true, true);
+
+	GetWorldTimerManager().SetTimer(TimeHandle_MatchEndFade, this, &ASurvivalPlayerController::OnFadedMatchEnd, 1.0f);
+}
+
+void ASurvivalPlayerController::OnFadedMatchEnd()
+{
 	FlushPressedKeys();
 	StopMovement();
 
@@ -120,11 +135,20 @@ void ASurvivalPlayerController::MatchHasEnded_Implementation(int32 WinnerTeamIdx
 		GetPawn()->GetMovementComponent()->StopMovementImmediately();
 	}
 
-	OnMatchHasEnded(WinnerTeamIdx);
-
 	UnPossess();
 
-	GetWorldTimerManager().ClearTimer(TimerHandle_UnFreeze);
+	if (GetLevel() && GetLevel()->GetLevelScriptActor())
+	{
+		ASurvivalLevelScriptActor* LevelScriptActor = Cast<ASurvivalLevelScriptActor>(GetLevel()->GetLevelScriptActor());
+		if (LevelScriptActor)
+		{
+			ALevelSequenceActor* MatchEndSequence = LevelScriptActor->GetMatchEndSequence();
+			if (MatchEndSequence)
+			{
+				//MatchEndSequence->SequencePlayer->PlayLooping();
+			}
+		}
+	}
 }
 
 void ASurvivalPlayerController::OpenPauseMenu()
@@ -213,6 +237,8 @@ void ASurvivalPlayerController::BeginInactiveState()
 void ASurvivalPlayerController::EndInactiveState()
 {
 	Super::EndInactiveState();
+
+	PlayerCameraManager->StartCameraFade(1.0f, 0.0f, 1.0f, FLinearColor::Black);
 
 	OnRespawn();
 }
