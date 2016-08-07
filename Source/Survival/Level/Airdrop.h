@@ -25,14 +25,19 @@ public:
 	void Init(FVector LandingLocation, TSubclassOf<ADroppablePhysicsActor> PayloadClass);
 
 protected:
+	UFUNCTION(NetMulticast, Reliable)
+	void SetLandingRoute(FVector LandingLocation);
+	void SetLandingRoute_Implementation(FVector LandingLocation);
+
 	UFUNCTION()
 	void OnLanded(const FHitResult& ImpactResult, float Time);
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Payload)
 	void ReleasePayload();
 
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Payload)
-	void StartEscapeRoute();
+	UFUNCTION(BlueprintCallable, NetMulticast, Reliable, Category = Payload)
+	void SetEscapeRoute();
+	void SetEscapeRoute_Implementation();
 
 protected:
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = Payload)
@@ -78,8 +83,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Airdrop, meta = (AllowPrivateAccess = "true"))
 	float ReleasePayloadHeight;
 
+	UPROPERTY(Transient)
 	FVector StartLocation;
 
+	UPROPERTY(Transient)
 	FVector LandingLocation;
 
 };

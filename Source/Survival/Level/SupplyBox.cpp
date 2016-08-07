@@ -6,9 +6,9 @@
 ASupplyBox::ASupplyBox()
 {
 	CaseMesh = CreateDefaultSubobject<UStaticMeshComponent>("CaseMesh");
-	CaseMesh->BodyInstance.bLockXRotation = true;
-	CaseMesh->BodyInstance.bLockYRotation = true;
-	CaseMesh->BodyInstance.CreateDOFLock();
+	//CaseMesh->BodyInstance.bLockXRotation = true;
+	//CaseMesh->BodyInstance.bLockYRotation = true;
+	//CaseMesh->BodyInstance.CreateDOFLock();
 	CaseMesh->SetCollisionProfileName("SupplyBox");
 	RootComponent = CaseMesh;
 

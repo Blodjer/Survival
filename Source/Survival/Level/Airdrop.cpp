@@ -45,10 +45,10 @@ AAirdrop::AAirdrop()
 	EscapeDistance = 50000.0f;
 	EscapeSpeed = 900.0f;
 
-	ReleasePayloadHeight = 300.0f;
+	ReleasePayloadHeight = 350.0f;
 
 	bReplicates = true;
-	bReplicateMovement = true;
+	bReplicateMovement = false;
 	bAlwaysRelevant = true;
 
 	PrimaryActorTick.bCanEverTick = true;
@@ -88,7 +88,7 @@ void AAirdrop::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if ((GetActorLocation() - LandingLocation).Z <= ReleasePayloadHeight)
+	if (HasAuthority() && Payload && (GetActorLocation() - LandingLocation).Z <= ReleasePayloadHeight)
 	{
 		ReleasePayload();
 	}
@@ -98,7 +98,7 @@ void AAirdrop::Init(FVector LandingLocation, TSubclassOf<ADroppablePhysicsActor>
 {
 	this->PayloadClass = PayloadClass;
 
-	if (PayloadClass != nullptr)
+	if (HasAuthority() && PayloadClass != nullptr)
 	{
 		FActorSpawnParameters SpawnParameters;
 		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -112,6 +112,11 @@ void AAirdrop::Init(FVector LandingLocation, TSubclassOf<ADroppablePhysicsActor>
 		}
 	}
 
+	SetLandingRoute(LandingLocation);
+}
+
+void AAirdrop::SetLandingRoute_Implementation(FVector LandingLocation)
+{
 	this->StartLocation = GetActorLocation();
 	this->LandingLocation = LandingLocation;
 
@@ -155,11 +160,11 @@ void AAirdrop::ReleasePayload()
 		
 		Payload = nullptr;
 
-		StartEscapeRoute();
+		SetEscapeRoute();
 	}
 }
 
-void AAirdrop::StartEscapeRoute()
+void AAirdrop::SetEscapeRoute_Implementation()
 {
 	MovementComponent->SetUpdatedComponent(RootComponent);
 

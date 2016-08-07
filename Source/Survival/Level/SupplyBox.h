@@ -49,4 +49,7 @@ private:
 	UFUNCTION()
 	void OnRep_IsOpen();
 
+public:
+	FORCEINLINE UStaticMeshComponent* GetCaseMesh() const { return CaseMesh; };
+
 };

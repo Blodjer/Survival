@@ -13,7 +13,7 @@ ADroppablePhysicsActor::ADroppablePhysicsActor()
 void ADroppablePhysicsActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
 	if (HasAuthority() && PhysicsRootComponent != nullptr && PhysicsRootComponent->IsSimulatingPhysics() && GetVelocity().Size() < 1.0f && GetWorld()->GetTimeSeconds() - CreationTime > 1.0f)
 	{
 		StopSimulatePhysics();
@@ -34,7 +34,7 @@ void ADroppablePhysicsActor::OnRep_ReplicateMovement()
 	}
 }
 
-void ADroppablePhysicsActor::StartSimulatePhysics(FVector Velocity)
+void ADroppablePhysicsActor::StartSimulatePhysics(FVector Velocity, FVector AngularVelocity)
 {
 	PhysicsRootComponent = Cast<UPrimitiveComponent>(GetRootComponent());
 
@@ -48,6 +48,7 @@ void ADroppablePhysicsActor::StartSimulatePhysics(FVector Velocity)
 	PhysicsRootComponent->SetCollisionProfileName(SimulatingPhysicsProfileName.IsNone() ? DefaultPhysicProfileName : SimulatingPhysicsProfileName);
 	PhysicsRootComponent->SetSimulatePhysics(true);
 	PhysicsRootComponent->SetAllPhysicsLinearVelocity(Velocity);
+	PhysicsRootComponent->SetAllPhysicsAngularVelocity(AngularVelocity);
 }
 
 void ADroppablePhysicsActor::StopSimulatePhysics()

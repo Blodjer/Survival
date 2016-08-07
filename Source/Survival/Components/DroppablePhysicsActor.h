@@ -18,7 +18,7 @@ public:
 	virtual void OnRep_ReplicateMovement() override;
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Physics)
-	virtual void StartSimulatePhysics(FVector Velocity = FVector::ZeroVector);
+	virtual void StartSimulatePhysics(FVector Velocity = FVector::ZeroVector, FVector AngularVelocity = FVector::ZeroVector);
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = Physics)
 	virtual void StopSimulatePhysics();
