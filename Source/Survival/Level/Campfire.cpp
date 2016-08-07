@@ -105,7 +105,7 @@ void ACampfire::Tick(float DeltaTime)
 
 	for (APawn* Pawn : DamagingPawns)
 	{
-		Pawn->TakeDamage(20.0f * DeltaTime, FDamageEvent(), nullptr, this);
+		Pawn->TakeDamage(FireDamage * DeltaTime, FDamageEvent(), nullptr, this);
 	}
 }
 
