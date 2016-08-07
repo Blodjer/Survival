@@ -11,6 +11,8 @@ ASurvivalPlayerController::ASurvivalPlayerController()
 {
 	IgnoreGameInput = 0;
 
+	bIsWaitingForPlayers = false;
+
 	bInPauseMenu = false;
 
 	CheatClass = USurvivalCheatManager::StaticClass();
@@ -82,19 +84,19 @@ void ASurvivalPlayerController::MatchIsWaitingForPlayers_Implementation()
 	SetIgnoreMoveInput(true);
 	SetIgnoreGameInput(true);
 
-	bPlayerIsWaiting = true;
+	bIsWaitingForPlayers = true;
 
 	OnMatchIsWaitingForPlayers();
 }
 
 void ASurvivalPlayerController::MatchHasStartedCountdown_Implementation(float RemainingTime)
 {
-	if (bPlayerIsWaiting)
+	if (bIsWaitingForPlayers)
 	{
 		SetIgnoreMoveInput(false);
 		SetIgnoreGameInput(false);
 
-		bPlayerIsWaiting = false;
+		bIsWaitingForPlayers = false;
 	}
 
 	OnMatchHasStartedCountdown(RemainingTime);
@@ -193,7 +195,7 @@ bool ASurvivalPlayerController::IsGameInputIgnored() const
 
 void ASurvivalPlayerController::ResetIgnoreInputFlags()
 {
-	if (!bPlayerIsWaiting)
+	if (!bIsWaitingForPlayers)
 	{
 		Super::ResetIgnoreInputFlags();
 

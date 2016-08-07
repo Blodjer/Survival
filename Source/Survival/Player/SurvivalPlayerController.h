@@ -101,4 +101,7 @@ private:
 	UPROPERTY(BlueprintReadOnly, Category = Pause, meta = (AllowPrivateAccess = "true"))
 	bool bInPauseMenu;
 
+	UPROPERTY(Transient)
+	bool bIsWaitingForPlayers;
+
 };
