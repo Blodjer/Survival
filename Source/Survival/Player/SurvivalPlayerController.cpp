@@ -116,13 +116,27 @@ void ASurvivalPlayerController::MatchHasStarted_Implementation()
 
 void ASurvivalPlayerController::MatchHasEnded_Implementation(int32 WinnerTeamIdx)
 {
-	OnMatchHasEnded(WinnerTeamIdx);
-
 	GetWorldTimerManager().ClearTimer(TimerHandle_UnFreeze);
 
-	PlayerCameraManager->StartCameraFade(0.0f, 1.0f, 1.0f, FLinearColor::Black, true, true);
+	OnMatchHasEnded(WinnerTeamIdx);
 
-	GetWorldTimerManager().SetTimer(TimeHandle_MatchEndFade, this, &ASurvivalPlayerController::OnFadedMatchEnd, 1.0f);
+	if (GetLevel() && GetLevel()->GetLevelScriptActor())
+	{
+		ASurvivalLevelScriptActor* LevelScriptActor = Cast<ASurvivalLevelScriptActor>(GetLevel()->GetLevelScriptActor());
+		if (LevelScriptActor)
+		{
+			if (LevelScriptActor->GetMatchEndSequence())
+			{
+				PlayerCameraManager->StartCameraFade(0.0f, 1.0f, 1.0f, FLinearColor::Black, true, true);
+
+				GetWorldTimerManager().SetTimer(TimeHandle_MatchEndFade, this, &ASurvivalPlayerController::OnFadedMatchEnd, 1.0f);
+
+				return;
+			}
+		}
+	}
+
+	UnPossess();
 }
 
 void ASurvivalPlayerController::OnFadedMatchEnd()
@@ -135,20 +149,21 @@ void ASurvivalPlayerController::OnFadedMatchEnd()
 		GetPawn()->GetMovementComponent()->StopMovementImmediately();
 	}
 
-	UnPossess();
-
 	if (GetLevel() && GetLevel()->GetLevelScriptActor())
 	{
 		ASurvivalLevelScriptActor* LevelScriptActor = Cast<ASurvivalLevelScriptActor>(GetLevel()->GetLevelScriptActor());
 		if (LevelScriptActor)
 		{
-			ALevelSequenceActor* MatchEndSequence = LevelScriptActor->GetMatchEndSequence();
-			if (MatchEndSequence)
+			if (LevelScriptActor->GetMatchEndSequence())
 			{
-				//MatchEndSequence->SequencePlayer->PlayLooping();
+				PlayerCameraManager->StartCameraFade(1.0f, 0.0f, 0.75f, FLinearColor::Black, true);
+
+				LevelScriptActor->GetMatchEndSequence()->SequencePlayer->PlayLooping();
 			}
 		}
 	}
+
+	UnPossess();
 }
 
 void ASurvivalPlayerController::OpenPauseMenu()
