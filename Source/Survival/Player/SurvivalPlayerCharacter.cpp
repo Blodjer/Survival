@@ -25,6 +25,8 @@ ASurvivalPlayerCharacter::ASurvivalPlayerCharacter(const FObjectInitializer& Obj
 	Camera->RelativeLocation = FVector(0, 0, BaseEyeHeight);
 	Camera->bUsePawnControlRotation = true;
 
+	//GetMesh()->bAbsoluteRotation = true;
+
 	// Create an extra MeshComponent for the first person mesh
 	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>("Mesh1P");
 	Mesh1P->SetupAttachment(Camera);
