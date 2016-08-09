@@ -297,6 +297,11 @@ void AWeapon::SimulateFire()
 
 	UGameplayStatics::PlaySoundAtLocation(GetWorld(), ShotSound, GetActorLocation());
 
+	if (MuzzleFlash)
+	{
+		UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, GetOwnerCharacter()->IsLocallyControlled() ? GetMesh1P() : GetMesh3P(), "Muzzle");
+	}
+
 	OnSimulateFire();
 }
 

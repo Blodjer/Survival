@@ -246,6 +246,9 @@ protected:
 	USoundBase* ShotSound;
 
 	UPROPERTY(EditDefaultsOnly, Category = Weapon)
+	UParticleSystem* MuzzleFlash;
+
+	UPROPERTY(EditDefaultsOnly, Category = Weapon)
 	USoundBase* TriggerSound;
 
 	UPROPERTY(EditDefaultsOnly, Category = Weapon)
