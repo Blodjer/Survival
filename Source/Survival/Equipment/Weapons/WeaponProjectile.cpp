@@ -117,6 +117,7 @@ UParticleSystem* AWeaponProjectile::GetImpactVFX(TEnumAsByte<EPhysicalSurface> S
 		case SURFACE_Water:		ParticleSystem = ImpactVFX.Water; break;
 		case SURFACE_Flesh:		ParticleSystem = ImpactVFX.Flesh; break;
 		case SURFACE_Metal:		ParticleSystem = ImpactVFX.Metal; break;
+		case SURFACE_Floor:		ParticleSystem = ImpactVFX.Floor; break;
 		default:				ParticleSystem = ImpactVFX.Default; break;
 	}
 
@@ -137,6 +138,7 @@ USoundBase* AWeaponProjectile::GetImpactSFX(TEnumAsByte<EPhysicalSurface> Surfac
 		case SURFACE_Water:		Sound = ImpactSFX.Water; break;
 		case SURFACE_Flesh:		Sound = ImpactSFX.Flesh; break;
 		case SURFACE_Metal:		Sound = ImpactSFX.Metal; break;
+		case SURFACE_Floor:		Sound = ImpactSFX.Floor; break;
 		default:				Sound = ImpactSFX.Default; break;
 	}
 

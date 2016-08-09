@@ -230,6 +230,9 @@ struct SURVIVAL_API FPhysicalVFX
 
 	UPROPERTY(EditDefaultsOnly, Category = Visual)
 	UParticleSystem* Metal;
+
+	UPROPERTY(EditDefaultsOnly, Category = Visual)
+	UParticleSystem* Floor;
 };
 
 USTRUCT(BlueprintType)
@@ -260,4 +263,7 @@ struct SURVIVAL_API FPhysicalSFX
 
 	UPROPERTY(EditDefaultsOnly, Category = Sound)
 	USoundBase* Metal;
+
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+	USoundBase* Floor;
 };
