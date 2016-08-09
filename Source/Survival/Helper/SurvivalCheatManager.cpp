@@ -41,11 +41,17 @@ void USurvivalCheatManager::StartMatch()
 	}
 }
 
-void USurvivalCheatManager::EndMatch()
+void USurvivalCheatManager::EndMatch(int32 WinnerTeamIdx)
 {
 	ASurvivalPlayerController* PlayerController = GetOuterASurvivalPlayerController();
 	if (PlayerController && PlayerController->GetWorld())
 	{
+		ASurvivalGameMode* SurvivalGameMode = Cast<ASurvivalGameMode>(PlayerController->GetWorld()->GetAuthGameMode());
+		if (SurvivalGameMode)
+		{
+			SurvivalGameMode->Cheat_SetMatchWinner(WinnerTeamIdx);
+		}
+
 		PlayerController->GetWorld()->GetAuthGameMode()->EndMatch();
 	}
 }

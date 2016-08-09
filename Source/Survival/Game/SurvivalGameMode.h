@@ -152,4 +152,9 @@ private:
 	UPROPERTY(Transient)
 	bool bPassedDelay;
 
+#if !UE_BUILD_SHIPPING
+public:
+	void Cheat_SetMatchWinner(int32 WinnerTeamIdx);
+#endif
+
 };

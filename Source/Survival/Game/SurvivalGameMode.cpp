@@ -334,6 +334,8 @@ void ASurvivalGameMode::HandleMatchHasEnded()
 			SurvivalPlayerController->MatchHasEnded(WinnerTeamIdx);
 		}
 	}
+
+	GetWorldTimerManager().ClearTimer(TimerHandle_SendAirdrop);
 }
 
 void ASurvivalGameMode::Killed(const UDamageType* DamageType, AController* Killer, AController* KilledPlayer)
@@ -578,3 +580,10 @@ void ASurvivalGameMode::SendAirdrop(TSubclassOf<AAirdropSupplyBox> Payload, AAir
 		UGameplayStatics::FinishSpawningActor(Airdrop, SpawnTransform);
 	}
 }
+
+#if !UE_BUILD_SHIPPING
+void ASurvivalGameMode::Cheat_SetMatchWinner(int32 WinnerTeamIdx)
+{
+	this->WinnerTeamIdx = WinnerTeamIdx;
+}
+#endif
