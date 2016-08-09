@@ -299,7 +299,7 @@ void AWeapon::SimulateFire()
 
 	if (MuzzleFlash)
 	{
-		UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, GetOwnerCharacter()->IsLocallyControlled() ? GetMesh1P() : GetMesh3P(), "Muzzle");
+		UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, GetOwnerCharacter()->IsLocallyControlled() ? GetMesh1P() : GetMesh3P(), "Muzzle", FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, true);
 	}
 
 	OnSimulateFire();
