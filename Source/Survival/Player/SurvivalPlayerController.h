@@ -108,4 +108,7 @@ private:
 
 	FTimerHandle TimeHandle_MatchEndFade;
 
+	UPROPERTY(Transient)
+	int32 ReceivedWinnerTeamIdx;
+
 };

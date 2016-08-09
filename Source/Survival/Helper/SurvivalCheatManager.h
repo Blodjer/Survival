@@ -20,6 +20,6 @@ class SURVIVAL_API USurvivalCheatManager : public UCheatManager
 	void StartMatch();
 
 	UFUNCTION(Exec)
-	void EndMatch();
+	void EndMatch(int32 WinnerTeamIdx = -1);
 	
 };

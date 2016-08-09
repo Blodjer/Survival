@@ -17,6 +17,8 @@ ASurvivalPlayerController::ASurvivalPlayerController()
 
 	bInPauseMenu = false;
 
+	ReceivedWinnerTeamIdx = -1;
+
 	CheatClass = USurvivalCheatManager::StaticClass();
 }
 
@@ -116,9 +118,9 @@ void ASurvivalPlayerController::MatchHasStarted_Implementation()
 
 void ASurvivalPlayerController::MatchHasEnded_Implementation(int32 WinnerTeamIdx)
 {
-	GetWorldTimerManager().ClearTimer(TimerHandle_UnFreeze);
+	ReceivedWinnerTeamIdx = WinnerTeamIdx;
 
-	OnMatchHasEnded(WinnerTeamIdx);
+	GetWorldTimerManager().ClearTimer(TimerHandle_UnFreeze);
 
 	if (GetLevel() && GetLevel()->GetLevelScriptActor())
 	{
@@ -135,6 +137,8 @@ void ASurvivalPlayerController::MatchHasEnded_Implementation(int32 WinnerTeamIdx
 			}
 		}
 	}
+
+	OnMatchHasEnded(WinnerTeamIdx);
 
 	UnPossess();
 }
@@ -158,10 +162,12 @@ void ASurvivalPlayerController::OnFadedMatchEnd()
 			{
 				PlayerCameraManager->StartCameraFade(1.0f, 0.0f, 0.75f, FLinearColor::Black, true);
 
-				LevelScriptActor->GetMatchEndSequence()->SequencePlayer->PlayLooping();
+				LevelScriptActor->GetMatchEndSequence()->SequencePlayer->Play();
 			}
 		}
 	}
+
+	OnMatchHasEnded(ReceivedWinnerTeamIdx);
 
 	UnPossess();
 }
