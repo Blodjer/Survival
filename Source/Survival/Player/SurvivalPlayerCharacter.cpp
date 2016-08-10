@@ -971,6 +971,9 @@ void ASurvivalPlayerCharacter::UpdateTeamColors()
 		{
 			for (UMaterialInstanceDynamic* MID : MeshMIDs)
 			{
+				if (MID == nullptr)
+					continue;
+
 				FTeamInfo TeamInfo;
 				SurvivalPlayerState->GetTeamInfo(TeamInfo);
 				MID->SetVectorParameterValue("TeamColor", TeamInfo.Color);
