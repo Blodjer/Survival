@@ -56,18 +56,6 @@ struct SURVIVAL_API FWeaponMovementValues : public FCharacterMovementValues
 	}
 };
 
-USTRUCT()
-struct FWeaponAnim
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditDefaultsOnly, Category = Animation)
-	UAnimMontage* FirstPerson;
-
-	UPROPERTY(EditDefaultsOnly, Category = Animation)
-	UAnimMontage* ThridPerson;
-};
-
 UCLASS(Abstract, Blueprintable)
 class SURVIVAL_API AWeapon : public AHandheld
 {
@@ -277,7 +265,7 @@ protected:
 	USoundBase* FiremodeSound;
 
 	UPROPERTY(EditDefaultsOnly, Category = Weapon)
-	FWeaponAnim ReloadAnimation;
+	FHandheldAnim ReloadAnimation;
 
 protected:
 	UPROPERTY(Transient, BlueprintReadOnly, Category = Weapon)

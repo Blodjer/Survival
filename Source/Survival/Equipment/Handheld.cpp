@@ -156,6 +156,22 @@ bool AHandheld::IsGameInputAllowed() const
 	return GetOwnerCharacter() ? GetOwnerCharacter()->IsGameInputAllowed() : false;
 }
 
+float AHandheld::PlayAnimation(const FHandheldAnim& Animation)
+{
+	if (!GetOwnerCharacter())
+		return 0.0f;
+
+	return GetOwnerCharacter()->PlayAnimMontage(GetOwnerCharacter()->IsLocallyControlled() ? Animation.FirstPerson : Animation.ThridPerson);
+}
+
+void AHandheld::StopAnimation(const FHandheldAnim& Animation)
+{
+	if (!GetOwnerCharacter())
+		return;
+
+	GetOwnerCharacter()->StopAnimMontage(GetOwnerCharacter()->IsLocallyControlled() ? Animation.FirstPerson : Animation.ThridPerson);
+}
+
 void AHandheld::ClearActionBindings()
 {
 	if (InputActionBindings.Num() == 0 || OwnerInputComponent == nullptr)

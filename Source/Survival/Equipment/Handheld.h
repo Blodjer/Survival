@@ -15,6 +15,19 @@ enum class EHandheldType : uint8
 	Unknown
 };
 
+
+USTRUCT()
+struct FHandheldAnim
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UAnimMontage* FirstPerson;
+
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UAnimMontage* ThridPerson;
+};
+
 UCLASS(Abstract, NotBlueprintable)
 class SURVIVAL_API AHandheld : public AActor
 {
@@ -60,6 +73,12 @@ protected:
 
 	UFUNCTION(BlueprintPure, Category = Handheld)
 	bool IsGameInputAllowed() const;
+
+	UFUNCTION(BlueprintCallable, Category = Handheld)
+	float PlayAnimation(const FHandheldAnim& Animation);
+
+	UFUNCTION(BlueprintCallable, Category = Handheld)
+	void StopAnimation(const FHandheldAnim& Animation);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = Handheld)

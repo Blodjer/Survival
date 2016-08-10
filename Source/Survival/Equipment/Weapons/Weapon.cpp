@@ -377,7 +377,7 @@ void AWeapon::StartReload()
 
 	StopFire();
 
-	GetOwnerCharacter()->PlayAnimMontage(GetOwnerCharacter()->IsLocallyControlled() ? ReloadAnimation.FirstPerson : ReloadAnimation.ThridPerson);
+	PlayAnimation(ReloadAnimation);
 
 	GetWorldTimerManager().SetTimer(TimerHandle_Reload, this, &AWeapon::Reload, NoAnimReloadDuration, false);
 

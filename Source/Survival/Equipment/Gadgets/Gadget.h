@@ -16,6 +16,8 @@ public:
 protected:
 	virtual void SetupInputActions() override;
 
+	virtual void OnCharacterStopUse() override;
+
 	void Use();
 
 	UFUNCTION(Server, Reliable, WithValidation)
@@ -31,8 +33,31 @@ protected:
 	void SimulateUse();
 	void SimulateUse_Implementation();
 
+	UFUNCTION()
+	void CooldownEnd();
+
 protected:
+	virtual void BeforeDrop() override;
+
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = Gadget)
+	float UseDelay;
+
+	UPROPERTY(EditDefaultsOnly, Category = Gadget)
+	float Cooldown;
+
+	UPROPERTY(EditDefaultsOnly, Category = Gadget)
+	FHandheldAnim UseAnimation;
+
 	UPROPERTY(EditDefaultsOnly, Category = Gadget)
 	bool bIsDisposable;
 	
+private:
+	UPROPERTY(Transient)
+	bool bIsInUse;
+
+	FTimerHandle TimerHandle_UseDelay;
+
+	FTimerHandle TimerHandle_Cooldown;
+
 };
