@@ -9,8 +9,7 @@ ULensFlareComponent::ULensFlareComponent()
 	SetTemplate(LensFlareTemplate.Object);
 	
 	bIsSpotLight = false;
-	bScreenSizeScaled = false;
-	DepthOffset = 0.0f;
+	ScreenSizeScale = 0.0f;
 
 	bWantsInitializeComponent = true;
 	PrimaryComponentTick.bCanEverTick = true;
@@ -24,6 +23,7 @@ void ULensFlareComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 
+	OnConstruction();
 }
 
 #if WITH_EDITORONLY_DATA
@@ -60,8 +60,9 @@ void ULensFlareComponent::OnRegister()
 	{
 		LensFlareMID->SetTextureParameterValue("FlareTexture", OverrideTexture);
 	}
-	LensFlareMID->SetScalarParameterValue("ScreenSizeScaled", bScreenSizeScaled ? 1.0f : 0.0f);
-	LensFlareMID->SetScalarParameterValue("DepthOffset", DepthOffset);
+	LensFlareMID->SetScalarParameterValue("ScreenSizeScaled", ScreenSizeScale);
+
+	OnConstruction();
 }
 #endif
 
@@ -88,8 +89,9 @@ void ULensFlareComponent::PostEditChangeProperty(FPropertyChangedEvent& Property
 	{
 		LensFlareMID->SetTextureParameterValue("FlareTexture", OverrideTexture);
 	}
-	LensFlareMID->SetScalarParameterValue("ScreenSizeScaled", bScreenSizeScaled ? 1.0f : 0.0f);
-	LensFlareMID->SetScalarParameterValue("DepthOffset", DepthOffset);
+	LensFlareMID->SetScalarParameterValue("ScreenSizeScaled", ScreenSizeScale);
+
+	OnConstruction();
 }
 #endif
 

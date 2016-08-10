@@ -25,19 +25,21 @@ public:
 
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
+protected:
+	UFUNCTION(BlueprintImplementableEvent, Category = LensFlare)
+	void OnConstruction();
+
 private:
-	UPROPERTY(EditAnywhere, Category = LensFlare, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditInstanceOnly, Category = LensFlare, meta = (AllowPrivateAccess = "true"))
 	UTexture* OverrideTexture;
 
-	UPROPERTY(EditAnywhere, Category = LensFlare, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditInstanceOnly, Category = LensFlare, meta = (AllowPrivateAccess = "true"))
 	bool bIsSpotLight;
 
-	UPROPERTY(EditAnywhere, Category = LensFlare, meta = (AllowPrivateAccess = "true"))
-	bool bScreenSizeScaled;
+	UPROPERTY(EditInstanceOnly, Category = LensFlare, meta = (AllowPrivateAccess = "true"))
+	float ScreenSizeScale;
 
-	UPROPERTY(EditAnywhere, Category = LensFlare, meta = (AllowPrivateAccess = "true"))
-	float DepthOffset;
-
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, BlueprintReadOnly, Category = LensFlare, meta = (AllowPrivateAccess = "true"))
 	UMaterialInstanceDynamic* LensFlareMID;
+
 };
