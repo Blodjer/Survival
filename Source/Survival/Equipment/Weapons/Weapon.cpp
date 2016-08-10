@@ -11,12 +11,12 @@ AWeapon::AWeapon(const FObjectInitializer& ObjectInitializer)
 	MagazineMesh1P->SetOnlyOwnerSee(true);
 	MagazineMesh1P->SetCastShadow(false);
 	MagazineMesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	MagazineMesh1P->AttachToComponent(GetMesh1P(), FAttachmentTransformRules::SnapToTargetIncludingScale, "Magazine");
+	MagazineMesh1P->SetupAttachment(GetMesh1P(), "Magazine");
 
 	MagazineMesh3P = CreateDefaultSubobject<UStaticMeshComponent>("MagazineMesh3P");
 	MagazineMesh3P->SetOwnerNoSee(true);
 	MagazineMesh3P->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	MagazineMesh3P->AttachToComponent(GetMesh3P(), FAttachmentTransformRules::SnapToTargetIncludingScale, "Magazine");
+	MagazineMesh3P->SetupAttachment(GetMesh3P(), "Magazine");
 
 	Type = EHandheldType::PrimaryWeapon;
 
