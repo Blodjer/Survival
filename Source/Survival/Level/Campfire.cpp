@@ -132,7 +132,7 @@ void ACampfire::SetActive(bool bActive)
 
 bool ACampfire::IsCaptured()
 {
-	return CaptureValue >= 1.0f;
+	return CaptureValue >= 0.98f;
 }
 
 void ACampfire::UpdateCapturingPlayers()
