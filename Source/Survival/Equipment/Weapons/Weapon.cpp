@@ -413,9 +413,10 @@ void AWeapon::StopReload()
 		return;
 
 	GetOwnerCharacter()->StopAnimMontage(GetOwnerCharacter()->IsLocallyControlled() ? ReloadAnimation.FirstPerson : ReloadAnimation.ThridPerson);
+	AnimLoadMagazine();
 
 	GetWorldTimerManager().ClearTimer(TimerHandle_Reload);
-
+	
 	bIsReloading = false;
 }
 
@@ -493,7 +494,7 @@ bool AWeapon::CanFire()
 
 bool AWeapon::CanAim()
 {
-	return IsEquipped() && IsGameInputAllowed() && !GetOwnerCharacter()->IsSprinting();
+	return IsEquipped() && IsGameInputAllowed() && !GetOwnerCharacter()->IsSprinting() && !bIsReloading;
 }
 
 bool AWeapon::CanReload()
@@ -529,6 +530,36 @@ void AWeapon::AttachSight(TSubclassOf<AWeaponSight> Sight)
 
 		NewSight->GetMesh1P()->AttachToComponent(GetMesh1P(), FAttachmentTransformRules::SnapToTargetIncludingScale);
 		NewSight->GetMesh3P()->AttachToComponent(GetMesh3P(), FAttachmentTransformRules::SnapToTargetIncludingScale);
+	}
+}
+
+void AWeapon::AnimDropMagazine()
+{
+	if (MagazineMesh1P)
+	{
+		MagazineMesh1P->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		MagazineMesh1P->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+		MagazineMesh1P->SetSimulatePhysics(true);
+	}
+}
+
+void AWeapon::AnimHandMagazine()
+{
+	if (MagazineMesh1P && GetOwnerCharacter())
+	{
+		MagazineMesh1P->SetSimulatePhysics(false);
+		MagazineMesh1P->AttachToComponent(GetOwnerCharacter()->GetMesh1P(), FAttachmentTransformRules::SnapToTargetIncludingScale, "L_WeaponSocket");
+		MagazineMesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+}
+
+void AWeapon::AnimLoadMagazine()
+{
+	if (MagazineMesh1P)
+	{
+		MagazineMesh1P->SetSimulatePhysics(false);
+		MagazineMesh1P->AttachToComponent(GetMesh1P(), FAttachmentTransformRules::SnapToTargetIncludingScale, "Magazine");
+		MagazineMesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 

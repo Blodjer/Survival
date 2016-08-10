@@ -196,6 +196,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	void AttachSight(TSubclassOf<AWeaponSight> Sight);
 
+public:
+	UFUNCTION(BlueprintCallable, Category = Weapon)
+	void AnimDropMagazine();
+
+	UFUNCTION(BlueprintCallable, Category = Weapon)
+	void AnimHandMagazine();
+
+	UFUNCTION(BlueprintCallable, Category = Weapon)
+	void AnimLoadMagazine();
+
 protected:
 	// The projectile the weapon uses
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapon)
