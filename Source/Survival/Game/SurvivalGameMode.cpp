@@ -584,6 +584,13 @@ void ASurvivalGameMode::SendAirdrop(TSubclassOf<AAirdropSupplyBox> Payload, AAir
 #if !UE_BUILD_SHIPPING
 void ASurvivalGameMode::Cheat_SetMatchWinner(int32 WinnerTeamIdx)
 {
-	this->WinnerTeamIdx = WinnerTeamIdx;
+	if (Teams.Num() > 0)
+	{
+		this->WinnerTeamIdx = FMath::Clamp(WinnerTeamIdx, 0, Teams.Num() - 1);
+	}
+	else
+	{
+		this->WinnerTeamIdx = -1;
+	}
 }
 #endif
