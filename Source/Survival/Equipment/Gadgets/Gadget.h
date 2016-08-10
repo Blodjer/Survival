@@ -11,7 +11,7 @@ class SURVIVAL_API AGadget : public AHandheld
 	GENERATED_BODY()
 
 public:
-	AGadget();
+	AGadget(const FObjectInitializer& ObjectInitializer);
 
 protected:
 	virtual void SetupInputActions() override;

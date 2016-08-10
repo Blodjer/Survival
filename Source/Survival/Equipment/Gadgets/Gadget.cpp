@@ -3,7 +3,8 @@
 #include "Survival.h"
 #include "Gadget.h"
 
-AGadget::AGadget()
+AGadget::AGadget(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 	Type = EHandheldType::Gadget;
 }

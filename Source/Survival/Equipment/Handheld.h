@@ -21,7 +21,7 @@ class SURVIVAL_API AHandheld : public AActor
 	GENERATED_BODY()
 	
 public:
-	AHandheld();
+	AHandheld(const FObjectInitializer& ObjectInitializer);
 
 	virtual void PostInitializeComponents() override;
 

@@ -56,13 +56,25 @@ struct SURVIVAL_API FWeaponMovementValues : public FCharacterMovementValues
 	}
 };
 
+USTRUCT()
+struct FWeaponAnim
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UAnimMontage* FirstPerson;
+
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UAnimMontage* ThridPerson;
+};
+
 UCLASS(Abstract, Blueprintable)
 class SURVIVAL_API AWeapon : public AHandheld
 {
 	GENERATED_BODY()
 	
 public:	
-	AWeapon();
+	AWeapon(const FObjectInitializer& ObjectInitializer);
 
 	virtual void PostInitializeComponents() override;
 
@@ -254,6 +266,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Weapon)
 	USoundBase* FiremodeSound;
 
+	UPROPERTY(EditDefaultsOnly, Category = Weapon)
+	FWeaponAnim ReloadAnimation;
+
 protected:
 	UPROPERTY(Transient, BlueprintReadOnly, Category = Weapon)
 	bool bIsAiming;
@@ -265,6 +280,12 @@ protected:
 	float NoAnimReloadDuration;
 
 private:
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Handheld, meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* MagazineMesh1P;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Handheld, meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* MagazineMesh3P;
+
 	// Time loop between shots. Different uses by owner and others
 	FTimerHandle TimerHandle_HandleFiring;
 

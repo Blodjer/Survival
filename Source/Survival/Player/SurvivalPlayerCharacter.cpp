@@ -253,6 +253,44 @@ void ASurvivalPlayerCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
+float ASurvivalPlayerCharacter::PlayAnimMontage(UAnimMontage* AnimMontage, float InPlayRate, FName StartSectionName)
+{
+	USkeletalMeshComponent* AnimMesh = IsLocallyControlled() ? GetMesh1P() : GetMesh();
+	if (AnimMontage && AnimMesh && AnimMesh->AnimScriptInstance)
+	{
+		float const Duration = AnimMesh->AnimScriptInstance->Montage_Play(AnimMontage, InPlayRate);
+		if (Duration > 0.f)
+		{
+			if (StartSectionName != NAME_None)
+			{
+				AnimMesh->AnimScriptInstance->Montage_JumpToSection(StartSectionName, AnimMontage);
+			}
+
+			return Duration;
+		}
+	}
+
+	return 0.0f;
+}
+
+void ASurvivalPlayerCharacter::StopAnimMontage(class UAnimMontage* AnimMontage)
+{
+	USkeletalMeshComponent* AnimMesh = IsLocallyControlled() ? GetMesh1P() : GetMesh();
+	if (AnimMontage && AnimMesh && AnimMesh->AnimScriptInstance && AnimMesh->AnimScriptInstance->Montage_IsPlaying(AnimMontage))
+	{
+		AnimMesh->AnimScriptInstance->Montage_Stop(AnimMontage->BlendOut.GetBlendTime());
+	}
+}
+
+void ASurvivalPlayerCharacter::StopAllAnimMontages()
+{
+	USkeletalMeshComponent* AnimMesh = IsLocallyControlled() ? GetMesh1P() : GetMesh();
+	if (AnimMesh && AnimMesh->AnimScriptInstance)
+	{
+		AnimMesh->AnimScriptInstance->Montage_Stop(0.0f);
+	}
+}
+
 void ASurvivalPlayerCharacter::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);

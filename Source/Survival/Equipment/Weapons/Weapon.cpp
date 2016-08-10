@@ -4,8 +4,20 @@
 #include "Weapon.h"
 
 
-AWeapon::AWeapon()
+AWeapon::AWeapon(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
+	MagazineMesh1P = CreateDefaultSubobject<UStaticMeshComponent>("MagazineMesh1P");
+	MagazineMesh1P->SetOnlyOwnerSee(true);
+	MagazineMesh1P->SetCastShadow(false);
+	MagazineMesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	MagazineMesh1P->AttachToComponent(GetMesh1P(), FAttachmentTransformRules::SnapToTargetIncludingScale, "Magazine");
+
+	MagazineMesh3P = CreateDefaultSubobject<UStaticMeshComponent>("MagazineMesh3P");
+	MagazineMesh3P->SetOwnerNoSee(true);
+	MagazineMesh3P->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	MagazineMesh3P->AttachToComponent(GetMesh3P(), FAttachmentTransformRules::SnapToTargetIncludingScale, "Magazine");
+
 	Type = EHandheldType::PrimaryWeapon;
 
 	Damage = 25.0f;
@@ -365,6 +377,8 @@ void AWeapon::StartReload()
 
 	StopFire();
 
+	GetOwnerCharacter()->PlayAnimMontage(GetOwnerCharacter()->IsLocallyControlled() ? ReloadAnimation.FirstPerson : ReloadAnimation.ThridPerson);
+
 	GetWorldTimerManager().SetTimer(TimerHandle_Reload, this, &AWeapon::Reload, NoAnimReloadDuration, false);
 
 	bIsReloading = true;
@@ -397,6 +411,8 @@ void AWeapon::StopReload()
 {
 	if (!bIsReloading)
 		return;
+
+	GetOwnerCharacter()->StopAnimMontage(GetOwnerCharacter()->IsLocallyControlled() ? ReloadAnimation.FirstPerson : ReloadAnimation.ThridPerson);
 
 	GetWorldTimerManager().ClearTimer(TimerHandle_Reload);
 

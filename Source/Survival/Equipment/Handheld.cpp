@@ -4,7 +4,8 @@
 #include "Handheld.h"
 
 
-AHandheld::AHandheld()
+AHandheld::AHandheld(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 	// Create the first person mesh
 	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>("Mesh1P");

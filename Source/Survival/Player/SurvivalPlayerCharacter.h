@@ -126,6 +126,12 @@ public:
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+	virtual float PlayAnimMontage(class UAnimMontage* AnimMontage, float InPlayRate = 1.f, FName StartSectionName = NAME_None) override;
+
+	virtual void StopAnimMontage(class UAnimMontage* AnimMontage = nullptr) override;
+
+	virtual void StopAllAnimMontages();
+
 public:
 	virtual void Landed(const FHitResult& Hit) override;
 
