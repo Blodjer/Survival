@@ -331,7 +331,10 @@ void AWeapon::StartAiming()
 	FRotator WeaponBaseRotation = FRotator(0.0f, -90.0f, 0.0f);
 	GetMesh1P()->SetRelativeLocationAndRotation(WeaponBaseRotation.RotateVector(SightConfig.CenterLocation) * FVector(1,-1,-1) + FVector(SightConfig.CameraDistance, 0.0f, 0.0f), WeaponBaseRotation);
 
-	GetOwnerCharacter()->GetMesh1P()->SetVisibility(false, true);
+	if (GetHandheldType() != EHandheldType::SecondaryWeapon)
+	{
+		GetOwnerCharacter()->GetMesh1P()->SetVisibility(false, true);
+	}
 
 	GetWorld()->Exec(GetWorld(), TEXT("SetMouseSensitivity 0.04"));
 
