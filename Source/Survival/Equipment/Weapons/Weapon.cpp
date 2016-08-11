@@ -376,6 +376,7 @@ void AWeapon::StartReload()
 	}
 
 	StopFire();
+	StopAiming();
 
 	PlayAnimation(ReloadAnimation);
 
