@@ -8,6 +8,8 @@
 #include "Pickups/PickupEquipment.h"
 #include "Survival/Equipment/Weapons/Weapon.h"
 #include "Survival/Level/Campfire.h"
+#include "Runtime/Engine/Classes/Animation/AnimInstance.h"
+#include "Runtime/Engine/Classes/Animation/AnimMontage.h"
 
 ASurvivalPlayerCharacter::ASurvivalPlayerCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<USurvivalCharacterMovement>(ACharacter::CharacterMovementComponentName))
