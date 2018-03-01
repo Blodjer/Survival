@@ -4,9 +4,9 @@ using UnrealBuildTool;
 
 public class Survival : ModuleRules
 {
-	public Survival(TargetInfo Target)
+	public Survival(ReadOnlyTargetRules Target) : base(Target)
 	{
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "MovieScene" });
 
         PrivateDependencyModuleNames.AddRange(new string[] { "CableComponent", "LevelSequence" });
 

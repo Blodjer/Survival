@@ -64,11 +64,15 @@ void ASurvivalPlayerController::UnFreeze()
 	if (GetWorld() == nullptr || GetWorld()->GetAuthGameMode() == nullptr)
 		return;
 
-	if (GetWorld()->GetAuthGameMode()->GetMatchState() == MatchState::WaitingToStart)
+	AGameMode* GameMode = Cast<AGameMode>(GetWorld()->GetAuthGameMode());
+	if (GameMode == nullptr)
+		return;
+
+	if (GameMode->GetMatchState() == MatchState::WaitingToStart)
 	{
-		GetWorld()->GetAuthGameMode()->RestartPlayer(this);
+		GameMode->RestartPlayer(this);
 	}
-	else if (GetWorld()->GetAuthGameMode()->IsMatchInProgress())
+	else if (GameMode->IsMatchInProgress())
 	{
 		ServerRestartPlayer();
 	}
@@ -81,7 +85,7 @@ float ASurvivalPlayerController::GetRemainingRespawnTime()
 
 float ASurvivalPlayerController::GetMinDieDelay()
 {
-	AGameState const* const GameState = GetWorld()->GameState;
+	AGameStateBase const* const GameState = GetWorld()->GetGameState();
 	return ((GameState != NULL) && (GameState->GameModeClass != NULL)) ? GetDefault<ASurvivalGameMode>(GameState->GameModeClass)->MinDieDelay : 0.0f;
 }
 

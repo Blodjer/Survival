@@ -61,3 +61,9 @@ SourceArt/**/*.tga
 
 # Mac Artifacts
 .DS_Store
+
+# Visual Studio
+.vs/*
+
+Content/ExampleContent/
+Content/Playground/

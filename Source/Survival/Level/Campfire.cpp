@@ -62,7 +62,7 @@ void ACampfire::PostInitializeComponents()
 	
 	if (HasAuthority() && GetWorld())
 	{
-		AGameMode* GameMode = GetWorld()->GetAuthGameMode();
+		AGameModeBase* GameMode = GetWorld()->GetAuthGameMode();
 		if (GameMode)
 		{
 			ASurvivalGameMode* SurvivalGameMode = Cast<ASurvivalGameMode>(GameMode);

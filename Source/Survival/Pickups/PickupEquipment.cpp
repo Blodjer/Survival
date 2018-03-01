@@ -17,7 +17,7 @@ void APickupEquipment::PostInitializeComponents()
 			AWeaponAttachment* WeaponSight = Weapon->GetDefaultSight().GetDefaultObject();
 			
 			UStaticMeshComponent* SightMesh = NewObject<UStaticMeshComponent>(this, "SightMesh");
-			SightMesh->SetStaticMesh(WeaponSight->GetMesh3P()->StaticMesh);
+			SightMesh->SetStaticMesh(WeaponSight->GetMesh3P()->GetStaticMesh());
 			SightMesh->SetupAttachment(RootComponent);
 			SightMesh->RegisterComponent();
 		}

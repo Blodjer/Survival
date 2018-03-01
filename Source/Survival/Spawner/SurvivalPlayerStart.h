@@ -11,7 +11,7 @@ class SURVIVAL_API ASurvivalPlayerStart : public APlayerStart
 	GENERATED_BODY()
 	
 public:
-	ASurvivalPlayerStart();
+	ASurvivalPlayerStart(const FObjectInitializer& ObjectInitializer);
 
 private:
 	// Which team can start at this point

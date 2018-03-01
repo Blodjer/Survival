@@ -5,21 +5,10 @@ using System.Collections.Generic;
 
 public class SurvivalEditorTarget : TargetRules
 {
-	public SurvivalEditorTarget(TargetInfo Target)
+	public SurvivalEditorTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Editor;
-	}
 
-	//
-	// TargetRules interface.
-	//
-
-	public override void SetupBinaries(
-		TargetInfo Target,
-		ref List<UEBuildBinaryConfiguration> OutBuildBinaryConfigurations,
-		ref List<string> OutExtraModuleNames
-		)
-	{
-		OutExtraModuleNames.AddRange( new string[] { "Survival" } );
+        ExtraModuleNames.Add("Survival");
 	}
 }

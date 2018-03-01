@@ -160,8 +160,12 @@ void UPickupSpawnerComponent::TryRespawn()
 {
 	if (!IsRespawnable())
 		return;
+
+	AGameMode* GameMode = Cast<AGameMode>(GetWorld()->GetAuthGameMode());
+	if (GameMode == nullptr)
+		return;
 	
-	if ((!IsValid(SpawnedPickup) || SpawnedPickup == nullptr) && GetWorld()->GetAuthGameMode()->IsMatchInProgress())
+	if ((!IsValid(SpawnedPickup) || SpawnedPickup == nullptr) && GameMode->IsMatchInProgress())
 	{
 		Spawn();
 	}

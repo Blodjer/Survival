@@ -348,7 +348,7 @@ AGameSession* USurvivalGameInstance::GetGameSession() const
 	UWorld* const World = GetWorld();
 	if (World)
 	{
-		AGameMode* const GameMode = World->GetAuthGameMode();
+		AGameModeBase* const GameMode = World->GetAuthGameMode();
 		if (GameMode)
 		{
 			return GameMode->GameSession;

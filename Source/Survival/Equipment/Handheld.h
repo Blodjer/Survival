@@ -16,7 +16,7 @@ enum class EHandheldType : uint8
 };
 
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FHandheldAnim
 {
 	GENERATED_BODY()

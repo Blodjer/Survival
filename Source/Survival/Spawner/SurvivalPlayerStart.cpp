@@ -3,7 +3,7 @@
 #include "Survival.h"
 #include "SurvivalPlayerStart.h"
 
-ASurvivalPlayerStart::ASurvivalPlayerStart()
+ASurvivalPlayerStart::ASurvivalPlayerStart(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	GetCapsuleComponent()->InitCapsuleSize(45.0f, 100.0f);
 
