@@ -185,7 +185,7 @@ void ASurvivalPlayerController::OpenPauseMenu()
 
 	FInputModeGameAndUI InputMode;
 	InputMode.SetHideCursorDuringCapture(false);
-	InputMode.SetLockMouseToViewport(false);
+	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 	SetInputMode(InputMode);
 
 	SetCinematicMode(true, true, true);
